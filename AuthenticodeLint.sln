@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticodeLint", "AuthenticodeLint\AuthenticodeLint.csproj", "{22BE22E1-F160-456C-A26B-7E34D48603B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticodeLint.Core", "AuthenticodeLint.Core\AuthenticodeLint.Core.csproj", "{C15B19B6-60B7-4B11-B627-F1D9D8E5FEBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticodeLint.Core.Tests", "AuthenticodeLint.Core.Tests\AuthenticodeLint.Core.Tests.csproj", "{D979EA06-1121-41FC-BD35-AF1B42FC814A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22BE22E1-F160-456C-A26B-7E34D48603B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22BE22E1-F160-456C-A26B-7E34D48603B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22BE22E1-F160-456C-A26B-7E34D48603B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22BE22E1-F160-456C-A26B-7E34D48603B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C15B19B6-60B7-4B11-B627-F1D9D8E5FEBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C15B19B6-60B7-4B11-B627-F1D9D8E5FEBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C15B19B6-60B7-4B11-B627-F1D9D8E5FEBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C15B19B6-60B7-4B11-B627-F1D9D8E5FEBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D979EA06-1121-41FC-BD35-AF1B42FC814A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D979EA06-1121-41FC-BD35-AF1B42FC814A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D979EA06-1121-41FC-BD35-AF1B42FC814A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D979EA06-1121-41FC-BD35-AF1B42FC814A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
