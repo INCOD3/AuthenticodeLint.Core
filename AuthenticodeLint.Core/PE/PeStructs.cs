@@ -110,7 +110,7 @@ namespace AuthenticodeLint.Core.PE
 	}
 
 	[type: StructLayout(LayoutKind.Sequential, Pack = 4)]
-	public struct ImageDataDirectoryMap
+	internal struct ImageDataDirectoryMap
 	{
 		public uint VirtualAddress;
 		public uint Size;
