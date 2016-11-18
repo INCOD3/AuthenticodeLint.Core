@@ -12,18 +12,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.App">
-      <Version>1.0.1</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.NET.Sdk">
       <Version>1.0.0-alpha-20161104-2</Version>
       <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NETCore.App">
+      <Version>1.1.0</Version>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AuthenticodeLint.Core\AuthenticodeLint.Core.csproj">
-      <Project>{C15B19B6-60B7-4B11-B627-F1D9D8E5FEBF}</Project>
+      <Project>{5D8A184D-E6A7-4A40-B46E-1C7481B9BA8F}</Project>
       <Name>AuthenticodeLint.Core</Name>
     </ProjectReference>
   </ItemGroup>
