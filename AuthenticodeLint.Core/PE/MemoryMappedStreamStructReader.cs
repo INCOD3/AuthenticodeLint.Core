@@ -42,9 +42,31 @@ namespace AuthenticodeLint.Core.PE
 		public static async Task<T[]> ReadStructArrayAsync<T>(this MemoryMappedViewStream stream, int count, int offset = 0) where T : struct
 		{
 			var arr = new T[count];
-			for (var i = 0; i < count; i++)
+			var size = Marshal.SizeOf<T>();
+			var allocation = new byte[size];
+			var pin = GCHandle.Alloc(allocation, GCHandleType.Pinned);
+			var pinAddress = pin.AddrOfPinnedObject();
+			try
 			{
-				arr[i] = await ReadStructAsync<T>(stream, i == 0 ? offset : 0);
+				for (var i = 0; i < count; i++)
+				{
+					var type = typeof(T);
+					var typeInfo = type.GetTypeInfo();
+					if (!typeInfo.IsLayoutSequential)
+					{
+						throw new InvalidOperationException("Type must have a sequential layout.");
+					}
+					var read = await stream.ReadAsync(allocation, offset, size);
+					if (read != size)
+					{
+						throw new InvalidOperationException("Reached the end of the stream.");
+					}
+					arr[i] = Marshal.PtrToStructure<T>(pinAddress);
+				}
+			}
+			finally
+			{
+				pin.Free();
 			}
 			return arr;
 		}

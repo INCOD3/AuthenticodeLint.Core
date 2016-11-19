@@ -1,11 +1,10 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 using AuthenticodeLint.Core.PE;
 using System.Threading.Tasks;
 
 namespace AuthenticodeLint.Core.Tests
 {
-	public class Tests
+	public class PortableExecutableTests
 	{
 		[Fact]
 		public async Task ShouldReadSimpleAttributesOfPE()
