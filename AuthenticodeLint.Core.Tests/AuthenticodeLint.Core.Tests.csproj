@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuthenticodeLint.Core\AuthenticodeLint.Core.csproj">
-      <Project>{19E7C3A3-E102-486B-9A15-509554BC1ECF}</Project>
+      <Project>{E51CA27B-88FB-4E5E-88DC-7F49F7FA2F4B}</Project>
       <Name>AuthenticodeLint.Core</Name>
     </ProjectReference>
   </ItemGroup>

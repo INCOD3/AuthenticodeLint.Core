@@ -41,6 +41,12 @@ namespace AuthenticodeLint.Core.PE
 
 		public static async Task<T[]> ReadStructArrayAsync<T>(this MemoryMappedViewStream stream, int count, int offset = 0) where T : struct
 		{
+			var type = typeof(T);
+			var typeInfo = type.GetTypeInfo();
+			if (!typeInfo.IsLayoutSequential)
+			{
+				throw new InvalidOperationException("Type must have a sequential layout.");
+			}
 			var arr = new T[count];
 			var size = Marshal.SizeOf<T>();
 			var allocation = new byte[size];
@@ -50,12 +56,6 @@ namespace AuthenticodeLint.Core.PE
 			{
 				for (var i = 0; i < count; i++)
 				{
-					var type = typeof(T);
-					var typeInfo = type.GetTypeInfo();
-					if (!typeInfo.IsLayoutSequential)
-					{
-						throw new InvalidOperationException("Type must have a sequential layout.");
-					}
 					var read = await stream.ReadAsync(allocation, offset, size);
 					if (read != size)
 					{
