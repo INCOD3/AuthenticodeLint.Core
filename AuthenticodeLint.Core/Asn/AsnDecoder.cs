@@ -23,14 +23,22 @@ namespace AuthenticodeLint.Core.Asn
 			int octetLength;
 			ReadTag(tag, out asnClass, out constructed, out asnTagType);
 			var lengthWindow = new ArraySegment<byte>(data.Array, data.Offset + 1, data.Count - 1);
-			var length = ReadVariableLength(lengthWindow, out octetLength);
+			var length = ReadTagLength(lengthWindow, out octetLength);
 			var rawData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, lengthWindow.Count - octetLength);
 			switch (asnTagType)
 			{
 				case AsnTagType.Integer:
 					return new AsnInteger(rawData);
+				case AsnTagType.Boolean:
+					return new AsnBoolean(rawData);
+				case AsnTagType.BitString:
+					return new AsnBitString(rawData);
+				case AsnTagType.OctetString:
+					return new AsnOctetString(rawData);
+				case AsnTagType.ObjectIdentifier:
+					return new AsnObjectIdentifier(rawData);
 				default:
-					throw new NotImplementedException();
+					return new AsnRaw(asnTagType, rawData);
 						
 			}
 		}
@@ -42,26 +50,24 @@ namespace AuthenticodeLint.Core.Asn
 			asnClass = (AsnClass)((tag & 0xC0) >> 6);
 		}
 
-		internal static ulong ReadVariableLength(ArraySegment<byte> data, out int octetLength)
+		private static ulong ReadTagLength(ArraySegment<byte> data, out int octetLength)
 		{
-			var value = 0UL;
-			for (var i = 0; i < 8; i++)
+			var firstByte = data.Array[data.Offset];
+			var isLongForm = (firstByte & 0x80) == 0x80;
+			if (!isLongForm)
 			{
-				byte octet = data.Array[data.Offset + i];
-				if ((octet & 0x80) == 0x80)
-				{
-					ulong bigOctet = octet & 0x7FUL;
-					value |= bigOctet << (i * 8);
-				}
-				else
-				{
-					ulong bigOctet = octet;
-					value |= bigOctet << (i * 8);
-					octetLength = i+1;
-					return value;
-				}
+				octetLength = 1;
+				return firstByte;
 			}
-			throw new Exception("asn1 encoded length exceeds 8 octets.");
+			int length = firstByte & 0x7F;
+			octetLength = length+1;
+			ulong value = 0;
+			for (var i = 0; i < length; i++)
+			{
+				value <<= 8;
+				value |= data.Array[data.Offset + 1 + i];
+			}
+			return value;
 		}
 	}
 
@@ -82,7 +88,7 @@ namespace AuthenticodeLint.Core.Asn
 	}
 
 	/// <summary>
-	/// A signed asn1 integer.
+	/// A signed, big endian, asn1 integer.
 	/// </summary>
 	public sealed class AsnInteger : AsnElement
 	{
@@ -94,18 +100,112 @@ namespace AuthenticodeLint.Core.Asn
 		public AsnInteger(ArraySegment<byte> data) : base(data)
 		{
 			var buffer = new byte[data.Count];
+			//BigInteger expects the number in little endian.
 			for (int i = data.Count - 1, j = 0; i >= 0; i--, j++)
 			{
 				buffer[j] = data.Array[data.Offset + i];
 			}
 			Value = new BigInteger(buffer);
 		}
+
+		public override string ToString() => Value.ToString();
 	}
 
-	public sealed class AsnUknownElement : AsnElement
+	public sealed class AsnObjectIdentifier : AsnElement
 	{
-		public AsnUknownElement(ArraySegment<byte> data) : base(data)
+		public string Value { get; }
+
+		public AsnObjectIdentifier(ArraySegment<byte> data) : base(data)
 		{
+			var builder = new System.Text.StringBuilder();
+			var firstOctet = data.Array[data.Offset] / 40;
+			var secondOctet = data.Array[data.Offset] % 40;
+			builder.Append(firstOctet);
+			builder.Append('.');
+			builder.Append(secondOctet);
+			var value = 0L;
+			//Start at one since the first octet has special handling above
+			for (var i = 1; i < data.Count; i++)
+			{
+				var item = data.Array[data.Offset + i];
+				value <<= 7;
+				if ((item & 0x80) == 0x80)
+				{
+					value |= (byte)(item & 0x7F);
+				}
+				else
+				{
+					builder.Append('.');
+					builder.Append(value | item);
+					value = 0;
+				}
+			}
+			if (value != 0)
+			{
+				throw new InvalidOperationException();
+			}
+			Value = builder.ToString();
+		}
+
+		public override string ToString() => Value;
+	}
+
+	public sealed class AsnBitString : AsnElement
+	{
+		public ArraySegment<byte> Value { get; }
+		public int UnusedBits { get; }
+
+		public AsnBitString(ArraySegment<byte> data) : base(data)
+		{
+			UnusedBits = data.Array[data.Offset];
+			Value = new ArraySegment<byte>(data.Array, data.Offset + 1, data.Count - 1);
+		}
+	}
+
+	public sealed class AsnOctetString : AsnElement
+	{
+		public ArraySegment<byte> Value { get; }
+
+		public AsnOctetString(ArraySegment<byte> data) : base(data)
+		{
+			Value = data;
+		}
+	}
+
+	/// <summary>
+	/// An asn.1 encoded boolean value.
+	/// </summary>
+	public sealed class AsnBoolean : AsnElement
+	{
+		/// <summary>
+		/// The value of the asn element.
+		/// </summary>
+		public bool Value { get; }
+
+
+		public AsnBoolean(ArraySegment<byte> data) : base(data)
+		{
+			for (var i = 0; i < data.Count; i++)
+			{
+				if (data.Array[data.Offset + i] > 0)
+				{
+					Value = true;
+					return;
+				}
+			}
+			Value = false;
+		}
+
+		public override string ToString() => Value.ToString();
+	}
+
+	public sealed class AsnRaw : AsnElement
+	{
+		public AsnTagType TagType { get; }
+		
+		public AsnRaw(AsnTagType tagType, ArraySegment<byte> data) : base(data)
+		{
+			TagType = tagType;
 		}
 	}
 
@@ -141,7 +241,7 @@ namespace AuthenticodeLint.Core.Asn
 		BmpString = 30
 	}
 
-	internal enum AsnClass : byte
+	public enum AsnClass : byte
 	{
 		Univeral = 0,
 		Application = 1,
