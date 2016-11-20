@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace AuthenticodeLint.Core.Asn
 {
@@ -31,24 +29,24 @@ namespace AuthenticodeLint.Core.Asn
 			switch (asnTagType)
 			{
 				case AsnTagType.Integer:
-					return new AsnInteger(rawData);
+					return new AsnInteger(asnTagType, rawData);
 				case AsnTagType.Boolean:
-					return new AsnBoolean(rawData);
+					return new AsnBoolean(asnTagType, rawData);
 				case AsnTagType.BitString:
-					return new AsnBitString(rawData);
+					return new AsnBitString(asnTagType, rawData);
 				case AsnTagType.OctetString:
-					return new AsnOctetString(rawData);
+					return new AsnOctetString(asnTagType, rawData);
 				case AsnTagType.ObjectIdentifier:
-					return new AsnObjectIdentifier(rawData);
+					return new AsnObjectIdentifier(asnTagType, rawData);
 				case AsnTagType.IA5String:
-					return new AsnIA5String(rawData);
+					return new AsnIA5String(asnTagType, rawData);
 				case AsnTagType.AsnNull:
-					return new AsnNull(rawData);
+					return new AsnNull(asnTagType, rawData);
 				case AsnTagType.SequenceSequenceOf:
-					return new AsnSequence(rawData);
+					return new AsnSequence(asnTagType, rawData);
 				default:
 					return new AsnRaw(asnTagType, rawData);
-						
+
 			}
 		}
 
@@ -69,7 +67,7 @@ namespace AuthenticodeLint.Core.Asn
 				return firstByte;
 			}
 			int length = firstByte & 0x7F;
-			octetLength = length+1;
+			octetLength = length + 1;
 			ulong value = 0;
 			for (var i = 0; i < length; i++)
 			{
@@ -77,213 +75,6 @@ namespace AuthenticodeLint.Core.Asn
 				value |= data.Array[data.Offset + 1 + i];
 			}
 			return value;
-		}
-	}
-
-	/// <summary>
-	/// An asn1 element. All elements inherit from this type.
-	/// </summary>
-	public abstract class AsnElement
-	{
-		/// <summary>
-		/// Gets the segement of data for the element.
-		/// </summary>
-		public ArraySegment<byte> Data { get; }
-
-		protected AsnElement(ArraySegment<byte> data)
-		{
-			Data = data;
-		}
-	}
-
-	/// <summary>
-	/// A signed, big endian, asn1 integer.
-	/// </summary>
-	public sealed class AsnInteger : AsnElement
-	{
-		/// <summary>
-		/// The value of the integer.
-		/// </summary>
-		public BigInteger Value { get; }
-
-		public AsnInteger(ArraySegment<byte> data) : base(data)
-		{
-			var buffer = new byte[data.Count];
-			//BigInteger expects the number in little endian.
-			for (int i = data.Count - 1, j = 0; i >= 0; i--, j++)
-			{
-				buffer[j] = data.Array[data.Offset + i];
-			}
-			Value = new BigInteger(buffer);
-		}
-
-		public override string ToString() => Value.ToString();
-	}
-
-	public sealed class AsnIA5String : AsnElement
-	{
-		public string Value { get; }
-
-		public AsnIA5String(ArraySegment<byte> data) : base(data)
-		{
-			Value = System.Text.Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
-		}
-
-		public override string ToString() => Value;
-	}
-
-	public sealed class AsnUtf8String : AsnElement
-	{
-		public string Value { get; }
-
-		public AsnUtf8String(ArraySegment<byte> data) : base(data)
-		{
-			Value = System.Text.Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
-		}
-	}
-
-	public sealed class AsnBmpString : AsnElement
-	{
-		public string Value { get; }
-
-		public AsnBmpString(ArraySegment<byte> data) : base(data)
-		{
-			Value = System.Text.Encoding.Unicode.GetString(data.Array, data.Offset, data.Count);
-		}
-	}
-
-
-
-	public sealed class AsnObjectIdentifier : AsnElement
-	{
-		public string Value { get; }
-
-		public AsnObjectIdentifier(ArraySegment<byte> data) : base(data)
-		{
-			var builder = new System.Text.StringBuilder();
-			var firstOctet = data.Array[data.Offset] / 40;
-			var secondOctet = data.Array[data.Offset] % 40;
-			builder.Append(firstOctet);
-			builder.Append('.');
-			builder.Append(secondOctet);
-			var value = 0L;
-			//Start at one since the first octet has special handling above
-			for (var i = 1; i < data.Count; i++)
-			{
-				var item = data.Array[data.Offset + i];
-				value <<= 7;
-				if ((item & 0x80) == 0x80)
-				{
-					value |= (byte)(item & 0x7F);
-				}
-				else
-				{
-					builder.Append('.');
-					builder.Append(value | item);
-					value = 0;
-				}
-			}
-			if (value != 0)
-			{
-				throw new InvalidOperationException();
-			}
-			Value = builder.ToString();
-		}
-
-		public override string ToString() => Value;
-	}
-
-	public sealed class AsnBitString : AsnElement
-	{
-		public ArraySegment<byte> Value { get; }
-		public int UnusedBits { get; }
-
-		public AsnBitString(ArraySegment<byte> data) : base(data)
-		{
-			UnusedBits = data.Array[data.Offset];
-			Value = new ArraySegment<byte>(data.Array, data.Offset + 1, data.Count - 1);
-		}
-	}
-
-	public sealed class AsnOctetString : AsnElement
-	{
-		public ArraySegment<byte> Value { get; }
-
-		public AsnOctetString(ArraySegment<byte> data) : base(data)
-		{
-			Value = data;
-		}
-	}
-
-	public sealed class AsnNull : AsnElement
-	{
-		public AsnNull(ArraySegment<byte> data) : base(data)
-		{
-			if (data.Count > 0)
-			{
-				throw new InvalidOperationException("Null data cannot have a length.");
-			}
-		}
-
-		public override string ToString() => "Null";
-	}
-
-	/// <summary>
-	/// An asn.1 encoded boolean value.
-	/// </summary>
-	public sealed class AsnBoolean : AsnElement
-	{
-		/// <summary>
-		/// The value of the asn element.
-		/// </summary>
-		public bool Value { get; }
-
-
-		public AsnBoolean(ArraySegment<byte> data) : base(data)
-		{
-			for (var i = 0; i < data.Count; i++)
-			{
-				if (data.Array[data.Offset + i] > 0)
-				{
-					Value = true;
-					return;
-				}
-			}
-			Value = false;
-		}
-
-		public override string ToString() => Value.ToString();
-	}
-
-	public sealed class AsnRaw : AsnElement
-	{
-		public AsnTagType TagType { get; }
-		
-		public AsnRaw(AsnTagType tagType, ArraySegment<byte> data) : base(data)
-		{
-			TagType = tagType;
-		}
-	}
-
-	public sealed class AsnSequence : AsnElement
-	{
-		public AsnSequence(ArraySegment<byte> data) : base(data)
-		{
-		}
-
-		public IEnumerable<AsnElement> Elements()
-		{
-			var segment = Data;
-			while (true)
-			{
-				if (segment.Count == 0)
-				{
-					yield break;
-				}
-				int elementLength;
-				yield return AsnDecoder.Process(segment, out elementLength);
-				segment = new ArraySegment<byte>(segment.Array, segment.Offset + elementLength, segment.Count - elementLength);
-			}
 		}
 	}
 

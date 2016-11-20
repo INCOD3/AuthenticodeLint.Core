@@ -62,7 +62,7 @@ namespace AuthenticodeLint.Core.Tests
 			};
 			var decoded = AsnDecoder.Decode(data);
 			var asnRaw = Assert.IsType<AsnRaw>(decoded);
-			Assert.Equal((AsnTagType)31, asnRaw.TagType);
+			Assert.Equal((AsnTagType)31, asnRaw.Tag);
 			var tagData = SerializeArraySegement(asnRaw.Data);
 			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, tagData);
 		}
