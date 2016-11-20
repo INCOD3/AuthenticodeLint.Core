@@ -11,7 +11,8 @@
     	"compile": [
         	"**/*.cs",
         	"../AuthenticodeLint.Core/*.cs",
-          "../AuthenticodeLint.Core/PE/**/*.cs"
+          	"../AuthenticodeLint.Core/PE/**/*.cs",
+			"../AuthenticodeLint.Core/Asn/**/*.cs"
 		],
         "allowUnsafe": true,
         "debugType": "portable"
