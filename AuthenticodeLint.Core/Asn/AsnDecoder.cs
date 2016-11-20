@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace AuthenticodeLint.Core.Asn
@@ -11,10 +12,11 @@ namespace AuthenticodeLint.Core.Asn
 		public static AsnElement Decode(byte[] asnData)
 		{
 			var data = new ArraySegment<byte>(asnData);
-			return Process(data);
+			int elementLength;
+			return Process(data, out elementLength);
 		}
 
-		private static AsnElement Process(ArraySegment<byte> data)
+		internal static AsnElement Process(ArraySegment<byte> data, out int elementLength)
 		{
 			var tag = data.Array[data.Offset];
 			AsnClass asnClass;
@@ -24,7 +26,8 @@ namespace AuthenticodeLint.Core.Asn
 			ReadTag(tag, out asnClass, out constructed, out asnTagType);
 			var lengthWindow = new ArraySegment<byte>(data.Array, data.Offset + 1, data.Count - 1);
 			var length = ReadTagLength(lengthWindow, out octetLength);
-			var rawData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, lengthWindow.Count - octetLength);
+			var rawData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, (int)length);
+			elementLength = 1 + octetLength + checked((int)length);
 			switch (asnTagType)
 			{
 				case AsnTagType.Integer:
@@ -37,6 +40,12 @@ namespace AuthenticodeLint.Core.Asn
 					return new AsnOctetString(rawData);
 				case AsnTagType.ObjectIdentifier:
 					return new AsnObjectIdentifier(rawData);
+				case AsnTagType.IA5String:
+					return new AsnIA5String(rawData);
+				case AsnTagType.AsnNull:
+					return new AsnNull(rawData);
+				case AsnTagType.SequenceSequenceOf:
+					return new AsnSequence(rawData);
 				default:
 					return new AsnRaw(asnTagType, rawData);
 						
@@ -81,7 +90,7 @@ namespace AuthenticodeLint.Core.Asn
 		/// </summary>
 		public ArraySegment<byte> Data { get; }
 
-		public AsnElement(ArraySegment<byte> data)
+		protected AsnElement(ArraySegment<byte> data)
 		{
 			Data = data;
 		}
@@ -110,6 +119,40 @@ namespace AuthenticodeLint.Core.Asn
 
 		public override string ToString() => Value.ToString();
 	}
+
+	public sealed class AsnIA5String : AsnElement
+	{
+		public string Value { get; }
+
+		public AsnIA5String(ArraySegment<byte> data) : base(data)
+		{
+			Value = System.Text.Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
+		}
+
+		public override string ToString() => Value;
+	}
+
+	public sealed class AsnUtf8String : AsnElement
+	{
+		public string Value { get; }
+
+		public AsnUtf8String(ArraySegment<byte> data) : base(data)
+		{
+			Value = System.Text.Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
+		}
+	}
+
+	public sealed class AsnBmpString : AsnElement
+	{
+		public string Value { get; }
+
+		public AsnBmpString(ArraySegment<byte> data) : base(data)
+		{
+			Value = System.Text.Encoding.Unicode.GetString(data.Array, data.Offset, data.Count);
+		}
+	}
+
+
 
 	public sealed class AsnObjectIdentifier : AsnElement
 	{
@@ -172,6 +215,19 @@ namespace AuthenticodeLint.Core.Asn
 		}
 	}
 
+	public sealed class AsnNull : AsnElement
+	{
+		public AsnNull(ArraySegment<byte> data) : base(data)
+		{
+			if (data.Count > 0)
+			{
+				throw new InvalidOperationException("Null data cannot have a length.");
+			}
+		}
+
+		public override string ToString() => "Null";
+	}
+
 	/// <summary>
 	/// An asn.1 encoded boolean value.
 	/// </summary>
@@ -206,6 +262,28 @@ namespace AuthenticodeLint.Core.Asn
 		public AsnRaw(AsnTagType tagType, ArraySegment<byte> data) : base(data)
 		{
 			TagType = tagType;
+		}
+	}
+
+	public sealed class AsnSequence : AsnElement
+	{
+		public AsnSequence(ArraySegment<byte> data) : base(data)
+		{
+		}
+
+		public IEnumerable<AsnElement> Elements()
+		{
+			var segment = Data;
+			while (true)
+			{
+				if (segment.Count == 0)
+				{
+					yield break;
+				}
+				int elementLength;
+				yield return AsnDecoder.Process(segment, out elementLength);
+				segment = new ArraySegment<byte>(segment.Array, segment.Offset + elementLength, segment.Count - elementLength);
+			}
 		}
 	}
 
