@@ -18,7 +18,7 @@ namespace AuthenticodeLint.Core.Asn
 			{
 				if (segment.Count == 0)
 				{
-					yield break;
+					break;
 				}
 				int elementLength;
 				yield return AsnDecoder.Process(segment, out elementLength);

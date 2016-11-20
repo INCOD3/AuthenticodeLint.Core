@@ -8,50 +8,6 @@ namespace AuthenticodeLint.Core.Tests
 	public class AsnDecoderTests
 	{
 		[Fact]
-		public void ShouldDecodeSimpleInteger()
-		{
-			var data = new byte[]
-			{
-				0x02, //Integer tag
-				0x02, //Has a content length of "2",
-				0x00, 0x86, //With a value of 134.
-			};
-			var decoded = AsnDecoder.Decode(data);
-			var integer = Assert.IsType<AsnInteger>(decoded);
-			Assert.Equal(0x86, integer.Value);
-			Assert.Equal(0x00, integer.Data.Array[integer.Data.Offset]);
-			Assert.Equal(0x86, integer.Data.Array[integer.Data.Offset+1]);
-		}
-
-		[Fact]
-		public void ShouldDecodeMultiByteInteger()
-		{
-			var data = new byte[]
-			{
-				0x02, //Integer tag
-				0x02, //Has a content length of "2",
-				0x02, 0x0E, //With a value of 134.
-			};
-			var decoded = AsnDecoder.Decode(data);
-			var integer = Assert.IsType<AsnInteger>(decoded);
-			Assert.Equal(526, integer.Value);
-		}
-
-		[Fact]
-		public void ShouldDecodeSimpleIntegerWithNoSignOctet()
-		{
-			var data = new byte[]
-			{
-				0x02, //Integer tag
-				0x01, //Has a content length of "1",
-				0x2A, //With a value of 42.
-			};
-			var decoded = AsnDecoder.Decode(data);
-			var integer = Assert.IsType<AsnInteger>(decoded);
-			Assert.Equal(42, integer.Value);
-		}
-
-		[Fact]
 		public void ShouldDecodeRawTagType()
 		{
 			var data = new byte[]
@@ -65,21 +21,6 @@ namespace AuthenticodeLint.Core.Tests
 			Assert.Equal((AsnTagType)31, asnRaw.Tag);
 			var tagData = SerializeArraySegement(asnRaw.Data);
 			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, tagData);
-		}
-
-		[
-			Theory,
-			InlineData(new byte[] { 0x01, 0x01, 0x00 }, false),
-			InlineData(new byte[] { 0x01, 0x01, 0x01 }, true),
-			InlineData(new byte[] { 0x01, 0x01, 0x80 }, true),
-			InlineData(new byte[] { 0x01, 0x02, 0x80, 0x00 }, true),
-			InlineData(new byte[] { 0x01, 0x02, 0x00, 0x80 }, true),
-		]
-		public void ShouldDecodeAsnBooleanValues(byte[] data, bool expected)
-		{
-			var decoded = AsnDecoder.Decode(data);
-			var asnBoolean = Assert.IsType<AsnBoolean>(decoded);
-			Assert.Equal(expected, asnBoolean.Value);
 		}
 
 		[Fact]
@@ -132,20 +73,6 @@ namespace AuthenticodeLint.Core.Tests
 		}
 
 		[Fact]
-		public void ShouldDecodeObjectIdentifier()
-		{
-			var data = new byte[]
-			{
-				0x06, //ObjectIdentifier tag
-				0x08, //with a content lengh of 8
-				42, 134, 72, 206, 61, 3, 1, 7 //oid
-			};
-			var decoded = AsnDecoder.Decode(data);
-			var objectIdentifier = Assert.IsType<AsnObjectIdentifier>(decoded);
-			Assert.Equal("1.2.840.10045.3.1.7", objectIdentifier.Value);
-		}
-
-		[Fact]
 		public void ShouldDecodeIA5String()
 		{
 			var data = new byte[]
@@ -157,30 +84,6 @@ namespace AuthenticodeLint.Core.Tests
 			var decoded = AsnDecoder.Decode(data);
 			var ia5String = Assert.IsType<AsnIA5String>(decoded);
 			Assert.Equal("hello", ia5String.Value);
-		}
-
-		[Fact]
-		public void ShouldDecodeNull()
-		{
-			var data = new byte[]
-			{
-				0x05, //null tag
-				0x00, //with a length of zero
-			};
-			var decoded = AsnDecoder.Decode(data);
-			Assert.IsType<AsnNull>(decoded);
-		}
-
-		[Fact]
-		public void ShouldThrowExceptionIfNullHasLength()
-		{
-			var data = new byte[]
-			{
-				0x05, //null tag
-				0x01, //with a length of 1
-				0xFF, //with 255 for data
-			};
-			Assert.Throws<InvalidOperationException>(() => AsnDecoder.Decode(data));
 		}
 
 		[Fact]

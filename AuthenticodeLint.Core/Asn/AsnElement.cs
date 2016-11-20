@@ -28,7 +28,7 @@ namespace AuthenticodeLint.Core.Asn
 
 		public override int GetHashCode() => Data.GetHashCode();
 
-		public bool Equals(AsnElement other)
+		public virtual bool Equals(AsnElement other)
 		{
 			if (ReferenceEquals(other, null))
 			{
