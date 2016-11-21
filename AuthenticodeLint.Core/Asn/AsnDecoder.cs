@@ -47,6 +47,8 @@ namespace AuthenticodeLint.Core.Asn
 						return new AsnSet(tag, rawData);
 					case AsnTagValue.PrintableString:
 						return new AsnPrintableString(tag, rawData);
+					case AsnTagValue.UtcTime:
+						return new AsnUtcTime(tag, rawData);
 				}
 			}
 			if (tag.Constructed)
