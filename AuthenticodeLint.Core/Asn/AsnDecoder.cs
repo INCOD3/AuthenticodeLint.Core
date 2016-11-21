@@ -16,50 +16,62 @@ namespace AuthenticodeLint.Core.Asn
 
 		internal static AsnElement Process(ArraySegment<byte> data, out int elementLength)
 		{
-			var tag = data.Array[data.Offset];
-			AsnClass asnClass;
-			bool constructed;
-			AsnTagType asnTagType;
+			var tagOctet = data.Array[data.Offset];
 			int octetLength;
-			ReadTag(tag, out asnClass, out constructed, out asnTagType);
+			var tag = ReadTag(tagOctet);
 			var lengthWindow = new ArraySegment<byte>(data.Array, data.Offset + 1, data.Count - 1);
 			var length = ReadTagLength(lengthWindow, out octetLength);
 			var rawData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, (int)length);
 			elementLength = 1 + octetLength + checked((int)length);
-			switch (asnTagType)
+			if (tag.AsnClass == AsnClass.Univeral)
 			{
-				case AsnTagType.Integer:
-					return new AsnInteger(asnTagType, rawData);
-				case AsnTagType.Boolean:
-					return new AsnBoolean(asnTagType, rawData);
-				case AsnTagType.BitString:
-					return new AsnBitString(asnTagType, rawData);
-				case AsnTagType.OctetString:
-					return new AsnOctetString(asnTagType, rawData);
-				case AsnTagType.ObjectIdentifier:
-					return new AsnObjectIdentifier(asnTagType, rawData);
-				case AsnTagType.IA5String:
-					return new AsnIA5String(asnTagType, rawData);
-				case AsnTagType.AsnNull:
-					return new AsnNull(asnTagType, rawData);
-				case AsnTagType.SequenceSequenceOf:
-					return new AsnSequence(asnTagType, rawData);
-				default:
-					return new AsnRaw(asnTagType, rawData);
-
+				switch (tag.Tag)
+				{
+					case AsnTagValue.Integer:
+						return new AsnInteger(tag, rawData);
+					case AsnTagValue.Boolean:
+						return new AsnBoolean(tag, rawData);
+					case AsnTagValue.BitString:
+						return new AsnBitString(tag, rawData);
+					case AsnTagValue.OctetString:
+						return new AsnOctetString(tag, rawData);
+					case AsnTagValue.ObjectIdentifier:
+						return new AsnObjectIdentifier(tag, rawData);
+					case AsnTagValue.IA5String:
+						return new AsnIA5String(tag, rawData);
+					case AsnTagValue.AsnNull:
+						return new AsnNull(tag, rawData);
+					case AsnTagValue.SequenceSequenceOf:
+						return new AsnSequence(tag, rawData);
+					case AsnTagValue.SetSetOf:
+						return new AsnSet(tag, rawData);
+					case AsnTagValue.PrintableString:
+						return new AsnPrintableString(tag, rawData);
+				}
+			}
+			if (tag.Constructed)
+			{
+				return new AsnConstructed(tag, rawData);
+			}
+			else
+			{
+				return new AsnRaw(tag, rawData);
 			}
 		}
 
-		private static void ReadTag(byte tag, out AsnClass asnClass, out bool constructed, out AsnTagType asnTagType)
+		private static AsnTag ReadTag(byte tag)
 		{
-			asnTagType = (AsnTagType)(tag & 0x1F);
-			constructed = (tag & 0x20) == 0x20;
-			asnClass = (AsnClass)((tag & 0xC0) >> 6);
+			return new AsnTag((AsnTagValue)(tag & 0x1F), (AsnClass)((tag & 0xC0) >> 6), (tag & 0x20) == 0x20);
 		}
 
 		private static ulong ReadTagLength(ArraySegment<byte> data, out int octetLength)
 		{
 			var firstByte = data.Array[data.Offset];
+			//This is a "unknown" length, which we don't support right now.
+			if (firstByte == 0x80)
+			{
+				throw new NotSupportedException("Elements of unknown lengths are not supported.");
+			}
 			var isLongForm = (firstByte & 0x80) == 0x80;
 			if (!isLongForm)
 			{
@@ -78,7 +90,7 @@ namespace AuthenticodeLint.Core.Asn
 		}
 	}
 
-	public enum AsnTagType : byte
+	public enum AsnTagValue : byte
 	{
 		Boolean = 1,
 		Integer = 2,

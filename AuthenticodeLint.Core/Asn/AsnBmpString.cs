@@ -8,7 +8,7 @@ namespace AuthenticodeLint.Core.Asn
 	{
 		public string Value { get; }
 
-		public AsnBmpString(AsnTagType tag, ArraySegment<byte> data) : base(tag, data)
+		public AsnBmpString(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
 		{
 			Value = Encoding.Unicode.GetString(data.Array, data.Offset, data.Count);
 		}

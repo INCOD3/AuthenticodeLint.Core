@@ -1483,13 +1483,13 @@
           "lib/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
         }
       },
-      "System.Numerics.Vectors/4.1.1": {
+      "System.Numerics.Vectors/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Globalization": "4.0.11",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0"
+          "System.Globalization": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.0/System.Numerics.Vectors.dll": {}
@@ -5101,12 +5101,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "System.Numerics.Vectors/4.1.1": {
-      "sha512": "5xmPuPQf7rSxJ3ihpMX8OVp6+NQF1bQCIVRkcBNK1ATigjbAdCbOQPwtDnZ+TbjKSs7Ay9tNmWNcE4fF18wRyw==",
+    "System.Numerics.Vectors/4.3.0": {
+      "sha512": "lSkdvVY5rFDPvqmb+nkWhBI5ePddsaUBQnYOe1l1EBHp4sCXiakw0o8yiiJSWrz+0F1E3/217zTo6Vtf4QDvPQ==",
       "type": "package",
-      "path": "System.Numerics.Vectors/4.1.1",
+      "path": "System.Numerics.Vectors/4.3.0",
       "files": [
-        "System.Numerics.Vectors.4.1.1.nupkg.sha512",
+        "System.Numerics.Vectors.4.3.0.nupkg.sha512",
         "System.Numerics.Vectors.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -7471,6 +7471,7 @@
   "projectFileDependencyGroups": {
     "": [
       "System.IO.MemoryMappedFiles >= 4.3.0",
+      "System.Numerics.Vectors >= 4.3.0",
       "dotnet-test-xunit >= 2.2.0-preview2-build1029",
       "xunit >= 2.2.0-beta4-build3444"
     ],

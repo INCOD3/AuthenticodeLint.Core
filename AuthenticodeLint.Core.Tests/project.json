@@ -4,7 +4,8 @@
     "dependencies": {
     	"xunit": "2.2.0-beta4-build3444",
         "dotnet-test-xunit": "2.2.0-preview2-build1029",
-        "System.IO.MemoryMappedFiles": "4.3.0"
+        "System.IO.MemoryMappedFiles": "4.3.0",
+		"System.Numerics.Vectors": "4.3.0"
     },
     "testRunner": "xunit",
     "buildOptions": {

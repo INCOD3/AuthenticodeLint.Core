@@ -4,7 +4,7 @@ namespace AuthenticodeLint.Core.Asn
 {
 	public sealed class AsnNull : AsnElement
 	{
-		public AsnNull(AsnTagType tag, ArraySegment<byte> data) : base(tag, data)
+		public AsnNull(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
 		{
 			if (data.Count > 0)
 			{

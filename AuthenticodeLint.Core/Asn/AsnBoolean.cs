@@ -12,7 +12,7 @@ namespace AuthenticodeLint.Core.Asn
 		/// </summary>
 		public bool Value { get; }
 
-		public AsnBoolean(AsnTagType tag, ArraySegment<byte> data) : base(tag, data)
+		public AsnBoolean(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
 		{
 			for (var i = 0; i < data.Count; i++)
 			{

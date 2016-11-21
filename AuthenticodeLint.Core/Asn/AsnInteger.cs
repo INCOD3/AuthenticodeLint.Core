@@ -14,7 +14,7 @@ namespace AuthenticodeLint.Core.Asn
 		/// </summary>
 		public BigInteger Value { get; }
 
-		public AsnInteger(AsnTagType tag, ArraySegment<byte> data) : base(tag, data)
+		public AsnInteger(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
 		{
 			var buffer = new byte[data.Count];
 			//BigInteger expects the number in little endian.

@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace AuthenticodeLint.Core.Asn
 {
@@ -16,9 +17,9 @@ namespace AuthenticodeLint.Core.Asn
 		/// <summary>
 		/// The tag of the asn1 element.
 		/// </summary>
-		public AsnTagType Tag { get; }
+		public AsnTag Tag { get; }
 
-		protected AsnElement(AsnTagType tag, ArraySegment<byte> data)
+		protected AsnElement(AsnTag tag, ArraySegment<byte> data)
 		{
 			Data = data;
 			Tag = tag;
@@ -84,6 +85,15 @@ namespace AuthenticodeLint.Core.Asn
 			//Byte comparison passed, return true.
 			return true;
 		}
-	}
 
+		public override string ToString()
+		{
+			var builder = new StringBuilder();
+			for (var i = 0; i < Data.Count; i++)
+			{
+				builder.AppendFormat("{0:X2}", Data.Array[Data.Offset + i]);
+			}
+			return builder.ToString();
+		}
+	}
 }

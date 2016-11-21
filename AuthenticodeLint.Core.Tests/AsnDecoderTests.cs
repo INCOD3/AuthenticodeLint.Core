@@ -18,25 +18,9 @@ namespace AuthenticodeLint.Core.Tests
 			};
 			var decoded = AsnDecoder.Decode(data);
 			var asnRaw = Assert.IsType<AsnRaw>(decoded);
-			Assert.Equal((AsnTagType)31, asnRaw.Tag);
+			Assert.Equal((AsnTagValue)31, asnRaw.Tag.Tag);
 			var tagData = SerializeArraySegement(asnRaw.Data);
 			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, tagData);
-		}
-
-		[Fact]
-		public void ShouldDecodeBitStringWithNoUnusedBits()
-		{
-			var data = new byte[]
-			{
-				0x03, //BitString tag
-				0x02, //with a content length of 2,
-				0x03, //With 3 unused bits,
-				0x0A, //With a value of 0101
-			};
-			var decoded = AsnDecoder.Decode(data);
-			var asnBitString = Assert.IsType<AsnBitString>(decoded);
-			Assert.Equal(3, asnBitString.UnusedBits);
-			Assert.Equal(10, asnBitString.Value.Array[asnBitString.Value.Offset]);
 		}
 
 		[Fact]
@@ -84,31 +68,6 @@ namespace AuthenticodeLint.Core.Tests
 			var decoded = AsnDecoder.Decode(data);
 			var ia5String = Assert.IsType<AsnIA5String>(decoded);
 			Assert.Equal("hello", ia5String.Value);
-		}
-
-		[Fact]
-		public void ShouldDecodeSimpleSequence()
-		{
-			var data = new byte[]
-			{
-				0x30, //sequence tag
-				0x06, //with a length of 6
-				0x02, //first item in sequence is an integer
-				0x01, //first item has a length of 1
-				0x10, //first item has a value of 16
-				0x02, //second item in sequence is an integer
-				0x01, //second item has a length of 1
-				0x20, //second item has a value of 32
-			};
-			var decoded = AsnDecoder.Decode(data);
-			var sequence = Assert.IsType<AsnSequence>(decoded);
-			var elements = sequence.Elements().ToArray();
-			Assert.Equal(2, elements.Length);
-			Assert.All(elements, (obj) => Assert.IsType<AsnInteger>(obj));
-			var integerOne = (AsnInteger)elements[0];
-			var integerTwo = (AsnInteger)elements[1];
-			Assert.Equal(16, integerOne.Value);
-			Assert.Equal(32, integerTwo.Value);
 		}
 
 		private static T[] SerializeArraySegement<T>(ArraySegment<T> segement)

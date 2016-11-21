@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Asn
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AsnUtf8String"/> with a segement of data.
 		/// </summary>
-		public AsnUtf8String(AsnTagType tag, ArraySegment<byte> data) : base(tag, data)
+		public AsnUtf8String(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
 		{
 			Value = Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
 		}

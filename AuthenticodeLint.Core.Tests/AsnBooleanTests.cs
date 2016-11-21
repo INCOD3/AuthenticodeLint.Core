@@ -44,5 +44,18 @@ namespace AuthenticodeLint.Core.Tests
 				Assert.NotEqual(asnBoolean1, asnBoolean2);
 			}
 		}
+
+		[
+			Theory,
+			InlineData(new byte[] { 0x01, 0x01, 0x00 }, "False"),
+			InlineData(new byte[] { 0x01, 0x01, 0x01 }, "True"),
+			InlineData(new byte[] { 0x01, 0x01, 0xFF }, "True"),
+		]
+		public void ShouldDisplayStringAsBoolean(byte[] data, string expected)
+		{
+			var decoded = AsnDecoder.Decode(data);
+			var asnBoolean = Assert.IsType<AsnBoolean>(decoded);
+			Assert.Equal(expected, asnBoolean.ToString());
+		}
 	}
 }

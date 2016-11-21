@@ -28,13 +28,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuthenticodeLint.Core\AuthenticodeLint.Core.csproj">
-      <Project>{1EF99772-E9FA-42D7-B105-EFBAF2122A90}</Project>
+      <Project>{78606B41-077D-4398-86A5-D214BCEC25F5}</Project>
       <Name>AuthenticodeLint.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
 	<Include Include="files/authlint.exe" />
+	<Include Include="files/vcsjones.com.crt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
