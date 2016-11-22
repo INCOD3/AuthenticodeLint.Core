@@ -23,11 +23,10 @@ namespace AuthenticodeLint.Core.Tests
 			};
 			var decoded = AsnDecoder.Decode(data);
 			var sequence = Assert.IsType<AsnSequence>(decoded);
-			var elements = sequence.Elements().ToArray();
-			Assert.Equal(2, elements.Length);
-			Assert.All(elements, (obj) => Assert.IsType<AsnInteger>(obj));
-			var integerOne = (AsnInteger)elements[0];
-			var integerTwo = (AsnInteger)elements[1];
+			Assert.Equal(2, sequence.Count);
+			Assert.All(sequence, (obj) => Assert.IsType<AsnInteger>(obj));
+			var integerOne = (AsnInteger)sequence[0];
+			var integerTwo = (AsnInteger)sequence[1];
 			Assert.Equal(16, integerOne.Value);
 			Assert.Equal(32, integerTwo.Value);
 		}
@@ -46,9 +45,7 @@ namespace AuthenticodeLint.Core.Tests
 				0x01, //second item has a length of 1
 				0x20, //second item has a value of 32
 			};
-			var decoded = AsnDecoder.Decode(data);
-			var sequence = Assert.IsType<AsnSequence>(decoded);
-			Assert.Throws<InvalidOperationException>(() => sequence.Elements().ToArray());
+			var decoded = Assert.Throws<InvalidOperationException>(() => AsnDecoder.Decode(data));
 		}
 
 		[Fact]
@@ -66,12 +63,10 @@ namespace AuthenticodeLint.Core.Tests
 			};
 			var decoded = AsnDecoder.Decode(data);
 			var sequence = Assert.IsType<AsnSequence>(decoded);
-			var sequenceItems = sequence.Elements().ToArray();
-			Assert.Equal(1, sequenceItems.Length);
-			var childElement = sequenceItems[0];
+			Assert.Equal(1, sequence.Count);
+			var childElement = sequence[0];
 			var childSequence = Assert.IsType<AsnSequence>(childElement);
-			var childItems = childSequence.Elements().ToArray();
-			var childInteger = Assert.IsType<AsnInteger>(childItems[0]);
+			var childInteger = Assert.IsType<AsnInteger>(childSequence[0]);
 			Assert.Equal(64, childInteger.Value);
 		}
 
@@ -85,7 +80,7 @@ namespace AuthenticodeLint.Core.Tests
 			};
 			var decoded = AsnDecoder.Decode(data);
 			var sequence = Assert.IsType<AsnSequence>(decoded);
-			Assert.Equal(0, sequence.Elements().Count());
+			Assert.Equal(0, sequence.Count);
 		}
 	}
 }

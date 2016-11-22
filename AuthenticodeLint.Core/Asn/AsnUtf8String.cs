@@ -9,7 +9,7 @@ namespace AuthenticodeLint.Core.Asn
 	/// <remarks>
 	/// This creates a copy of the data to create a string.
 	/// </remarks>
-	public sealed class AsnUtf8String : AsnElement
+	public sealed class AsnUtf8String : AsnElement, IDirectoryString
 	{
 		/// <summary>
 		/// The value of the string.

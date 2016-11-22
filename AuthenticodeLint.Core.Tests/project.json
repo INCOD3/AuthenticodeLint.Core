@@ -13,7 +13,8 @@
         	"**/*.cs",
         	"../AuthenticodeLint.Core/*.cs",
           	"../AuthenticodeLint.Core/PE/**/*.cs",
-			"../AuthenticodeLint.Core/Asn/**/*.cs"
+			"../AuthenticodeLint.Core/Asn/**/*.cs",
+			"../AuthenticodeLint.Core/x509/**/*.cs",
 		],
         "allowUnsafe": true,
         "debugType": "portable"

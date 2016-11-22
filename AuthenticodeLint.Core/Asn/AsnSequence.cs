@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 
 namespace AuthenticodeLint.Core.Asn
 {
-	
+
 	/// <summary>
 	/// An ordered sequence of zero or more asn.1 elements.
 	/// </summary>

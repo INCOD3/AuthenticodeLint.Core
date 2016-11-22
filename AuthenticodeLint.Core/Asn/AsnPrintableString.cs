@@ -3,7 +3,7 @@ using System.Text;
 
 namespace AuthenticodeLint.Core.Asn
 {
-	public sealed class AsnPrintableString : AsnElement
+	public sealed class AsnPrintableString : AsnElement, IDirectoryString
 	{
 		public string Value { get; }
 

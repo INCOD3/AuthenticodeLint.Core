@@ -4,7 +4,7 @@ using System.Text;
 namespace AuthenticodeLint.Core.Asn
 {
 
-	public sealed class AsnBmpString : AsnElement
+	public sealed class AsnBmpString : AsnElement, IDirectoryString
 	{
 		public string Value { get; }
 

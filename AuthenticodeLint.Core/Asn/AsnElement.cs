@@ -7,7 +7,7 @@ namespace AuthenticodeLint.Core.Asn
 	/// <summary>
 	/// An asn1 element. All elements inherit from this type.
 	/// </summary>
-	public abstract class AsnElement : IEquatable<AsnElement>
+	public abstract class AsnElement : IAsnElement, IEquatable<AsnElement>
 	{
 		/// <summary>
 		/// Gets the segement of data for the element.
