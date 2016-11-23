@@ -1,7 +1,8 @@
-﻿
-using System;
-using AuthenticodeLint.Core.x509;
+﻿using AuthenticodeLint.Core.x509;
 using Xunit;
+
+using DNC = System.Collections.Generic.Dictionary<string, string>;
+using static AuthenticodeLint.Core.Asn.KnownOids.DistinguishedName;
 
 namespace AuthenticodeLint.Core.Tests
 {
@@ -17,7 +18,67 @@ namespace AuthenticodeLint.Core.Tests
 			Assert.Null(certificate.AlgorithmIdentifier.Parameters);
 			Assert.Equal(2, certificate.Version);
 			Assert.Equal(5, certificate.Issuer.Count);
-			Console.WriteLine(certificate.Issuer);
+			Assert.Equal("C=GB, ST=Greater Manchester, L=Salford, O=COMODO CA Limited, CN=COMODO ECC Domain Validation Secure Server CA", certificate.Issuer.ToString());
+		}
+
+		[Fact]
+		public void ShouldDecodeASingleX500Component()
+		{
+			var data = DNHelper.TestDN(new DNC
+			{
+				[id_at_commonName] = "Kevin Jones"
+			});
+			var dn = new x500DistinguishedName(data);
+			Assert.Equal(1, dn.Count);
+			Assert.Equal(1, dn[0].Count);
+			Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier);
+			Assert.Equal("Kevin Jones", dn[0][0].Value);
+			Assert.Equal("CN=Kevin Jones", dn.ToString());
+		}
+
+		[Fact]
+		public void ShouldDecodeMultipleComponents()
+		{
+			var data = DNHelper.TestDN(new DNC
+			{
+				[id_at_commonName] = "Kevin Jones"
+			}, new DNC
+			{
+				[id_at_countryName] = "US"
+			});
+			var dn = new x500DistinguishedName(data);
+			Assert.Equal(2, dn.Count);
+			Assert.Equal(1, dn[0].Count);
+			Assert.Equal(1, dn[1].Count);
+			Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier);
+			Assert.Equal("Kevin Jones", dn[0][0].Value);
+			Assert.Equal(id_at_countryName, dn[1][0].ObjectIdentifier);
+			Assert.Equal("US", dn[1][0].Value);
+			Assert.Equal("CN=Kevin Jones, C=US", dn.ToString());
+		}
+
+
+
+		[Fact]
+		public void ShouldDecodeMultiComponentRDNAndRegularComponents()
+		{
+			var data = DNHelper.TestDN(new DNC
+			{
+				[id_at_commonName] = "Kevin Jones",
+				[id_at_countryName] = "US"
+			},
+		    new DNC
+		    {
+				[id_at_commonName] = "Turtle",
+		    });
+			var dn = new x500DistinguishedName(data);
+			Assert.Equal(2, dn.Count);
+			Assert.Equal(2, dn[0].Count);
+			Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier);
+			Assert.Equal(id_at_countryName, dn[0][1].ObjectIdentifier);
+			Assert.Equal("Kevin Jones", dn[0][0].Value);
+			Assert.Equal("US", dn[0][1].Value);
+			Assert.Equal("CN=Kevin Jones + C=US, CN=Turtle", dn.ToString());
 		}
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System;
-namespace AuthenticodeLint.Core
+using AuthenticodeLint.Core.Asn;
+
+namespace AuthenticodeLint.Core.x509
 {
 	internal static class DistinguishedNameComponents
 	{

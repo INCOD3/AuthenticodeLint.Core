@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Core.Tests
 			var data = System.IO.File.ReadAllBytes("files/vcsjones.com.crt");
 			//var data = Convert.FromBase64String(d);
 			var decoded = AsnDecoder.Decode(data);
-			AsnPrinter.Print(System.Console.Out, decoded);
+			//AsnPrinter.Print(System.Console.Out, decoded);
 		}
 	}
 }

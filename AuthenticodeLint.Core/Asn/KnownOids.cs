@@ -1,6 +1,6 @@
-﻿namespace AuthenticodeLint.Core
+﻿namespace AuthenticodeLint.Core.Asn
 {
-	internal static class KnownOids
+	public static class KnownOids
 	{
 		public static class DistinguishedName
 		{

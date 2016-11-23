@@ -7,11 +7,12 @@ namespace AuthenticodeLint.Core.Asn
 	/// </summary>
 	public static class AsnDecoder
 	{
-		public static AsnElement Decode(byte[] asnData)
+		public static AsnElement Decode(byte[] asnData) => Decode(new ArraySegment<byte>(asnData));
+
+		public static AsnElement Decode(ArraySegment<byte> asnData)
 		{
-			var data = new ArraySegment<byte>(asnData);
 			int elementLength;
-			return Process(data, out elementLength);
+			return Process(asnData, out elementLength);
 		}
 
 		internal static AsnElement Process(ArraySegment<byte> data, out int elementLength)
@@ -49,6 +50,8 @@ namespace AuthenticodeLint.Core.Asn
 						return new AsnPrintableString(tag, rawData);
 					case AsnTagValue.UtcTime:
 						return new AsnUtcTime(tag, rawData);
+					case AsnTagValue.GeneralizedTime:
+						return new AsnGeneralizedTime(tag, rawData);
 				}
 			}
 			if (tag.Constructed)

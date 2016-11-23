@@ -6,10 +6,14 @@ namespace AuthenticodeLint.Core.x509
 {
 	public class x509Certificate
 	{
-		private readonly byte[] _data;
+		private readonly ArraySegment<byte> _data;
 		private readonly AsnSequence _certificate;
 
-		public x509Certificate(byte[] data)
+		public x509Certificate(byte[] data) : this(new ArraySegment<byte>(data))
+		{
+		}
+
+		public x509Certificate(ArraySegment<byte> data)
 		{
 			_data = data;
 			var decoded = AsnDecoder.Decode(data) as AsnSequence;
@@ -74,9 +78,13 @@ namespace AuthenticodeLint.Core.x509
 			SerialNumber = serialNumber.Data.ToArray();
 			AlgorithmIdentifier = new AlgorithmIdentifier(signature);
 			Issuer = new x500DistinguishedName(issuer);
-			if (version.Count != 1)
+			if (version.Tag.Tag != 0 || version.Count != 1)
 			{
 				throw new InvalidOperationException("Version is not specified.");
+			}
+			if (!(version[0] is AsnInteger))
+			{
+				throw new InvalidOperationException("Version is not a valid integer.");
 			}
 			Version = (int)((version[0] as AsnInteger)?.Value ?? 0);
 		}

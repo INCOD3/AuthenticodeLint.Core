@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="**\*.resx" />
+    <Compile Remove="AsnGeneralizedTime.cs" />
   </ItemGroup>
 
   <ItemGroup>
