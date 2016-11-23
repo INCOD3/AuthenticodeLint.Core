@@ -17,7 +17,7 @@ namespace AuthenticodeLint.Core.Tests
 			Assert.Null(certificate.AlgorithmIdentifier.Parameters);
 			Assert.Equal(2, certificate.Version);
 			Assert.Equal(5, certificate.Issuer.Count);
-			Console.WriteLine(certificate.Issuer.ToString());
+			Console.WriteLine(certificate.Issuer);
 		}
 	}
 }

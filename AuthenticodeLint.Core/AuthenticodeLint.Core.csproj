@@ -27,7 +27,6 @@
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="**\*.resx" />
-    <Compile Remove="Asn\AsnReal.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,10 +43,6 @@
     <PackageReference Include="System.Numerics.Vectors">
       <Version>4.3.0</Version>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="x509\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
