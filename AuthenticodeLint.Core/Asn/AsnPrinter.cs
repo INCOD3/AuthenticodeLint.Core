@@ -22,7 +22,7 @@ namespace AuthenticodeLint.Core.Asn
 			}
 			else
 			{
-				writer.WriteLine($"{indent}{displayTag}: {element.ToString()}");
+				writer.WriteLine($"{indent}{displayTag}: {element}");
 			}
 		}
 

@@ -4,7 +4,7 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
 {
-	public class x509Certificate
+	public sealed class x509Certificate
 	{
 		private readonly ArraySegment<byte> _data;
 		private readonly AsnSequence _certificate;
@@ -47,17 +47,25 @@ namespace AuthenticodeLint.Core.x509
 
 		public int Version { get; private set; }
 
-		public byte[] SerialNumber { get; private set; }
+		public ArraySegment<byte> SerialNumber { get; private set; }
 
 		public AlgorithmIdentifier AlgorithmIdentifier { get; private set; }
 
 		public x500DistinguishedName Issuer { get; private set; }
 
+		public DateTimeOffset NotBefore { get; private set; }
+
+		public DateTimeOffset NotAfter { get; private set; }
+
+		public x500DistinguishedName Subject { get; private set; }
+
+		public SubjectPublicKeyInfo PublicKey { get; private set; }
+
 		private void ReadTbsCertificate(AsnSequence tbsCertificate)
 		{
 			AsnConstructed version;
 			AsnInteger serialNumber;
-			AsnSequence signature, issuer;
+			AsnSequence signature, issuer, validityPeriod, subject, spki;
 			var reader = new AsnConstructedReader(tbsCertificate);
 			if (!reader.MoveNext(out version))
 			{
@@ -75,18 +83,31 @@ namespace AuthenticodeLint.Core.x509
 			{
 				ThrowRead(nameof(issuer));
 			}
-			SerialNumber = serialNumber.Data.ToArray();
+			if (!reader.MoveNext(out validityPeriod))
+			{
+				ThrowRead(nameof(validityPeriod));
+			}
+			if (!reader.MoveNext(out subject))
+			{
+				ThrowRead(nameof(subject));
+			}
+			if (!reader.MoveNext(out spki))
+			{
+				ThrowRead(nameof(spki));
+			}
+			SerialNumber = serialNumber.Data;
 			AlgorithmIdentifier = new AlgorithmIdentifier(signature);
 			Issuer = new x500DistinguishedName(issuer);
-			if (version.Tag.Tag != 0 || version.Count != 1)
+			if (version.Tag.Tag != 0)
 			{
 				throw new InvalidOperationException("Version is not specified.");
 			}
-			if (!(version[0] is AsnInteger))
-			{
-				throw new InvalidOperationException("Version is not a valid integer.");
-			}
-			Version = (int)((version[0] as AsnInteger)?.Value ?? 0);
+			Version = (int)AsnContructedStaticReader.Read<AsnInteger>(version).Item1.Value;
+			var validity = AsnContructedStaticReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
+			NotBefore = validity.Item1.Value;
+			NotAfter = validity.Item2.Value;
+			Subject = new x500DistinguishedName(subject);
+			PublicKey = new SubjectPublicKeyInfo(spki);
 		}
 
 		private static void ThrowRead(string field)

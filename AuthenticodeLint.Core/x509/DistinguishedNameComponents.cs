@@ -19,6 +19,10 @@ namespace AuthenticodeLint.Core.x509
 					return "O";
 				case KnownOids.DistinguishedName.id_at_stateOrProvinceName:
 					return "ST";
+				case KnownOids.DistinguishedName.id_at_organizationalUnitName:
+					return "OU";
+				case KnownOids.DistinguishedName.e_mailAddress:
+					return "E";
 				default:
 					return oid;
 			}

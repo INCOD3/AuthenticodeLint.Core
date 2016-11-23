@@ -6,7 +6,7 @@ namespace AuthenticodeLint.Core.x509
 
 	public sealed class AlgorithmIdentifier
 	{
-		public AlgorithmIdentifier(string algorithm, byte[] parameters)
+		public AlgorithmIdentifier(string algorithm, ArraySegment<byte> parameters)
 		{
 			Algorithm = algorithm;
 			Parameters = parameters;
@@ -24,11 +24,15 @@ namespace AuthenticodeLint.Core.x509
 			Algorithm = algorithm.Value;
 			if (reader.MoveNext(out parameters))
 			{
-				Parameters = parameters.Data.ToArray();
+				Parameters = parameters.Data;
+			}
+			else
+			{
+				Parameters = null;
 			}
 		}
-		
+
 		public string Algorithm { get; }
-		public byte[] Parameters { get; }
+		public ArraySegment<byte>? Parameters { get; }
 	}
 }

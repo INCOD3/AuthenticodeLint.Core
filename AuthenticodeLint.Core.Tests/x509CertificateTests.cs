@@ -3,6 +3,7 @@ using Xunit;
 
 using DNC = System.Collections.Generic.Dictionary<string, string>;
 using static AuthenticodeLint.Core.Asn.KnownOids.DistinguishedName;
+using System;
 
 namespace AuthenticodeLint.Core.Tests
 {
@@ -19,6 +20,10 @@ namespace AuthenticodeLint.Core.Tests
 			Assert.Equal(2, certificate.Version);
 			Assert.Equal(5, certificate.Issuer.Count);
 			Assert.Equal("C=GB, ST=Greater Manchester, L=Salford, O=COMODO CA Limited, CN=COMODO ECC Domain Validation Secure Server CA", certificate.Issuer.ToString());
+			Assert.Equal(new DateTimeOffset(2016, 7, 30, 0, 0, 0, TimeSpan.Zero), certificate.NotBefore);
+			Assert.Equal(new DateTimeOffset(2018, 7, 30, 23, 59, 59, TimeSpan.Zero), certificate.NotAfter);
+			Assert.Equal("OU=Domain Control Validated, OU=COMODO SSL, CN=vcsjones.com", certificate.Subject.ToString());
+			Console.WriteLine(certificate.PublicKey.Algorithm.Algorithm);
 		}
 
 		[Fact]
