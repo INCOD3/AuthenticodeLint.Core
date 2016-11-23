@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AuthenticodeLint.Core.Asn
 {
-	public sealed class AsnGeneralizedTime : AsnElement
+	public sealed class AsnGeneralizedTime : AsnElement, IAsnDateTime
 	{
 		public DateTimeOffset Value { get; }
 		
