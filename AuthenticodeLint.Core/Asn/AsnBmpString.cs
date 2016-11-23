@@ -4,16 +4,16 @@ using System.Text;
 namespace AuthenticodeLint.Core.Asn
 {
 
-	public sealed class AsnBmpString : AsnElement, IDirectoryString
-	{
-		public string Value { get; }
+    public sealed class AsnBmpString : AsnElement, IDirectoryString
+    {
+        public string Value { get; }
 
-		public AsnBmpString(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
-		{
-			Value = Encoding.Unicode.GetString(data.Array, data.Offset, data.Count);
-		}
+        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        {
+            Value = Encoding.Unicode.GetString(contentData.Array, contentData.Offset, contentData.Count);
+        }
 
-		public override string ToString() => Value;
-	}
+        public override string ToString() => Value;
+    }
 
 }

@@ -1,32 +1,32 @@
 {
-	"name": "AuthenticodeLint.Core.Tests",
-	"version": "0.1.0",
+    "name": "AuthenticodeLint.Core.Tests",
+    "version": "0.1.0",
     "dependencies": {
-    	"xunit": "2.2.0-beta4-build3444",
+        "xunit": "2.2.0-beta4-build3444",
         "dotnet-test-xunit": "2.2.0-preview2-build1029",
         "System.IO.MemoryMappedFiles": "4.3.0",
-		"System.Numerics.Vectors": "4.3.0"
+        "System.Numerics.Vectors": "4.3.0"
     },
     "testRunner": "xunit",
     "buildOptions": {
-    	"compile": [
-        	"**/*.cs",
-        	"../AuthenticodeLint.Core/*.cs",
-          	"../AuthenticodeLint.Core/PE/**/*.cs",
-			"../AuthenticodeLint.Core/Asn/**/*.cs",
-			"../AuthenticodeLint.Core/x509/**/*.cs",
-		],
+        "compile": [
+            "**/*.cs",
+            "../AuthenticodeLint.Core/*.cs",
+              "../AuthenticodeLint.Core/PE/**/*.cs",
+            "../AuthenticodeLint.Core/Asn/**/*.cs",
+            "../AuthenticodeLint.Core/x509/**/*.cs",
+        ],
         "allowUnsafe": true,
         "debugType": "portable"
     },
-	"frameworks": {
-	  "netcoreapp1.0": {
+    "frameworks": {
+      "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
           "version": "1.1.0",
           "type": "platform"
         }
       }
-	}
+    }
   }
 }

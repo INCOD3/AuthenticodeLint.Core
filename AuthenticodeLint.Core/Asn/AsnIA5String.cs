@@ -3,15 +3,15 @@ using System.Text;
 
 namespace AuthenticodeLint.Core.Asn
 {
-	public sealed class AsnIA5String : AsnElement, IDirectoryString
-	{
-		public string Value { get; }
+    public sealed class AsnIA5String : AsnElement, IDirectoryString
+    {
+        public string Value { get; }
 
-		public AsnIA5String(AsnTag tag, ArraySegment<byte> data) : base(tag, data)
-		{
-			Value = Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
-		}
+        public AsnIA5String(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        {
+            Value = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+        }
 
-		public override string ToString() => Value;
-	}
+        public override string ToString() => Value;
+    }
 }
