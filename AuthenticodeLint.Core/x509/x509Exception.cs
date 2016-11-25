@@ -1,9 +1,9 @@
 ﻿using System;
-namespace AuthenticodeLint.Core
+namespace AuthenticodeLint.Core.x509
 {
-    public class x509Exception
+    public sealed class x509Exception : Exception
     {
-        public x509Exception()
+        public x509Exception(string message) : base(message)
         {
         }
     }

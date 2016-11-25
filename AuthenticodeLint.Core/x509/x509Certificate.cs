@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Core.x509
             var decoded = AsnDecoder.Decode(data) as AsnSequence;
             if (decoded == null)
             {
-                throw new Exception("Encoded data is not an x509 certificate.");
+                throw new x509Exception("Encoded data is not an x509 certificate.");
             }
             _certificate = decoded;
             AsnSequence tbsCertificate;
@@ -100,7 +100,7 @@ namespace AuthenticodeLint.Core.x509
             Issuer = new x500DistinguishedName(issuer);
             if (version.Tag.Tag != 0)
             {
-                throw new InvalidOperationException("Version is not specified.");
+                throw new x509Exception("Version is not specified.");
             }
             Version = (int)AsnContructedStaticReader.Read<AsnInteger>(version).Item1.Value;
             var validity = AsnContructedStaticReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
@@ -112,7 +112,7 @@ namespace AuthenticodeLint.Core.x509
 
         private static void ThrowRead(string field)
         {
-            throw new InvalidOperationException($"Unable to read {field} from certificate.");
+            throw new x509Exception($"Unable to read {field} from certificate.");
         }
     }
 }
