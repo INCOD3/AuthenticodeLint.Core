@@ -58,7 +58,7 @@ namespace AuthenticodeLint.Core.Asn
 
     internal static class AsnContructedStaticReader
     {
-        public static Tuple<T1> Read<T1>(AsnConstructed sequence)
+        public static ValueTuple<T1> Read<T1>(AsnConstructed sequence)
             where T1 : class, IAsnElement
         {
             if (sequence.Count != 1)
@@ -70,11 +70,11 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new InvalidOperationException();
             }
-            return Tuple.Create(item);
+            return ValueTuple.Create(item);
         }
 
 
-        public static Tuple<T1, T2> Read<T1, T2>(AsnConstructed sequence)
+        public static ValueTuple<T1, T2> Read<T1, T2>(AsnConstructed sequence)
             where T1 : class, IAsnElement
             where T2 : class, IAsnElement
         {
@@ -88,11 +88,11 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new InvalidOperationException();
             }
-            return Tuple.Create(item1, item2);
+            return ValueTuple.Create(item1, item2);
         }
 
 
-        public static Tuple<T1, T2, T3> Read<T1, T2, T3>(AsnConstructed sequence)
+        public static ValueTuple<T1, T2, T3> Read<T1, T2, T3>(AsnConstructed sequence)
             where T1 : class, IAsnElement
             where T2 : class, IAsnElement
             where T3 : class, IAsnElement
@@ -108,7 +108,7 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new InvalidOperationException();
             }
-            return Tuple.Create(item1, item2, item3);
+            return ValueTuple.Create(item1, item2, item3);
         }
     }
 }
