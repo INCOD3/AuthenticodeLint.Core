@@ -63,12 +63,12 @@ namespace AuthenticodeLint.Core.Asn
         {
             if (sequence.Count != 1)
             {
-                throw new InvalidOperationException();
+                throw new AsnException("Expected exactly one item in asn sequence.");
             }
             var item = sequence[0] as T1;
             if (item == null)
             {
-                throw new InvalidOperationException();
+                throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T1)} but was {item?.GetType()}.");
             }
             return ValueTuple.Create(item);
         }
@@ -80,13 +80,17 @@ namespace AuthenticodeLint.Core.Asn
         {
             if (sequence.Count != 2)
             {
-                throw new InvalidOperationException();
+                throw new AsnException("Expected exactly two items in asn sequence.");
             }
             var item1 = sequence[0] as T1;
             var item2 = sequence[1] as T2;
-            if (item1 == null || item2 == null)
+            if (item1 == null)
             {
-                throw new InvalidOperationException();
+                throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T1)} but was {item1?.GetType()}.");
+            }
+            if (item2 == null)
+            {
+                throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T2)} but was {item2?.GetType()}.");
             }
             return ValueTuple.Create(item1, item2);
         }
@@ -99,14 +103,22 @@ namespace AuthenticodeLint.Core.Asn
         {
             if (sequence.Count != 3)
             {
-                throw new InvalidOperationException();
+                throw new AsnException("Expected exactly three items in asn sequence.");
             }
             var item1 = sequence[0] as T1;
             var item2 = sequence[1] as T2;
             var item3 = sequence[3] as T3;
-            if (item1 == null || item2 == null || item3 == null)
+            if (item2 == null)
             {
-                throw new InvalidOperationException();
+                throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T1)} but was {item1?.GetType()}.");
+            }
+            if (item2 == null)
+            {
+                throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T2)} but was {item2?.GetType()}.");
+            }
+            if (item3 == null)
+            {
+                throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T3)} but was {item3?.GetType()}.");
             }
             return ValueTuple.Create(item1, item2, item3);
         }

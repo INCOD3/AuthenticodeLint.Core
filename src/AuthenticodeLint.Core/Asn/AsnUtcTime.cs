@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Asn
             DateTimeOffset val;
             if (!DateTimeOffset.TryParseExact(strData, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out val))
             {
-                throw new InvalidOperationException("Encoded UTCDate is not valid.");
+                throw new AsnException("Encoded UTCDate is not valid.");
             }
             Value = val;
         }

@@ -22,7 +22,7 @@ namespace AuthenticodeLint.Core.Asn
                 collection.Add(AsnDecoder.Process(segment, out elementLength));
                 if (segment.Count - elementLength < 0)
                 {
-                    throw new InvalidOperationException("Child data extended beyond set total length.");
+                    throw new AsnException("Child data extended beyond set total length.");
                 }
                 segment = new ArraySegment<byte>(segment.Array, segment.Offset + elementLength, segment.Count - elementLength);
             }

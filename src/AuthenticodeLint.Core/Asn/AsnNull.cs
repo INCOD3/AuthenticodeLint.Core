@@ -8,7 +8,7 @@ namespace AuthenticodeLint.Core.Asn
         {
             if (contentData.Count > 0)
             {
-                throw new InvalidOperationException("Null data cannot have a length.");
+                throw new AsnException("Null data cannot have a length.");
             }
         }
 

@@ -33,7 +33,7 @@ namespace AuthenticodeLint.Core.Asn
             DateTimeOffset val;
             if (!DateTimeOffset.TryParseExact(strData, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out val))
             {
-                throw new InvalidOperationException("Encoded GeneralizedTime is not valid.");
+                throw new AsnException("Encoded GeneralizedTime is not valid.");
             }
             Value = val;
         }
