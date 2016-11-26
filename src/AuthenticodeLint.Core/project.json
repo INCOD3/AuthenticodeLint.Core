@@ -1,0 +1,18 @@
+{
+    "name": "AuthenticodeLint.Core",
+    "version": "0.1.0-*",
+    "authors": ["Kevin Jones"],
+    "buildOptions": {
+        "allowUnsafe": true
+    },
+    "dependencies": {
+        "System.IO.MemoryMappedFiles": "4.3.0"
+    },
+    "frameworks": {
+        "netstandard1.3": {
+            "dependencies": {
+                "NETStandard.Library": "1.6.1"
+            }
+        }
+    }
+}
