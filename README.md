@@ -8,11 +8,3 @@ project to .NET Core. As AuthenticodeLint relied heavily on Win32 APIs, a simple
 not work. This project aims to not depend on any external libraries of the operating system,
 if possible. It includes a fully managed and platform agnostic PE reader, ASN.1 parser, and 
 x509 parser.
-
-# Building
-
-This project depends on the alpha tools of .NET Core. It should be buildable with VS 2017,
-or VS for Mac Preview.
-
-As VS for Mac does not yet support Unit Test projects, tests can be run with the 
-`dotnet test` command line.
