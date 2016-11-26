@@ -16,11 +16,11 @@ namespace AuthenticodeLint.Core.x509
             AsnBitString publicKey;
             if (!reader.MoveNext(out algorithmIdentifier))
             {
-                throw new InvalidOperationException("Invalid SPKI algorithm identifier.");
+                throw new x509Exception("Invalid SPKI algorithm identifier.");
             }
             if (!reader.MoveNext(out publicKey))
             {
-                throw new InvalidOperationException("Invalid public key.");
+                throw new x509Exception("Invalid public key.");
             }
             Algorithm = new AlgorithmIdentifier(algorithmIdentifier);
             PublicKey = publicKey.ContentData;

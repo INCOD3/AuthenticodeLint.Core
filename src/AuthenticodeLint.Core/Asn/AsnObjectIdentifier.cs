@@ -34,7 +34,7 @@ namespace AuthenticodeLint.Core.Asn
             }
             if (value != 0)
             {
-                throw new InvalidOperationException("ObjectIdentifier incorrectly terminated. Expecting more data.");
+                throw new AsnException("ObjectIdentifier incorrectly terminated. Expecting more data.");
             }
             Value = builder.ToString();
         }
