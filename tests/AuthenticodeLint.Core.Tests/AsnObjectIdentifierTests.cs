@@ -31,7 +31,7 @@ namespace AuthenticodeLint.Core.Tests
                 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x3, 0x1,
                     0xff //final octet has MSB set, but no data to process afterward.
             };
-            Assert.Throws<InvalidOperationException>(() => AsnDecoder.Decode(data));
+            Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
         }
 
         [

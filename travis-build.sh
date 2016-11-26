@@ -8,4 +8,6 @@ sudo apt-get install dotnet-dev-1.0.0-preview2.1-003177
 dotnet restore
 pushd tests/AuthenticodeLint.Core.Tests
 dotnet test 
+RES=$?
 popd
+exit $RES

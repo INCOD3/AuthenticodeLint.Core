@@ -27,7 +27,7 @@ namespace AuthenticodeLint.Core.Tests
                 0x01, //with a length of 1
                 0xFF, //with 255 for data
             };
-            Assert.Throws<InvalidOperationException>(() => AsnDecoder.Decode(data));
+            Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
         }
 
         [

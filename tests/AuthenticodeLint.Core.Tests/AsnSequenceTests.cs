@@ -44,7 +44,7 @@ namespace AuthenticodeLint.Core.Tests
                 0x01, //second item has a length of 1
                 0x20, //second item has a value of 32
             };
-            var decoded = Assert.Throws<InvalidOperationException>(() => AsnDecoder.Decode(data));
+            var decoded = Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
         }
 
         [Fact]
