@@ -1,4 +1,3 @@
-using System;
 using AuthenticodeLint.Core.Asn;
 using Xunit;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using AuthenticodeLint.Core.Asn;
+﻿using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
 {

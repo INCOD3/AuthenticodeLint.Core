@@ -1,5 +1,4 @@
-﻿using System;
-namespace AuthenticodeLint.Core.PE
+﻿namespace AuthenticodeLint.Core.PE
 {
     internal static class MagicValues
     {
