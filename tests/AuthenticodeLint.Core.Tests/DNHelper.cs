@@ -105,16 +105,5 @@ namespace AuthenticodeLint.Core.Tests
                 return stream.ToArray();
             }
         }
-
-        public static void Mockup()
-        {
-            TestDN(new Dictionary<string, string>
-            {
-                [KnownOids.DistinguishedName.id_at_commonName] = "Kevin Jones"
-            }, new Dictionary<string, string>
-            {
-                [KnownOids.DistinguishedName.id_at_stateOrProvinceName] = "Virginia"
-            });
-        }
     }
 }
