@@ -6,4 +6,6 @@ sudo apt-get install dotnet-dev-1.0.0-preview2-003131
 sudo apt-get install dotnet-dev-1.0.0-preview2.1-003177
 
 dotnet restore
-dotnet test tests/AuthenticodeLint.Core.Tests
+pushd tests/AuthenticodeLint.Core.Tests
+dotnet test 
+popd
