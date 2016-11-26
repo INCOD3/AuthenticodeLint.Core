@@ -1,4 +1,4 @@
-﻿using AuthenticodeLint.Core.Asn;
+using AuthenticodeLint.Core.Asn;
 using Xunit;
 
 namespace AuthenticodeLint.Core.Tests

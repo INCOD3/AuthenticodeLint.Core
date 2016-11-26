@@ -1,4 +1,4 @@
-﻿namespace AuthenticodeLint.Core.Asn
+namespace AuthenticodeLint.Core.Asn
 {
     public struct AsnTag
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace AuthenticodeLint.Core.Asn
 {
     public interface IAsnDateTime : IAsnElement
