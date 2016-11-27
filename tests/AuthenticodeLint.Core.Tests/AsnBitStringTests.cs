@@ -28,6 +28,11 @@ namespace AuthenticodeLint.Core.Tests
             InlineData(new byte[] { 0x03, 0x03, 0x07, 0x00, 0xFF }, "000000001"),
             InlineData(new byte[] { 0x03, 0x03, 0x01, 0x00, 0x00 }, "000000000000000"),
             InlineData(new byte[] { 0x03, 0x03, 0x00, 0x00, 0x00 }, "0000000000000000"),
+            InlineData(new byte[] { 0x03, 0x03, 0x10, 0x00, 0x00 }, ""),
+            InlineData(new byte[] { 0x03, 0x03, 0x11, 0x00, 0x00 }, ""),
+            InlineData(new byte[] { 0x03, 0x03, 0x08, 0x00, 0xFF }, "00000000"),
+            InlineData(new byte[] { 0x03, 0x03, 0x0F, 0xFF, 0xFF }, "1"),
+            InlineData(new byte[] { 0x03, 0x03, 0xFF, 0xFF, 0xFF }, ""),
         ]
         public void ShouldConvertToStringWithUnusedBits(byte[] data, string expected)
         {

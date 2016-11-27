@@ -19,10 +19,13 @@ namespace AuthenticodeLint.Core.Asn
         public override string ToString()
         {
             var builder = new StringBuilder();
-            for (var i = 0; i < Value.Count; i++)
+            const int BITS_IN_OCTET = 8;
+            var wholeBytes = UnusedBits / BITS_IN_OCTET;
+            var remainingBits = UnusedBits % BITS_IN_OCTET;
+            for (var i = 0; i < Value.Count - wholeBytes; i++)
             {
                 var b = Value.Array[Value.Offset + i];
-                if (i < Value.Count - 1)
+                if (i <  Value.Count - wholeBytes - 1)
                 {
                     builder.Append((b & 0x80) > 0 ? "1" : "0");
                     builder.Append((b & 0x40) > 0 ? "1" : "0");
@@ -35,7 +38,7 @@ namespace AuthenticodeLint.Core.Asn
                 }
                 else
                 {
-                    for (var j = 0; j < 8 - UnusedBits; j++)
+                    for (var j = 0; j < BITS_IN_OCTET - remainingBits; j++)
                     {
                         var mask = 0x80 >> j;
                         builder.Append((b & mask) > 0 ? "1" : "0");
