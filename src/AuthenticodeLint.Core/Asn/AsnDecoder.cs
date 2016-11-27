@@ -52,6 +52,8 @@ namespace AuthenticodeLint.Core.Asn
                         return new AsnUtcTime(tag, contentData);
                     case AsnTagValue.GeneralizedTime:
                         return new AsnGeneralizedTime(tag, contentData);
+                    case AsnTagValue.NumericString:
+                        return new AsnNumericString(tag, contentData);
                 }
             }
             if (tag.Constructed)
