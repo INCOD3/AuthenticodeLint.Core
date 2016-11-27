@@ -87,7 +87,6 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal(expected, utcTime.Value);
         }
 
-
         [Fact]
         public void ShouldDecodeSimpleWithNoSecondsWithNegativeOffset()
         {
@@ -101,6 +100,39 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = AsnDecoder.Decode(data);
             var utcTime = Assert.IsType<AsnUtcTime>(decoded);
             var expected = new DateTimeOffset(2018, 07, 30, 23, 59, 00, -new TimeSpan(05, 12, 0));
+            Assert.Equal(expected, utcTime.Value);
+        }
+
+        [Fact]
+        public void ShouldHandleTwoDigitYearsAtCorrectBoundary2000()
+        {
+            var data = new byte[]
+            {
+                0x17, //UTCTime tag
+                0xD, //with a length of 13
+                0x34, 0x39, 0x30, 0x37, 0x33, 0x30,
+                    0x32, 0x33, 0x35, 0x39, 0x35, 0x39, 0x5A //ASCII encoding for 490730235959Z
+            };
+            var decoded = AsnDecoder.Decode(data);
+            var utcTime = Assert.IsType<AsnUtcTime>(decoded);
+            var expected = new DateTimeOffset(2049, 07, 30, 23, 59, 59, TimeSpan.Zero);
+            Assert.Equal(expected, utcTime.Value);
+        }
+
+
+        [Fact]
+        public void ShouldHandleTwoDigitYearsAtCorrectBoundary1900()
+        {
+            var data = new byte[]
+            {
+                0x17, //UTCTime tag
+                0xD, //with a length of 13
+                0x35, 0x30, 0x30, 0x37, 0x33, 0x30,
+                    0x32, 0x33, 0x35, 0x39, 0x35, 0x39, 0x5A //ASCII encoding for 500730235959Z
+            };
+            var decoded = AsnDecoder.Decode(data);
+            var utcTime = Assert.IsType<AsnUtcTime>(decoded);
+            var expected = new DateTimeOffset(1950, 07, 30, 23, 59, 59, TimeSpan.Zero);
             Assert.Equal(expected, utcTime.Value);
         }
     }
