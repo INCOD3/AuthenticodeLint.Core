@@ -14,6 +14,10 @@ namespace AuthenticodeLint.Core.Asn
 
         public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
         {
+            if (contentData.Count == 0)
+            {
+                throw new AsnException("asn.1 boolean value cannot be empty.");
+            }
             for (var i = 0; i < contentData.Count; i++)
             {
                 if (contentData.Array[contentData.Offset + i] > 0)

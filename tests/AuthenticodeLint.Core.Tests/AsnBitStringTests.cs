@@ -40,5 +40,15 @@ namespace AuthenticodeLint.Core.Tests
             var bitString = Assert.IsType<AsnBitString>(decoded);
             Assert.Equal(expected, bitString.ToString());
         }
+
+        [Fact]
+        public void ShouldThrowAsnExceptionWhenLengthIsZero()
+        {
+            var data = new byte[] {
+                0x03, //BitString tag
+                0x00, //with a length of zero
+            };
+            Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
+        }
     }
 }

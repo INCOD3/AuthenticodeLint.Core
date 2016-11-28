@@ -10,7 +10,15 @@ namespace AuthenticodeLint.Core.Asn
 
         public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
         {
-            var strData = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+            string strData;
+            try
+            {
+                strData = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+            }
+            catch (Exception e) when (e is DecoderFallbackException || e is ArgumentException)
+            {
+                throw new AsnException("asn.1 encoded GeneralizedTime could not be decoded into a string.", e);
+            }
             var formats = new string[] {
                 //Valid local times
                 "yyyyMMddHH",

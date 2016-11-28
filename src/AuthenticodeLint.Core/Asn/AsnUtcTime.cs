@@ -18,7 +18,15 @@ namespace AuthenticodeLint.Core.Asn
 
         public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
         {
-            var strData = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+            string strData;
+            try
+            {
+                strData = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+            }
+            catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
+            {
+                throw new AsnException("asn.1 UTCTime could not be decoded to a string.", e);
+            }
             var formats = new string[] {
                 "yyMMddHHmmsszzz",
                 "yyMMddHHmmzzz",

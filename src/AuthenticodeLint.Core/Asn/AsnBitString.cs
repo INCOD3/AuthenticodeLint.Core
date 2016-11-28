@@ -12,6 +12,10 @@ namespace AuthenticodeLint.Core.Asn
 
         public AsnBitString(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
         {
+            if (contentData.Count == 0)
+            {
+                throw new AsnException("asn.1 BitString does not have enough data.");
+            }
             UnusedBits = contentData.Array[contentData.Offset];
             Value = new ArraySegment<byte>(contentData.Array, contentData.Offset + 1, contentData.Count - 1);
         }

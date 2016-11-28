@@ -212,5 +212,16 @@ namespace AuthenticodeLint.Core.Tests
             var expectedDateTime = new DateTimeOffset(2014, 03, 11, 06, 37, 01, -new TimeSpan(5, 45, 0)).AddMilliseconds(999);
             Assert.Equal(expectedDateTime, generalizedTime.Value);
         }
+
+        [
+            Theory,
+            InlineData(new byte[] { 0x18, 0x00 }),
+            InlineData(new byte[] { 0x18, 0x0A, 0xFF, 0x30, 0x38, 0x30, 0x31, 0x32, 0x31, 0x30, 0x32, 0x33}),
+            InlineData(new byte[] { 0x18, 0x0A, 0x65, 0x30, 0x38, 0x30, 0x31, 0x32, 0x31, 0x30, 0x32, 0x33})
+        ]
+        public void ShouldThrowOnInvalidInput(byte[] data)
+        {
+            Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
+        }
     }
 }

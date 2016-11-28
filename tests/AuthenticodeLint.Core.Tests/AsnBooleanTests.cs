@@ -57,5 +57,15 @@ namespace AuthenticodeLint.Core.Tests
             var asnBoolean = Assert.IsType<AsnBoolean>(decoded);
             Assert.Equal(expected, asnBoolean.ToString());
         }
+
+        [Fact]
+        public void ShouldThrowExceptionIfBooleanDataEmpty()
+        {
+            var data = new byte[] {
+                0x01, //boolean tag
+                0x00, //empty length
+            };
+            Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
+        }
     }
 }

@@ -22,7 +22,14 @@ namespace AuthenticodeLint.Core.Asn
         /// </summary>
         public AsnUtf8String(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
         {
-            Value = Encoding.UTF8.GetString(contentData.Array, contentData.Offset, contentData.Count);
+            try
+            {
+                Value = Encoding.UTF8.GetString(contentData.Array, contentData.Offset, contentData.Count);
+            }
+            catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
+            {
+                throw new AsnException("asn.1 UTF-8 string could not be decoded to a string.", e);
+            }
         }
 
         public override string ToString() => Value;
