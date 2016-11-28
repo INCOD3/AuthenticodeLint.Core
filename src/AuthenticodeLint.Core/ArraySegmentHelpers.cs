@@ -3,7 +3,7 @@ namespace AuthenticodeLint.Core
 {
     internal static class ArraySegmentHelpers
     {
-        public static T[] ToArray<T>(this ArraySegment<T> ars)
+        public static T[] AsArray<T>(this ArraySegment<T> ars)
         {
             var arr = new T[ars.Count];
             for (var i = 0; i < ars.Count; i++)

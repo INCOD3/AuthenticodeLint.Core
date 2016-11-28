@@ -10,7 +10,8 @@ namespace AuthenticodeLint.Core.Asn
 
         public int UnusedBits { get; }
 
-        public AsnBitString(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             if (contentData.Count == 0)
             {

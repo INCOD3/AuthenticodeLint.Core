@@ -7,7 +7,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         public string Value { get; }
 
-        public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             var builder = new System.Text.StringBuilder();
             var firstOctet = contentData.Array[contentData.Offset] / 40;

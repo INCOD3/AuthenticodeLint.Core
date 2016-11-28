@@ -12,7 +12,8 @@ namespace AuthenticodeLint.Core.Asn
         /// </summary>
         public bool Value { get; }
 
-        public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             if (contentData.Count == 0)
             {

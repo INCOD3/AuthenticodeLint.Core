@@ -7,7 +7,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         public ArraySegment<byte> Value => ContentData;
 
-        public AsnOctetString(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnOctetString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
         }
     }

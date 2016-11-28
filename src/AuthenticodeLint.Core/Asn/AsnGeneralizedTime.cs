@@ -8,7 +8,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         public DateTimeOffset Value { get; }
 
-        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             string strData;
             try

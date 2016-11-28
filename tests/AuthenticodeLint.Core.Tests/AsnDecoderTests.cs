@@ -14,13 +14,14 @@ namespace AuthenticodeLint.Core.Tests
             {
                 0x1F, //Unimplemented tag
                 0x05, //Content length is "5",
-                0x01, 0x02, 0x03, 0x04, 0x05
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x6, 0x7
             };
             var decoded = AsnDecoder.Decode(data);
             var asnRaw = Assert.IsType<AsnRaw>(decoded);
             Assert.Equal((AsnTagValue)31, asnRaw.Tag.Tag);
             var tagData = SerializeArraySegement(asnRaw.ContentData);
             Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, tagData);
+            Assert.Equal(new byte[] { 0x1F, 5, 1, 2, 3, 4, 5 }, SerializeArraySegement(asnRaw.ElementData));
         }
 
         [Fact]

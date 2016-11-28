@@ -9,18 +9,24 @@ namespace AuthenticodeLint.Core.Asn
     public abstract class AsnElement : IAsnElement, IEquatable<AsnElement>
     {
         /// <summary>
-        /// Gets the segement of data for the element.
+        /// Gets the segement of data for the content of the element.
         /// </summary>
         public ArraySegment<byte> ContentData { get; }
+
+        /// <summary>
+        /// Gets the segement of data for the entire element triplet.
+        /// </summary>
+        public ArraySegment<byte> ElementData { get; } 
 
         /// <summary>
         /// The tag of the asn1 element.
         /// </summary>
         public AsnTag Tag { get; }
 
-        protected AsnElement(AsnTag tag, ArraySegment<byte> contentData)
+        protected AsnElement(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
         {
             ContentData = contentData;
+            ElementData = elementData;
             Tag = tag;
         }
 

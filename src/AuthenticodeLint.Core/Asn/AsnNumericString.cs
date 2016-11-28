@@ -6,7 +6,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         public string Value { get; }
 
-        public AsnNumericString(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnNumericString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             var arr = new char[contentData.Count];
             for (int i = 0, j = contentData.Offset; i < contentData.Count; i++, j++)

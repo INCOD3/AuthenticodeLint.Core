@@ -8,7 +8,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         private readonly AsnElement[] _items;
 
-        public AsnConstructed(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnConstructed(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             var collection = new List<AsnElement>();
             var segment = ContentData;
@@ -18,8 +19,9 @@ namespace AuthenticodeLint.Core.Asn
                 {
                     break;
                 }
-                int elementLength;
-                collection.Add(AsnDecoder.Process(segment, out elementLength));
+                var asnSegment = AsnDecoder.Decode(segment);
+                int elementLength = asnSegment.ElementData.Count;
+                collection.Add(asnSegment);
                 if (segment.Count - elementLength < 0)
                 {
                     throw new AsnException("Child data extended beyond set total length.");

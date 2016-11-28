@@ -8,7 +8,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         public string Value { get; }
 
-        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             try
             {

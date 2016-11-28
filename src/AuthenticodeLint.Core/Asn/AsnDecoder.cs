@@ -9,62 +9,57 @@ namespace AuthenticodeLint.Core.Asn
     {
         public static AsnElement Decode(byte[] asnData) => Decode(new ArraySegment<byte>(asnData));
 
-        public static AsnElement Decode(ArraySegment<byte> asnData)
-        {
-            int elementLength;
-            return Process(asnData, out elementLength);
-        }
-
-        internal static AsnElement Process(ArraySegment<byte> data, out int elementLength)
+        public static AsnElement Decode(ArraySegment<byte> data)
         {
             var tagOctet = data.Array[data.Offset];
             int octetLength;
             var tag = ReadTag(tagOctet);
-            var lengthWindow = new ArraySegment<byte>(data.Array, data.Offset + 1, data.Count - 1);
+            var lengthWindow = data.Advance(1);
             var length = ReadTagLength(lengthWindow, out octetLength);
             var contentData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, (int)length);
-            elementLength = 1 + octetLength + checked((int)length);
+            var elementLength = 1 + octetLength + checked((int)length);
+            var elementData = new ArraySegment<byte>(data.Array, data.Offset, elementLength);
             if (tag.AsnClass == AsnClass.Univeral)
             {
                 switch (tag.Tag)
                 {
                     case AsnTagValue.Integer:
-                        return new AsnInteger(tag, contentData);
+                        return new AsnInteger(tag, contentData, elementData);
                     case AsnTagValue.Boolean:
-                        return new AsnBoolean(tag, contentData);
+                        return new AsnBoolean(tag, contentData, elementData);
                     case AsnTagValue.BitString:
-                        return new AsnBitString(tag, contentData);
+                        return new AsnBitString(tag, contentData, elementData);
                     case AsnTagValue.OctetString:
-                        return new AsnOctetString(tag, contentData);
+                        return new AsnOctetString(tag, contentData, elementData);
                     case AsnTagValue.ObjectIdentifier:
-                        return new AsnObjectIdentifier(tag, contentData);
+                        return new AsnObjectIdentifier(tag, contentData, elementData);
                     case AsnTagValue.IA5String:
-                        return new AsnIA5String(tag, contentData);
+                        return new AsnIA5String(tag, contentData, elementData);
                     case AsnTagValue.AsnNull:
-                        return new AsnNull(tag, contentData);
+                        return new AsnNull(tag, contentData, elementData);
                     case AsnTagValue.SequenceSequenceOf:
-                        return new AsnSequence(tag, contentData);
+                        return new AsnSequence(tag, contentData, elementData);
                     case AsnTagValue.SetSetOf:
-                        return new AsnSet(tag, contentData);
+                        return new AsnSet(tag, contentData, elementData);
                     case AsnTagValue.PrintableString:
-                        return new AsnPrintableString(tag, contentData);
+                        return new AsnPrintableString(tag, contentData, elementData);
                     case AsnTagValue.UtcTime:
-                        return new AsnUtcTime(tag, contentData);
+                        return new AsnUtcTime(tag, contentData, elementData);
                     case AsnTagValue.GeneralizedTime:
-                        return new AsnGeneralizedTime(tag, contentData);
+                        return new AsnGeneralizedTime(tag, contentData, elementData);
                     case AsnTagValue.NumericString:
-                        return new AsnNumericString(tag, contentData);
+                        return new AsnNumericString(tag, contentData, elementData);
                     case AsnTagValue.BmpString:
-                        return new AsnBmpString(tag, contentData);
+                        return new AsnBmpString(tag, contentData, elementData);
                 }
             }
             if (tag.Constructed)
             {
-                return new AsnConstructed(tag, contentData);
+                return new AsnConstructed(tag, contentData, elementData);
             }
             else
             {
-                return new AsnRaw(tag, contentData);
+                return new AsnRaw(tag, contentData, elementData);
             }
         }
 

@@ -7,7 +7,8 @@ namespace AuthenticodeLint.Core.Asn
     {
         public string Value { get; }
 
-        public AsnIA5String(AsnTag tag, ArraySegment<byte> contentData) : base(tag, contentData)
+        public AsnIA5String(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+            : base(tag, contentData, elementData)
         {
             try
             {
