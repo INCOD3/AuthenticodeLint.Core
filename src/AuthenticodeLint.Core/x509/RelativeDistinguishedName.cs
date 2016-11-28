@@ -25,7 +25,7 @@ namespace AuthenticodeLint.Core.x509
                 {
                     throw new InvalidOperationException();
                 }
-                dnList.Add(new RelativeDistinguishedNameComponent(identifier.Value, value.Value, value.ContentData.ToArray()));
+                dnList.Add(new RelativeDistinguishedNameComponent(identifier.Value, value.Value, value.ContentData.AsArray()));
             }
             _components = dnList;
         }

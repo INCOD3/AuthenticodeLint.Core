@@ -11,13 +11,12 @@ namespace AuthenticodeLint.Core.Asn
 
         public static AsnElement Decode(ArraySegment<byte> data)
         {
-            var tagOctet = data.Array[data.Offset];
-            int octetLength;
-            var tag = ReadTag(tagOctet);
-            var lengthWindow = data.Advance(1);
+            int octetLength, tagLength;
+            var tag = ReadTag(data, out tagLength);
+            var lengthWindow = data.Advance(tagLength);
             var length = ReadTagLength(lengthWindow, out octetLength);
             var contentData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, (int)length);
-            var elementLength = 1 + octetLength + checked((int)length);
+            var elementLength = tagLength + octetLength + checked((int)length);
             var elementData = new ArraySegment<byte>(data.Array, data.Offset, elementLength);
             if (tag.AsnClass == AsnClass.Univeral)
             {
@@ -63,9 +62,37 @@ namespace AuthenticodeLint.Core.Asn
             }
         }
 
-        private static AsnTag ReadTag(byte tag)
+        private static AsnTag ReadTag(ArraySegment<byte> tagData, out int tagLength)
         {
-            return new AsnTag((AsnTagValue)(tag & 0x1F), (AsnClass)((tag & 0xC0) >> 6), (tag & 0x20) == 0x20);
+            var tag = tagData.Array[tagData.Offset];
+            var asnClass = (AsnClass)((tag & 0xC0) >> 6);
+            var constructed = (tag & 0x20) == 0x20;
+            var highTagNumber = (tag & 0x1F) == 0x1F; //5 lower bits set
+            if (!highTagNumber)
+            {
+                tagLength = 1;
+                return new AsnTag((AsnTagValue)(tag & 0x1F), asnClass, constructed);
+            }
+            else
+            {
+                ulong tagNumber = 0;
+                for (var i = 1; i < tagData.Count; i++)
+                {
+                    if (i > 8)
+                    {
+                        throw new AsnException($"asn.1 encoded tag is larger than the supported maximum of {ulong.MaxValue}");
+                    }
+                    var item = tagData.Array[tagData.Offset + i];
+                    tagNumber <<= 7;
+                    tagNumber |= (byte)(item & 0x7F);
+                    if ((item & 0x80) != 0x80)
+                    {
+                        tagLength = i + 1;
+                        return new AsnTag((AsnTagValue)tagNumber, asnClass, constructed);
+                    }
+                }
+                throw new AsnException("asn.1 tag malformed. Expected more data.");
+            }
         }
 
         private static ulong ReadTagLength(ArraySegment<byte> data, out int octetLength)
@@ -94,7 +121,9 @@ namespace AuthenticodeLint.Core.Asn
         }
     }
 
-    public enum AsnTagValue : byte
+    //This enum is a ulong because other non-universal values
+    //may be converted to this enum as a nameless value. 
+    public enum AsnTagValue : ulong
     {
         Boolean = 1,
         Integer = 2,
