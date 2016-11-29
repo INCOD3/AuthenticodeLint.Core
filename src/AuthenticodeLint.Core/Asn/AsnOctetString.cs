@@ -10,6 +10,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnOctetString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of OctetString are not valid.");
+            }
         }
     }
 

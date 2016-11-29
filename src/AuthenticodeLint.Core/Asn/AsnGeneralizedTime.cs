@@ -11,6 +11,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of GeneralizeTime are not valid.");
+            }
             string strData;
             try
             {

@@ -13,6 +13,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of BitString are not valid.");
+            }
             if (contentData.Count == 0)
             {
                 throw new AsnException("asn.1 BitString does not have enough data.");

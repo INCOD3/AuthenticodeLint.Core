@@ -10,6 +10,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of ObjectIdentifier are not valid.");
+            }
             var builder = new System.Text.StringBuilder();
             var firstOctet = contentData.Array[contentData.Offset] / 40;
             var secondOctet = contentData.Array[contentData.Offset] % 40;

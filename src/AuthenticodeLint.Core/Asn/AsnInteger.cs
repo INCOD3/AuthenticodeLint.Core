@@ -17,6 +17,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnInteger(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of Integer are not valid.");
+            }
             var buffer = new byte[contentData.Count];
             //BigInteger expects the number in little endian.
             for (int i = contentData.Count - 1, j = 0; i >= 0; i--, j++)

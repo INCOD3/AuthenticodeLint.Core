@@ -9,6 +9,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnNumericString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of NumericString are not valid.");
+            }
             var arr = new char[contentData.Count];
             for (int i = 0, j = contentData.Offset; i < contentData.Count; i++, j++)
             {

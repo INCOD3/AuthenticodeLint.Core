@@ -23,6 +23,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnUtf8String(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of Utf8String are not valid.");
+            }
             try
             {
                 Value = Encoding.UTF8.GetString(contentData.Array, contentData.Offset, contentData.Count);

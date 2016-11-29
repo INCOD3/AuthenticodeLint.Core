@@ -10,6 +10,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnPrintableString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of PrintableString are not valid.");
+            }
             try
             {
                 Value = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);

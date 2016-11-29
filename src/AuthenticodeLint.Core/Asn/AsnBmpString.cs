@@ -11,6 +11,10 @@ namespace AuthenticodeLint.Core.Asn
         public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
             : base(tag, contentData, elementData)
         {
+            if (tag.Constructed)
+            {
+                throw new AsnException("Constructed forms of BmpString are not valid.");
+            }
             try
             {
                 Value = Encoding.BigEndianUnicode.GetString(contentData.Array, contentData.Offset, contentData.Count);
