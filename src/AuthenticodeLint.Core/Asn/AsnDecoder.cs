@@ -9,6 +9,34 @@ namespace AuthenticodeLint.Core.Asn
     {
         public static AsnElement Decode(byte[] asnData) => Decode(new ArraySegment<byte>(asnData));
 
+        public static bool TryDecode(byte[] asnData, out AsnElement element)
+        {
+            try
+            {
+                element = Decode(asnData);
+                return true;
+            }
+            catch (AsnException)
+            {
+                element = default(AsnElement);
+                return false;
+            }
+        }
+
+        public static bool TryDecode(ArraySegment<byte> asnData, out AsnElement element)
+        {
+            try
+            {
+                element = Decode(asnData);
+                return true;
+            }
+            catch (AsnException)
+            {
+                element = default(AsnElement);
+                return false;
+            }
+        }
+
         public static AsnElement Decode(ArraySegment<byte> data)
         {
             int octetLength, tagLength;
