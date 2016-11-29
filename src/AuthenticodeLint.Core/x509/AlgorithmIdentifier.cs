@@ -14,6 +14,7 @@ namespace AuthenticodeLint.Core.x509
 
         public AlgorithmIdentifier(AsnSequence sequence)
         {
+            RawData = sequence.ElementData;
             var reader = new AsnConstructedReader(sequence);
             AsnObjectIdentifier algorithm;
             AsnElement parameters;
@@ -32,6 +33,7 @@ namespace AuthenticodeLint.Core.x509
             }
         }
 
+        public ArraySegment<byte> RawData { get; }
         public string Algorithm { get; }
         public ArraySegment<byte>? Parameters { get; }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
@@ -38,6 +39,8 @@ namespace AuthenticodeLint.Core.x509
             {
                 ThrowRead(nameof(tbsSignature));
             }
+            SignatureAlgorithmIdentifier = new AlgorithmIdentifier(tbsSignatureAlgorithm);
+            Signature = tbsSignature.Value;
             ReadTbsCertificate(tbsCertificate);
         }
 
@@ -60,6 +63,12 @@ namespace AuthenticodeLint.Core.x509
         public x500DistinguishedName Subject { get; private set; }
 
         public SubjectPublicKeyInfo PublicKey { get; private set; }
+
+        public x509Extenions Extensions { get; private set; }
+
+        public AlgorithmIdentifier SignatureAlgorithmIdentifier { get; private set; }
+
+        public ArraySegment<byte> Signature { get; private set; }
 
         private void ReadTbsCertificate(AsnSequence tbsCertificate)
         {
@@ -108,6 +117,45 @@ namespace AuthenticodeLint.Core.x509
             NotAfter = validity.Item2.Value;
             Subject = new x500DistinguishedName(subject);
             PublicKey = new SubjectPublicKeyInfo(spki);
+            if (reader.CanMove() && Version == 0)
+            {
+                throw new x509Exception("x509 certificate is version 1 but contains version 2 or 3 data.");
+            }
+            AsnElement element;
+            ulong lastCustomTagRead = 0;
+            while (reader.MoveNext(out element))
+            {
+                if (!element.Tag.Constructed || element.Tag.AsnClass == AsnClass.Univeral)
+                {
+                    throw new x509Exception($"Unexpected tag type: {element.Tag.Tag}");
+                }
+                var tagNumber = (ulong)element.Tag.Tag;
+                if (tagNumber < lastCustomTagRead)
+                {
+                    throw new x509Exception("x509 certificate contains out-of-order elements.");
+                }
+                if (tagNumber == 1 || tagNumber == 2)
+                {
+                    //We don't do anything with the issuerUniqueID or subjectUniqueID fields right now.
+                    continue;
+                }
+                if (tagNumber == 3)
+                {
+                    var extensions = AsnContructedStaticReader.Read<AsnSequence>((AsnConstructed)element).Item1;
+                    Extensions = new x509Extenions(extensions);
+                }
+            }
+        }
+
+        public Task ExportAsync(Stream destination) => destination.WriteAsync(_data.Array, _data.Offset, _data.Count);
+
+        public void Export(byte[] buffer, int offset)
+        {
+            if (buffer.Length - offset < _data.Count)
+            {
+                throw new ArgumentException("Buffer is not large enough to contain data.");
+            }
+            Buffer.BlockCopy(_data.Array, _data.Offset, buffer, offset, _data.Count);
         }
 
         private static void ThrowRead(string field)

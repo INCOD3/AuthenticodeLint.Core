@@ -2,6 +2,12 @@ namespace AuthenticodeLint.Core.Asn
 {
     public static class KnownOids
     {
+        public static class CertificateExtensions
+        {
+            public const string id_ce_basicConsraints = "2.5.29.19";
+            public const string id_ce_extKeyUsage = "2.5.29.37";
+        }
+
         public static class DistinguishedName
         {
             public const string id_at_objectClass = "2.5.4.0";

@@ -30,13 +30,13 @@ namespace AuthenticodeLint.Core.Asn
                 item = default(T);
                 return false;
             }
-            _next++;
-            var next = _sequence[_next] as T;
+            var next = _sequence[_next + 1] as T;
             if (next == null)
             {
                 item = default(T);
                 return false;
             }
+            _next++;
             item = next;
             return true;
         }
