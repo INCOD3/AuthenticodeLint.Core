@@ -1,8 +1,6 @@
 AuthenticodeLint.Core
 ===========
 
-[![Build Status](https://travis-ci.org/vcsjones/AuthenticodeLint.Core.svg?branch=master)](https://travis-ci.org/vcsjones/AuthenticodeLint.Core)
-
 # About
 
 AuthenticodeLint.Core is a work-in-progress rewrite and port of the [AuthenticodeLint][1]
