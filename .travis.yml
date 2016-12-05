@@ -1,7 +1,0 @@
-language: generic
-dist: trusty
-sudo: required
-os:
-  - linux
-script:
-  - ./travis-build.sh
