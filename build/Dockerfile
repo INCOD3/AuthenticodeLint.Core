@@ -31,10 +31,6 @@ RUN mkdir -p /var/tmp/dotnet-prime \
     && rm -rf /var/tmp/dotnet-prime
 
 # Install surf
-RUN npm install -g surf-build
-
-# BIG HACK: Until https://github.com/surf-build/surf/pull/54
-# is deployed, we simply delete the danger.js file from surf's package
-RUN find /usr/local/lib/node_modules/surf-build -name danger.js | xargs rm
+RUN npm install -g surf-build@1.0.0-beta.15
 
 CMD surf-run -r https://github.com/vcsjones/AuthenticodeLint.Core -- surf-build -n 'surf-netcore-1.0.1'
