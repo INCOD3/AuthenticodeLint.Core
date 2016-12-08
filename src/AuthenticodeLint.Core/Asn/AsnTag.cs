@@ -42,5 +42,7 @@ namespace AuthenticodeLint.Core.Asn
             //Bit 1-8: asn class
             //Bit 9-16: asn tag
             ((int)_tag << 9) | ((int)_asnClass << 1) | (_constructed ? 1 : 0);
+
+        public override string ToString() => $"Tag: {{{ (AsnClass == AsnClass.Univeral ? Tag.ToString() : ((ulong)Tag).ToString()) }}}; Class: {{{AsnClass}}}; Constructed: {{{Constructed}}};";
     }
 }

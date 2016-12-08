@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +22,7 @@ namespace AuthenticodeLint.Core.x509
                 IDirectoryString value;
                 if (!seqReader.MoveNext(out identifier) || !seqReader.MoveNext(out value))
                 {
-                    throw new InvalidOperationException();
+                    throw new x509Exception("Distinguished Name component does not contain a valid ObjectIdentifer or directory string.");
                 }
                 dnList.Add(new RelativeDistinguishedNameComponent(identifier.Value, value.Value, value.ContentData.AsArray()));
             }

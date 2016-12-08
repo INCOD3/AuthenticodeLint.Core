@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
@@ -9,6 +7,11 @@ namespace AuthenticodeLint.Core.x509
     public sealed class x509Extenions : IReadOnlyList<x509Extension>
     {
         private readonly List<x509Extension> _internalList;
+
+        internal x509Extenions()
+        {
+            _internalList = new List<x509Extension>();
+        }
 
         internal x509Extenions(AsnSequence sequence)
         {

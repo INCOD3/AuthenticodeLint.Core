@@ -2,6 +2,16 @@ namespace AuthenticodeLint.Core.Asn
 {
     public static class KnownOids
     {
+        public static class CmsContentTypes
+        {
+            public const string signedData = "1.2.840.113549.1.7.2";
+            public const string data = "1.2.840.113549.1.7.1";
+            public const string envelopedData = "1.2.840.113549.1.7.3";
+            public const string signedAndEnvelopedData = "1.2.840.113549.1.7.4";
+            public const string digestedData = "1.2.840.113549.1.7.5";
+            public const string encryptedData = "1.2.840.113549.1.7.6";
+        }
+
         public static class CertificateExtensions
         {
             public const string id_ce_basicConsraints = "2.5.29.19";

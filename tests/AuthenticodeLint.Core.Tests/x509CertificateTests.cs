@@ -19,7 +19,12 @@ namespace AuthenticodeLint.Core.Tests
         {
             var certificate = new x509Certificate("files/vcsjones.com.crt");
             var expectedSerial = new byte[] { 0x00, 0x83, 0xE1, 0x89, 0x30, 0x1A, 0x8F, 0xF6, 0xA5, 0x52, 0x2A, 0x50, 0x09, 0x7E, 0xCA, 0x43, 0x44 };
+            var expectedSha1Thumbprint = new byte[] {
+                0x73, 0xBA, 0x68, 0x4B, 0x21, 0x76, 0x44, 0xD4, 0x4A, 0x67,
+                0x62, 0xAB, 0xFC, 0xC7, 0x57, 0x38, 0x77, 0x62, 0x72, 0xB3,
+                };
             Assert.Equal(expectedSerial, certificate.SerialNumber);
+            Assert.Equal(expectedSha1Thumbprint, certificate.Thumbprint);
             Assert.Equal("1.2.840.10045.4.3.2", certificate.AlgorithmIdentifier.Algorithm);
             Assert.Equal("1.2.840.10045.4.3.2", certificate.SignatureAlgorithmIdentifier.Algorithm);
             Assert.Null(certificate.AlgorithmIdentifier.Parameters);
@@ -133,6 +138,63 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal("Kevin Jones", dn[0][0].Value);
             Assert.Equal("US", dn[0][1].Value);
             Assert.Equal("CN=Kevin Jones + C=US, CN=Turtle", dn.ToString());
+        }
+
+        [
+            Theory,
+            InlineData("files/vcsjones.com.crt", "files/vcsjones.com.crt", true),
+            InlineData("files/vcsjones.com.crt", "files/thycotic.com.crt", false),
+        ]
+        public void ShouldCheckThumbprints(string path1, string path2, bool isZero)
+        {
+            var cert1 = new x509Certificate(path1);
+            var cert2 = new x509Certificate(path2);
+            if (isZero)
+            {
+                Assert.Equal(0, cert1.CompareTo(cert2, x509Certificate.ThumbprintComparer.Instance));
+            }
+            else
+            {
+                Assert.NotEqual(0, cert1.CompareTo(cert2, x509Certificate.ThumbprintComparer.Instance));
+            }
+        }
+
+        [
+            Theory,
+            InlineData("files/vcsjones.com.crt", "files/vcsjones.com.crt", true),
+            InlineData("files/vcsjones.com.crt", "files/thycotic.com.crt", false),
+        ]
+        public void ShouldCheckIssuerAndSerial(string path1, string path2, bool isZero)
+        {
+            var cert1 = new x509Certificate(path1);
+            var cert2 = new x509Certificate(path2);
+            if (isZero)
+            {
+                Assert.Equal(0, cert1.CompareTo(cert2, x509Certificate.IssuerAndSerialComparer.Instance));
+            }
+            else
+            {
+                Assert.NotEqual(0, cert1.CompareTo(cert2, x509Certificate.IssuerAndSerialComparer.Instance));
+            }
+        }
+
+        [
+            Theory,
+            InlineData("files/vcsjones.com.crt", "files/vcsjones.com.crt", true),
+            InlineData("files/vcsjones.com.crt", "files/thycotic.com.crt", false),
+        ]
+        public void ShouldCheckByteEquality(string path1, string path2, bool isZero)
+        {
+            var cert1 = new x509Certificate(path1);
+            var cert2 = new x509Certificate(path2);
+            if (isZero)
+            {
+                Assert.Equal(0, cert1.CompareTo(cert2, x509Certificate.IdenticalCertificateComparer.Instance));
+            }
+            else
+            {
+                Assert.NotEqual(0, cert1.CompareTo(cert2, x509Certificate.IdenticalCertificateComparer.Instance));
+            }
         }
     }
 }

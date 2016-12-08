@@ -78,6 +78,8 @@ namespace AuthenticodeLint.Core.Asn
                         return new AsnNumericString(tag, contentData, elementData);
                     case AsnTagValue.BmpString:
                         return new AsnBmpString(tag, contentData, elementData);
+                    case AsnTagValue.Utf8String:
+                        return new AsnUtf8String(tag, contentData, elementData);
                 }
             }
             if (tag.Constructed)
@@ -150,7 +152,7 @@ namespace AuthenticodeLint.Core.Asn
     }
 
     //This enum is a ulong because other non-universal values
-    //may be converted to this enum as a nameless value. 
+    //may be converted to this enum as a nameless value.
     public enum AsnTagValue : ulong
     {
         Boolean = 1,

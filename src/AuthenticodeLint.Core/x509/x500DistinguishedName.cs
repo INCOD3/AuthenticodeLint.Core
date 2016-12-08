@@ -9,12 +9,14 @@ namespace AuthenticodeLint.Core.x509
     public class x500DistinguishedName : IReadOnlyList<RelativeDistinguishedName>
     {
         private readonly RelativeDistinguishedName[] _rdns;
+        private readonly AsnSequence _underlyingSequence;
 
         /// <summary>
         /// Creates a new Distinguished Name from an asn.1 RDNSequence.
         /// </summary>
         public x500DistinguishedName(AsnSequence sequence)
         {
+            _underlyingSequence = sequence;
             var sets = sequence.Cast<AsnSet>().ToArray();
             var rdns = new RelativeDistinguishedName[sets.Length];
             for (var i = 0; i < rdns.Length; i++)
@@ -28,6 +30,8 @@ namespace AuthenticodeLint.Core.x509
         public RelativeDistinguishedName this[int index] => _rdns[index];
 
         public int Count => _rdns.Length;
+
+        internal AsnSequence UnderlyingSequence => _underlyingSequence;
 
         public IEnumerator<RelativeDistinguishedName> GetEnumerator()
         {
