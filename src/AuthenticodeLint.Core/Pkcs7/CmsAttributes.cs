@@ -5,15 +5,15 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.Pkcs7
 {
-    public sealed class CmsAttributes : IReadOnlyList<CmsAttribute>
+    public sealed class CmsAttributes : IReadOnlyList<CmsGenericAttribute>
     {
-        private readonly List<CmsAttribute> _list = new List<CmsAttribute>();
+        private readonly List<CmsGenericAttribute> _list = new List<CmsGenericAttribute>();
 
-        public CmsAttribute this[int index] => _list[index];
+        public CmsGenericAttribute this[int index] => _list[index];
 
         public int Count => _list.Count;
 
-        public IEnumerator<CmsAttribute> GetEnumerator() => _list.GetEnumerator();
+        public IEnumerator<CmsGenericAttribute> GetEnumerator() => _list.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

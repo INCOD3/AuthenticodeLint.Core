@@ -13,7 +13,9 @@ namespace AuthenticodeLint.Core.Asn
             var displayTag = DisplayTag(element.Tag);
             if (asConstructed != null)
             {
-                writer.WriteLine($"{indent}{displayTag}:");
+                writer.Write(indent);
+                writer.Write(displayTag);
+                writer.WriteLine(':');
                 var sequence = (AsnConstructed)element;
                 foreach (var child in sequence)
                 {
@@ -22,17 +24,13 @@ namespace AuthenticodeLint.Core.Asn
             }
             else
             {
-                writer.WriteLine($"{indent}{displayTag}: {element}");
+                writer.Write(indent);
+                writer.Write(displayTag);
+                writer.Write(": ");
+                writer.WriteLine(element);
             }
         }
 
-        private static string DisplayTag(AsnTag tag)
-        {
-            if (tag.AsnClass == AsnClass.Univeral)
-            {
-                return tag.Tag.ToString();
-            }
-            return $"[{((byte)tag.Tag)}]";
-        }
+        private static string DisplayTag(AsnTag tag) => tag.AsnClass == AsnClass.Univeral ? tag.Tag.ToString() : $"[{((ulong)tag.Tag)}]";
     }
 }

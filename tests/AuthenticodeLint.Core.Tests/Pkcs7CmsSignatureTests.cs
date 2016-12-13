@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using AuthenticodeLint.Core.PE;
@@ -22,6 +23,15 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal(1, signerInfo.Version);
             Assert.Equal("1.3.14.3.2.26", signerInfo.DigestAlgorithm.Algorithm);
             Assert.Equal("1.2.840.10045.2.1", signerInfo.EncryptionAlgorithm.Algorithm);
+            Assert.Equal(4, signerInfo.AuthenticatedAttributes.Count);
+
+            var opus = Assert.IsType<CmsOpusAttribute>(signerInfo.AuthenticatedAttributes[3]);
+            Assert.Equal("Authenticode Lint", opus.ProgramName);
+            Assert.Equal("https://vcsjones.com/authlint\u0020", opus.MoreInfo);
+
+            var digestAttribute = Assert.IsType<CmsMessageDigestAttibute>(signerInfo.AuthenticatedAttributes[2]);
+            var expectedDigest = new byte[] {0x1D, 0xC0, 0x36, 0x8A, 0xA7, 0xDC, 0x96, 0xE4, 0xAC, 0x57, 0x90, 0xBC, 0x3A, 0x4E, 0xEE, 0x35, 0x6A, 0x85, 0x2C, 0xCF};
+            Assert.Equal(new ArraySegment<byte>(expectedDigest), digestAttribute.Digest);
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

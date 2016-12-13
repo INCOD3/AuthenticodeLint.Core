@@ -3,13 +3,10 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.Pkcs7
 {
-    public abstract class CmsAttribute
+    public class CmsGenericAttribute
     {
         public string AttributeId { get; protected set; }
-    }
 
-    public class CmsGenericAttribute : CmsAttribute
-    {
         public CmsGenericAttribute(string attributeId, AsnSet content)
         {
             AttributeId = attributeId;
@@ -111,7 +108,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
     public static class CmsAttributeDecoder
     {
-        public static CmsAttribute Decode(AsnSequence sequence)
+        public static CmsGenericAttribute Decode(AsnSequence sequence)
         {
             var properties = AsnContructedStaticReader.Read<AsnObjectIdentifier, AsnSet>(sequence);
             var attributeId = properties.Item1.Value;
