@@ -30,10 +30,6 @@ namespace AuthenticodeLint.Core.Asn
             Tag = tag;
         }
 
-        public AsnElement()
-        {
-        }
-
         public override bool Equals(object obj) => Equals(obj as AsnElement);
 
         public override int GetHashCode() => ContentData.GetHashCode();
@@ -52,13 +48,10 @@ namespace AuthenticodeLint.Core.Asn
             return ElementData.Compare(other.ElementData) == 0;
         }
 
-        public TType Reinterpret<TType>() where TType : AsnElement, new()
+        public TType Reinterpret<TType>() where TType : AsnElement
         {
-            var element = new TType();
-            element.ContentData = ContentData;
-            element.ElementData = ElementData;
-            element.Tag = Tag;
-            return element;
+            //Yuck, but, yuck.
+            return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData);
         }
 
         public override string ToString()

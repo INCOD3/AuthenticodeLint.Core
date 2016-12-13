@@ -2,6 +2,12 @@ namespace AuthenticodeLint.Core.Asn
 {
     public static class KnownOids
     {
+        public static class CmsPkcs9AttributeIds
+        {
+            public const string messageDigest = "1.2.840.113549.1.9.4";
+            public const string opusInfo = "1.3.6.1.4.1.311.2.1.12";
+        }
+
         public static class CmsContentTypes
         {
             public const string signedData = "1.2.840.113549.1.7.2";
@@ -76,7 +82,6 @@ namespace AuthenticodeLint.Core.Asn
             public const string id_at_deltaRevocationList = "2.5.4.53";
             public const string id_at_attributeCertificate = "2.5.4.58";
             public const string id_at_pseudonym = "2.5.4.65";
-
             public const string e_mailAddress = "1.2.840.113549.1.9.1";
 
         }

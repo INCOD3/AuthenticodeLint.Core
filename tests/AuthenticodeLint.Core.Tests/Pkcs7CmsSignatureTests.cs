@@ -20,6 +20,8 @@ namespace AuthenticodeLint.Core.Tests
             var signerInfo = content.SignerInfos[0];
             Assert.NotNull(signerInfo.IssuerAndSerialNumber);
             Assert.Equal(1, signerInfo.Version);
+            Assert.Equal("1.3.14.3.2.26", signerInfo.DigestAlgorithm.Algorithm);
+            Assert.Equal("1.2.840.10045.2.1", signerInfo.EncryptionAlgorithm.Algorithm);
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)
