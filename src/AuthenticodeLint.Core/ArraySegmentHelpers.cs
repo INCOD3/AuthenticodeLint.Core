@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core
             var arr = new StringBuilder(ars.Count * 2);
             for (var i = 0; i < ars.Count; i++)
             {
-                arr.AppendFormat(ars.Array[ars.Offset + i].ToString("X2"));
+                arr.Append(ars.Array[ars.Offset + i].ToString("X2"));
             }
             return arr.ToString();
         }

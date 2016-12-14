@@ -48,20 +48,16 @@ namespace AuthenticodeLint.Core.Asn
             return ElementData.Compare(other.ElementData) == 0;
         }
 
+        /// <summary>
+        /// Reinterprets the current element as another element type.
+        /// This is useful for implicit tags.
+        /// </summary>
         public TType Reinterpret<TType>() where TType : AsnElement
         {
             //Yuck, but, yuck.
             return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData);
         }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            for (var i = 0; i < ContentData.Count; i++)
-            {
-                builder.AppendFormat("{0:X2}", ContentData.Array[ContentData.Offset + i]);
-            }
-            return builder.ToString();
-        }
+        public override string ToString() => ContentData.Join();
     }
 }

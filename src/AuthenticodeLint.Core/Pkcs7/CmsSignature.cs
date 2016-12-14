@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Pkcs7
                 throw new Pkcs7Exception("Unable to parse PKCS#7 signature.");
             }
             _contentInfo = (AsnSequence)decoded;
-            var items = AsnContructedStaticReader.Read<AsnObjectIdentifier, AsnElement>(_contentInfo);
+            var items = AsnReader.Read<AsnObjectIdentifier, AsnElement>(_contentInfo);
             ContentType = MapFromOid(items.Item1.Value);
             var content = items.Item2;
             switch (ContentType)

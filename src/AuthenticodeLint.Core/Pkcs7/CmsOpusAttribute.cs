@@ -1,37 +1,12 @@
-using System;
 using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.Pkcs7
 {
-    public class CmsGenericAttribute
-    {
-        public string AttributeId { get; protected set; }
-
-        public CmsGenericAttribute(string attributeId, AsnSet content)
-        {
-            AttributeId = attributeId;
-            Content = content.ElementData;
-        }
-
-        public ArraySegment<byte> Content { get; }
-    }
-
-    public sealed class CmsMessageDigestAttibute : CmsGenericAttribute
-    {
-        public CmsMessageDigestAttibute(string attributeId, AsnSet content) : base(attributeId, content)
-        {
-            var digest = AsnContructedStaticReader.Read<AsnOctetString>(content);
-            Digest = digest.Item1.Value;
-        }
-
-        public ArraySegment<byte> Digest { get; }
-    }
-
     public sealed class CmsOpusAttribute : CmsGenericAttribute
     {
         public CmsOpusAttribute(string attributeId, AsnSet content) : base(attributeId, content)
         {
-            var items = AsnContructedStaticReader.Read<AsnSequence>(content);
+            var items = AsnReader.Read<AsnSequence>(content);
             AsnConstructed programName = null, moreInfo = null;
             var reader = new AsnConstructedReader(items.Item1);
             AsnConstructed next;
@@ -48,13 +23,13 @@ namespace AuthenticodeLint.Core.Pkcs7
             }
             if (programName != null)
             {
-                var program = AsnContructedStaticReader.Read<AsnElement>(programName);
+                var program = AsnReader.Read<AsnElement>(programName);
                 ProgramName = DecodeSpcString(program.Item1);
             }
 
             if (moreInfo != null)
             {
-                var more = AsnContructedStaticReader.Read<AsnElement>(moreInfo);
+                var more = AsnReader.Read<AsnElement>(moreInfo);
                 if (more.Item1.Tag.IsExImTag(0))
                 {
                     var moreString = more.Item1.Reinterpret<AsnIA5String>();
@@ -103,24 +78,6 @@ namespace AuthenticodeLint.Core.Pkcs7
             Url,
             File,
             Moniker,
-        }
-    }
-
-    public static class CmsAttributeDecoder
-    {
-        public static CmsGenericAttribute Decode(AsnSequence sequence)
-        {
-            var properties = AsnContructedStaticReader.Read<AsnObjectIdentifier, AsnSet>(sequence);
-            var attributeId = properties.Item1.Value;
-            switch (attributeId)
-            {
-                case KnownOids.CmsPkcs9AttributeIds.messageDigest:
-                    return new CmsMessageDigestAttibute(attributeId, properties.Item2);
-                case KnownOids.CmsPkcs9AttributeIds.opusInfo:
-                    return new CmsOpusAttribute(attributeId, properties.Item2);
-                default:
-                    return new CmsGenericAttribute(attributeId, properties.Item2);
-            }
         }
     }
 }

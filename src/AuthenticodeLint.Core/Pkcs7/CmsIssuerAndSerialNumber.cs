@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public CmsIssuerAndSerialNumber(AsnSequence sequence)
         {
-            var nameAndSerial = AsnContructedStaticReader.Read<AsnSequence, AsnInteger>(sequence);
+            var nameAndSerial = AsnReader.Read<AsnSequence, AsnInteger>(sequence);
             Name = new x500DistinguishedName(nameAndSerial.Item1);
             SerialNumber = nameAndSerial.Item2.ContentData;
         }

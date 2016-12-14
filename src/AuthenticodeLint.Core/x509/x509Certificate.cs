@@ -141,8 +141,8 @@ namespace AuthenticodeLint.Core.x509
             {
                 throw new x509Exception("Version is not specified.");
             }
-            Version = (int)AsnContructedStaticReader.Read<AsnInteger>(version).Item1.Value;
-            var validity = AsnContructedStaticReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
+            Version = (int)AsnReader.Read<AsnInteger>(version).Item1.Value;
+            var validity = AsnReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
             NotBefore = validity.Item1.Value;
             NotAfter = validity.Item2.Value;
             Subject = new x500DistinguishedName(subject);
@@ -171,7 +171,7 @@ namespace AuthenticodeLint.Core.x509
                 }
                 if (tagNumber == 3)
                 {
-                    var extensions = AsnContructedStaticReader.Read<AsnSequence>((AsnConstructed)element).Item1;
+                    var extensions = AsnReader.Read<AsnSequence>((AsnConstructed)element).Item1;
                     Extensions = new x509Extenions(extensions);
                 }
             }

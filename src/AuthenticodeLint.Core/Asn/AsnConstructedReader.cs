@@ -101,7 +101,7 @@ namespace AuthenticodeLint.Core.Asn
         public void Reset() => _next = -1;
     }
 
-    internal static class AsnContructedStaticReader
+    internal static class AsnReader
     {
         public static ValueTuple<T1> Read<T1>(AsnConstructed sequence)
             where T1 : class, IAsnElement
