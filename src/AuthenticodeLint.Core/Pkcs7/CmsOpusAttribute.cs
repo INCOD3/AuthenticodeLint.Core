@@ -1,3 +1,4 @@
+using System;
 using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.Pkcs7
@@ -33,16 +34,19 @@ namespace AuthenticodeLint.Core.Pkcs7
                 if (more.Item1.Tag.IsExImTag(0))
                 {
                     var moreString = more.Item1.Reinterpret<AsnIA5String>();
-                    MoreInfo = moreString.Value;
-                    MoreInfoType = InfoType.Url;
+                    MoreInfo = new SpcMoreInfoString(moreString.Value, InfoType.Url);
                 }
                 else if (more.Item1.Tag.IsExImTag(1))
                 {
-                    MoreInfoType = InfoType.Moniker;
+                    var serializedSeq = more.Item1.Reinterpret<AsnSequence>();
+                    var data = AsnReader.Read<AsnOctetString, AsnOctetString>(serializedSeq);
+                    MoreInfo = new SpcMoreInfoBinary(new Guid(data.Item1.Value.AsArray()), data.Item2.Value);
                 }
                 else if (more.Item1.Tag.IsExImTag(2))
                 {
-                    MoreInfoType = InfoType.File;
+                    var spcString = AsnReader.Read<AsnElement>((AsnConstructed)more.Item1);
+                    var moreString = DecodeSpcString(spcString.Item1);
+                    MoreInfo = new SpcMoreInfoString(moreString, InfoType.File);
                 }
                 else
                 {
@@ -70,8 +74,40 @@ namespace AuthenticodeLint.Core.Pkcs7
         }
 
         public string ProgramName { get; }
-        public string MoreInfo { get; }
+        public SpcMoreInfo MoreInfo { get; }
+    }
+
+    public abstract class SpcMoreInfo
+    {
         public InfoType MoreInfoType { get; }
+
+        protected SpcMoreInfo(InfoType moreInfoType)
+        {
+            MoreInfoType = moreInfoType;
+        }
+    }
+
+    public sealed class SpcMoreInfoString : SpcMoreInfo
+    {
+        public string Value { get; }
+
+        public SpcMoreInfoString(string value, InfoType moreInfoType) : base(moreInfoType)
+        {
+            Value = value;
+        }
+    }
+
+    public sealed class SpcMoreInfoBinary : SpcMoreInfo
+    {
+        public Guid Uuid { get; }
+        public ArraySegment<byte> SerializedData { get; }
+
+        public SpcMoreInfoBinary(Guid uuid, ArraySegment<byte> serializedData) : base(InfoType.Moniker)
+        {
+            Uuid = uuid;
+            SerializedData = serializedData;
+        }
+    }
 
         public enum InfoType
         {
@@ -79,5 +115,4 @@ namespace AuthenticodeLint.Core.Pkcs7
             File,
             Moniker,
         }
-    }
 }

@@ -27,7 +27,8 @@ namespace AuthenticodeLint.Core.Tests
 
             var opus = Assert.IsType<CmsOpusAttribute>(signerInfo.AuthenticatedAttributes[3]);
             Assert.Equal("Authenticode Lint", opus.ProgramName);
-            Assert.Equal("https://vcsjones.com/authlint\u0020", opus.MoreInfo);
+            var moreInfoUrl = Assert.IsType<SpcMoreInfoString>(opus.MoreInfo);
+            Assert.Equal("https://vcsjones.com/authlint\u0020", moreInfoUrl.Value);
 
             var digestAttribute = Assert.IsType<CmsMessageDigestAttibute>(signerInfo.AuthenticatedAttributes[2]);
             var expectedDigest = new byte[] {0x1D, 0xC0, 0x36, 0x8A, 0xA7, 0xDC, 0x96, 0xE4, 0xAC, 0x57, 0x90, 0xBC, 0x3A, 0x4E, 0xEE, 0x35, 0x6A, 0x85, 0x2C, 0xCF};
