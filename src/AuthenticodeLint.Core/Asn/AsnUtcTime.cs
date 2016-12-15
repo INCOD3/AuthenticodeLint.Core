@@ -48,6 +48,12 @@ namespace AuthenticodeLint.Core.Asn
 
         public override string ToString() => Value.ToString();
 
+
+        //This is dumb trick to get UTCTime to handle two digit years the way the specification says.
+        //UTCTime only supports dates between 1/1/1950 and 12/31/2049 (with GeneralizedTime being the
+        //way to fix that.) If the two digit year is less then fifty, then the year should be interpreted
+        //as in the 2000s. Otherwise, it's the 1900s. This is a specialized calendar that is given to the parser
+        //that follows this rule.
         private class UTCTimeCalendar : GregorianCalendar
         {
             public override int ToFourDigitYear(int year) => (year < 50 ? 2000 : 1900) + year;

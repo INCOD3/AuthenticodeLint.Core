@@ -39,6 +39,9 @@ namespace AuthenticodeLint.Core.PE
             }
         }
 
+        /// <summary>
+        /// Reads an array of structures from a memory mapped stream.
+        /// </summary>
         public static async Task<T[]> ReadStructArrayAsync<T>(this MemoryMappedViewStream stream, int count, int offset = 0) where T : struct
         {
             var type = typeof(T);
