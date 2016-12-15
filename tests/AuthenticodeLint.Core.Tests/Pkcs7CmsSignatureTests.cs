@@ -38,8 +38,8 @@ namespace AuthenticodeLint.Core.Tests
         {
             using (var pe = new PortableExecutable(path))
             {
-                var header = await pe.GetDosHeader();
-                var peHeader = await pe.GetPeHeader(header);
+                var header = await pe.GetDosHeaderAsync();
+                var peHeader = await pe.GetPeHeaderAsync(header);
                 var securityHeader = peHeader.DataDirectories[ImageDataDirectoryEntry.IMAGE_DIRECTORY_ENTRY_SECURITY];
                 using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {

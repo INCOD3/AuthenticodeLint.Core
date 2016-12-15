@@ -21,7 +21,7 @@ namespace AuthenticodeLint.Core.PE
         /// <summary>
         /// Gets the DOS header from the image.
         /// </summary>
-        public async Task<DosHeader> GetDosHeader()
+        public async Task<DosHeader> GetDosHeaderAsync()
         {
             using (var stream = _file.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
             {
@@ -41,7 +41,7 @@ namespace AuthenticodeLint.Core.PE
         /// </summary>
         /// <returns>The pe header.</returns>
         /// <param name="dosHeader">The DOS header. The header is used to know where the PE section is located.</param>
-        public async Task<PeHeader> GetPeHeader(DosHeader dosHeader)
+        public async Task<PeHeader> GetPeHeaderAsync(DosHeader dosHeader)
         {
             using (var stream = _file.CreateViewStream(dosHeader.ExeFileHeaderAddress, 0, MemoryMappedFileAccess.Read))
             {
