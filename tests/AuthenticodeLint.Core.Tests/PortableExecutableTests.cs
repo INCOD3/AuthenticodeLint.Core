@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public async Task ShouldReadSimpleAttributesOfPE()
         {
-            using (var pe = new PortableExecutable("files/authlint.exe"))
+            using (var pe = new PortableExecutable(PathHelper.CombineWithProjectPath("files/authlint.exe")))
             {
                 var header = await pe.GetDosHeaderAsync();
                 Assert.NotEqual(0, header.ExeFileHeaderAddress);
@@ -28,12 +28,12 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public async Task ShouldReadSecuritySection()
         {
-            using (var pe = new PortableExecutable("files/authlint.exe"))
+            using (var pe = new PortableExecutable(PathHelper.CombineWithProjectPath("files/authlint.exe")))
             {
                 var header = await pe.GetDosHeaderAsync();
                 var peHeader = await pe.GetPeHeaderAsync(header);
                 var securityHeader = peHeader.DataDirectories[ImageDataDirectoryEntry.IMAGE_DIRECTORY_ENTRY_SECURITY];
-                using (var file = new FileStream("files/authlint.exe", FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var file = new FileStream(PathHelper.CombineWithProjectPath("files/authlint.exe"), FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     SecuritySection section;
                     var result = SecuritySection.ReadSection(file, securityHeader, out section);

@@ -8,7 +8,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public void ShouldBuildAnHttpsCertChain()
         {
-            var certificate = new x509Certificate("files/vcsjones.com.crt");
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var chainBuilder = x509Chain.Build(certificate);
             Assert.True(chainBuilder.Successful);
             Assert.NotEqual(0, chainBuilder.Chain.Count);

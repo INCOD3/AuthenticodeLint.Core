@@ -17,7 +17,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public void ShouldDecodeSimpleCertificate()
         {
-            var certificate = new x509Certificate("files/vcsjones.com.crt");
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var expectedSerial = new byte[] { 0x00, 0x83, 0xE1, 0x89, 0x30, 0x1A, 0x8F, 0xF6, 0xA5, 0x52, 0x2A, 0x50, 0x09, 0x7E, 0xCA, 0x43, 0x44 };
             var expectedSha1Thumbprint = new byte[] {
                 0x73, 0xBA, 0x68, 0x4B, 0x21, 0x76, 0x44, 0xD4, 0x4A, 0x67,
@@ -40,7 +40,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public void RawSPKIDataShouldProduceCorrectHash()
         {
-            var certificate = new x509Certificate("files/vcsjones.com.crt");
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var expectedPkp = "jV54RY1EPxNKwrQKIa5QMGDNPSbj3VwLPtXaHiEE8y8=";
             using (var sha = SHA256.Create())
             {
@@ -53,7 +53,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public void ShouldDecodeBasicConstraintExtension()
         {
-            var certificate = new x509Certificate("files/vcsjones.com.crt");
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var basicConstraintsExtension = (BasicConstraintsExtension)certificate.Extensions.Single(ext => ext.Oid == KnownOids.CertificateExtensions.id_ce_basicConsraints);
             Assert.False(basicConstraintsExtension.CA);
             Assert.Equal(0, basicConstraintsExtension.PathLengthConstraint);
@@ -63,7 +63,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public void ShouldDecodeEKUExtension()
         {
-            var certificate = new x509Certificate("files/vcsjones.com.crt");
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var ekuExtension = (ExtendedKeyUsageExtension)certificate.Extensions.Single(ext => ext.Oid == KnownOids.CertificateExtensions.id_ce_extKeyUsage);
             Assert.Equal(2, ekuExtension.KeyPurposeIds.Count);
             Assert.Equal(new [] { "1.3.6.1.5.5.7.3.1", "1.3.6.1.5.5.7.3.2" }, ekuExtension.KeyPurposeIds);
@@ -73,7 +73,7 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public async Task ShouldExportCertificateToStream()
         {
-            var certificate = new x509Certificate("files/vcsjones.com.crt");
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var ms = new MemoryStream();
             await certificate.ExportAsync(ms);
             ms.Position = 0;
@@ -147,8 +147,8 @@ namespace AuthenticodeLint.Core.Tests
         ]
         public void ShouldCheckThumbprints(string path1, string path2, bool isZero)
         {
-            var cert1 = new x509Certificate(path1);
-            var cert2 = new x509Certificate(path2);
+            var cert1 = new x509Certificate(PathHelper.CombineWithProjectPath(path1));
+            var cert2 = new x509Certificate(PathHelper.CombineWithProjectPath(path2));
             if (isZero)
             {
                 Assert.Equal(0, cert1.CompareTo(cert2, x509Certificate.ThumbprintComparer.Instance));
@@ -166,8 +166,8 @@ namespace AuthenticodeLint.Core.Tests
         ]
         public void ShouldCheckIssuerAndSerial(string path1, string path2, bool isZero)
         {
-            var cert1 = new x509Certificate(path1);
-            var cert2 = new x509Certificate(path2);
+            var cert1 = new x509Certificate(PathHelper.CombineWithProjectPath(path1));
+            var cert2 = new x509Certificate(PathHelper.CombineWithProjectPath(path2));
             if (isZero)
             {
                 Assert.Equal(0, cert1.CompareTo(cert2, x509Certificate.IssuerAndSerialComparer.Instance));
@@ -185,8 +185,8 @@ namespace AuthenticodeLint.Core.Tests
         ]
         public void ShouldCheckByteEquality(string path1, string path2, bool isZero)
         {
-            var cert1 = new x509Certificate(path1);
-            var cert2 = new x509Certificate(path2);
+            var cert1 = new x509Certificate(PathHelper.CombineWithProjectPath(path1));
+            var cert2 = new x509Certificate(PathHelper.CombineWithProjectPath(path2));
             if (isZero)
             {
                 Assert.Equal(0, cert1.CompareTo(cert2, x509Certificate.IdenticalCertificateComparer.Instance));
