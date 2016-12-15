@@ -12,10 +12,10 @@ namespace AuthenticodeLint.Core.Tests
         {
             using (var pe = new PortableExecutable("files/authlint.exe"))
             {
-                var header = await pe.GetDosHeader();
+                var header = await pe.GetDosHeaderAsync();
                 Assert.NotEqual(0, header.ExeFileHeaderAddress);
 
-                var peHeader = await pe.GetPeHeader(header);
+                var peHeader = await pe.GetPeHeaderAsync(header);
                 Assert.Equal(MachineArchitecture.x86, peHeader.Architecture);
                 Assert.Equal(16, peHeader.DataDirectories.Count);
 
@@ -30,8 +30,8 @@ namespace AuthenticodeLint.Core.Tests
         {
             using (var pe = new PortableExecutable("files/authlint.exe"))
             {
-                var header = await pe.GetDosHeader();
-                var peHeader = await pe.GetPeHeader(header);
+                var header = await pe.GetDosHeaderAsync();
+                var peHeader = await pe.GetPeHeaderAsync(header);
                 var securityHeader = peHeader.DataDirectories[ImageDataDirectoryEntry.IMAGE_DIRECTORY_ENTRY_SECURITY];
                 using (var file = new FileStream("files/authlint.exe", FileMode.Open, FileAccess.Read, FileShare.Read))
                 {

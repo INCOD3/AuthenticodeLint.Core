@@ -14,8 +14,8 @@ class Program
     {
         using (var pe = new PortableExecutable("/Users/kjones/ff.exe"))
         {
-            var header = await pe.GetDosHeader();
-            var pe2 = await pe.GetPeHeader(header);
+            var header = await pe.GetDosHeaderAsync();
+            var pe2 = await pe.GetPeHeaderAsync(header);
             Console.WriteLine(header.ExeFileHeaderAddress);
             Console.WriteLine(pe2.Architecture);
             var security = pe2.DataDirectories[ImageDataDirectoryEntry.IMAGE_DIRECTORY_ENTRY_SECURITY];
