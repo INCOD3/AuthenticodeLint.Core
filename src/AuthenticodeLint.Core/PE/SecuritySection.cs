@@ -20,6 +20,13 @@ namespace AuthenticodeLint.Core.PE
             Data = data;
         }
 
+        /// <summary>
+        /// Reads the section from a file stream stream.
+        /// </summary>
+        /// <param name="stream">A stream of the file.</param>
+        /// <param name="directory">A data directory of the contents. This should be the security directory.</param>
+        /// <param name="section">If successful, will return the section's contents.</param>
+        /// <returns>True if the security section was read, otherwise false.</returns>
         public static bool ReadSection(Stream stream, ImageDataDirectory directory, out SecuritySection section)
         {
             stream.Seek(directory.VirtualAddress, SeekOrigin.Begin);
@@ -28,6 +35,8 @@ namespace AuthenticodeLint.Core.PE
                 var winCertLength = reader.ReadUInt32();
                 var winCertRevision = reader.ReadUInt16();
                 var winCertType = reader.ReadUInt16();
+                //We don't support v1 authenticode signatures. They are ancient and unlikely to appear in the wild.
+                //They aren't documented, either.
                 if (winCertRevision != 0x200 && winCertRevision != 0x100)
                 {
                     section = null;

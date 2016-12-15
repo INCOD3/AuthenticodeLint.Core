@@ -63,7 +63,7 @@ namespace AuthenticodeLint.Core.x509
             }
             if (reader.MoveNext(out pathLengthConstraint))
             {
-                PathLengthConstraint = (int)pathLengthConstraint.Value;
+                PathLengthConstraint = checked((int)pathLengthConstraint.Value);
             }
         }
     }

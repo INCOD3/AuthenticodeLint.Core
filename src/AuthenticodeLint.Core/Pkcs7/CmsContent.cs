@@ -41,7 +41,6 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public CmsSignedData(AsnElement content) : base(content)
         {
-
             _signedData = AsnReader.Read<AsnSequence>((AsnConstructed)content).Item1;
             var reader = new AsnConstructedReader(_signedData);
             AsnInteger version;

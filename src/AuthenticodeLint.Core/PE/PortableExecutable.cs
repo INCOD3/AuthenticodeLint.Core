@@ -83,6 +83,9 @@ namespace AuthenticodeLint.Core.PE
             }
         }
 
+        /// <summary>
+        /// Reads a directory's contents as a stream. The caller is responsible for closing the stream when complete.
+        /// </summary>
         public Stream ReadDataDirectory(ImageDataDirectory directory)
         {
             if (directory == null)
