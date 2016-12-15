@@ -53,12 +53,12 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         private static string DecodeSpcString(AsnElement element)
         {
-            if (element.Tag.IsExImTag(0))
+            if (element.Tag.IsExImTag(0)) //0 is an implicit tag for a BmpString
             {
                 var bmpProgramString = element.Reinterpret<AsnBmpString>();
                 return bmpProgramString.Value;
             }
-            else if (element.Tag.IsExImTag(1))
+            else if (element.Tag.IsExImTag(1)) //1 is an implicit tag for a IA5String
             {
                 var ia5ProgramString = element.Reinterpret<AsnIA5String>();
                 return ia5ProgramString.Value;
