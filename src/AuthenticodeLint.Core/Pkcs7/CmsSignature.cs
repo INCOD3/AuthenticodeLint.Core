@@ -9,17 +9,15 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public CmsSignature(byte[] data) : this(new ArraySegment<byte>(data))
         {
-
         }
 
-        public CmsSignature(ArraySegment<byte> data)
+        public CmsSignature(ArraySegment<byte> data) : this(Decode(data))
         {
-            AsnElement decoded;
-            if (!AsnDecoder.TryDecode(data, out decoded) || !(decoded is AsnSequence))
-            {
-                throw new Pkcs7Exception("Unable to parse PKCS#7 signature.");
-            }
-            _contentInfo = (AsnSequence)decoded;
+        }
+
+        public CmsSignature(AsnSequence sequence)
+        {
+            _contentInfo = sequence;
             var items = AsnReader.Read<AsnObjectIdentifier, AsnElement>(_contentInfo);
             ContentType = MapFromOid(items.Item1.Value);
             var content = items.Item2;
@@ -34,6 +32,16 @@ namespace AuthenticodeLint.Core.Pkcs7
                 default:
                     throw new Pkcs7Exception($"ContentType {ContentType} is not supported.");
             }
+        }
+
+        private static AsnSequence Decode(ArraySegment<byte> data)
+        {
+            AsnElement decoded;
+            if (!AsnDecoder.TryDecode(data, out decoded) || !(decoded is AsnSequence))
+            {
+                throw new Pkcs7Exception("Unable to parse PKCS#7 signature.");
+            }
+            return (AsnSequence)decoded;
         }
 
         public ContentType ContentType { get; }

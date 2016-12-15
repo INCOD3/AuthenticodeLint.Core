@@ -6,6 +6,7 @@ namespace AuthenticodeLint.Core.Asn
         {
             public const string messageDigest = "1.2.840.113549.1.9.4";
             public const string opusInfo = "1.3.6.1.4.1.311.2.1.12";
+            public const string nested_signature = "1.3.6.1.4.1.311.2.4.1";
         }
 
         public static class CmsContentTypes

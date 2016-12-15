@@ -14,6 +14,8 @@ namespace AuthenticodeLint.Core.Pkcs7
                     return new CmsMessageDigestAttibute(attributeId, properties.Item2);
                 case KnownOids.CmsPkcs9AttributeIds.opusInfo:
                     return new CmsOpusAttribute(attributeId, properties.Item2);
+                case KnownOids.CmsPkcs9AttributeIds.nested_signature:
+                    return new CmsNestedSignatureAttribute(attributeId, properties.Item2);
                 default:
                     return new CmsGenericAttribute(attributeId, properties.Item2);
             }
