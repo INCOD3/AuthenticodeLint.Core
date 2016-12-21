@@ -118,7 +118,6 @@ namespace AuthenticodeLint.Core.Asn
             return ValueTuple.Create(item);
         }
 
-
         public static ValueTuple<T1, T2> Read<T1, T2>(AsnConstructed sequence)
             where T1 : class, IAsnElement
             where T2 : class, IAsnElement

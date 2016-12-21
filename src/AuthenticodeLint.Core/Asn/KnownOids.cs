@@ -7,6 +7,10 @@ namespace AuthenticodeLint.Core.Asn
             public const string messageDigest = "1.2.840.113549.1.9.4";
             public const string opusInfo = "1.3.6.1.4.1.311.2.1.12";
             public const string nested_signature = "1.3.6.1.4.1.311.2.4.1";
+            public const string rfc3161_timestamp = "1.3.6.1.4.1.311.3.3.1";
+            public const string rsa_authenticode_timestamp = "1.2.840.113549.1.9.6";
+            public const string signing_time = "1.2.840.113549.1.9.5";
+            public const string signing_certificate = "1.2.840.113549.1.9.16.2.12";
         }
 
         public static class CmsContentTypes

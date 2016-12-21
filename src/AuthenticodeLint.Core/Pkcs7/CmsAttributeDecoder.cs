@@ -16,6 +16,14 @@ namespace AuthenticodeLint.Core.Pkcs7
                     return new CmsOpusAttribute(attributeId, properties.Item2);
                 case KnownOids.CmsPkcs9AttributeIds.nested_signature:
                     return new CmsNestedSignatureAttribute(attributeId, properties.Item2);
+                case KnownOids.CmsPkcs9AttributeIds.rsa_authenticode_timestamp:
+                    return new CmsPkcsAuthenticodeTimestampAttribute(attributeId, properties.Item2);
+                case KnownOids.CmsPkcs9AttributeIds.rfc3161_timestamp:
+                    return new CmsPkcsRfc3161TimestampAttribute(attributeId, properties.Item2);
+                case KnownOids.CmsPkcs9AttributeIds.signing_time:
+                    return new CmsSigningTimeAttribute(attributeId, properties.Item2);
+                case KnownOids.CmsPkcs9AttributeIds.signing_certificate:
+                    return new CmsSigningCertificateAttribute(attributeId, properties.Item2);
                 default:
                     return new CmsGenericAttribute(attributeId, properties.Item2);
             }

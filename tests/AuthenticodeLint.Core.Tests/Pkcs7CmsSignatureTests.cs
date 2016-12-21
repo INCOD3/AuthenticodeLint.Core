@@ -61,6 +61,8 @@ namespace AuthenticodeLint.Core.Tests
 
             var nestedSignature = Assert.IsType<CmsNestedSignatureAttribute>(signerInfo.UnauthenticatedAttributes[1]);
             Assert.Equal(ContentType.SignedData, nestedSignature.Signature.ContentType);
+            var nestedContent = Assert.IsType<CmsSignedData>(nestedSignature.Signature.Content);
+            var nestedSignerInfo = nestedContent.SignerInfos[0];
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)
