@@ -2,6 +2,15 @@ namespace AuthenticodeLint.Core.Asn
 {
     public static class KnownOids
     {
+        public static class Algorithms
+        {
+            public static class Digest
+            {
+                public const string sha1 = "1.3.14.3.2.26";
+                public const string sha256 = "2.16.840.1.101.3.4.2.1";
+            }
+        }
+
         public static class CmsPkcs9AttributeIds
         {
             public const string messageDigest = "1.2.840.113549.1.9.4";

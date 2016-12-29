@@ -103,7 +103,7 @@ namespace AuthenticodeLint.Core.Asn
 
     internal static class AsnReader
     {
-        public static ValueTuple<T1> Read<T1>(AsnConstructed sequence)
+        public static T1 Read<T1>(AsnConstructed sequence)
             where T1 : class, IAsnElement
         {
             if (sequence.Count != 1)
@@ -115,7 +115,7 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T1)} but was {item?.GetType()?.ToString() ?? "null" }.");
             }
-            return ValueTuple.Create(item);
+            return item;
         }
 
         public static ValueTuple<T1, T2> Read<T1, T2>(AsnConstructed sequence)

@@ -9,7 +9,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             var items = AsnReader.Read<AsnSequence>(content);
             AsnConstructed programName = null, moreInfo = null;
-            var reader = new AsnConstructedReader(items.Item1);
+            var reader = new AsnConstructedReader(items);
             AsnConstructed next;
             while (reader.MoveNext(out next))
             {
@@ -25,27 +25,27 @@ namespace AuthenticodeLint.Core.Pkcs7
             if (programName != null)
             {
                 var program = AsnReader.Read<AsnElement>(programName);
-                ProgramName = DecodeSpcString(program.Item1);
+                ProgramName = DecodeSpcString(program);
             }
 
             if (moreInfo != null)
             {
                 var more = AsnReader.Read<AsnElement>(moreInfo);
-                if (more.Item1.Tag.IsExImTag(0))
+                if (more.Tag.IsExImTag(0))
                 {
-                    var moreString = more.Item1.Reinterpret<AsnIA5String>();
+                    var moreString = more.Reinterpret<AsnIA5String>();
                     MoreInfo = new SpcMoreInfoString(moreString.Value, InfoType.Url);
                 }
-                else if (more.Item1.Tag.IsExImTag(1))
+                else if (more.Tag.IsExImTag(1))
                 {
-                    var serializedSeq = more.Item1.Reinterpret<AsnSequence>();
+                    var serializedSeq = more.Reinterpret<AsnSequence>();
                     var data = AsnReader.Read<AsnOctetString, AsnOctetString>(serializedSeq);
                     MoreInfo = new SpcMoreInfoBinary(new Guid(data.Item1.Value.AsArray()), data.Item2.Value);
                 }
-                else if (more.Item1.Tag.IsExImTag(2))
+                else if (more.Tag.IsExImTag(2))
                 {
-                    var spcString = AsnReader.Read<AsnElement>((AsnConstructed)more.Item1);
-                    var moreString = DecodeSpcString(spcString.Item1);
+                    var spcString = AsnReader.Read<AsnElement>((AsnConstructed)more);
+                    var moreString = DecodeSpcString(spcString);
                     MoreInfo = new SpcMoreInfoString(moreString, InfoType.File);
                 }
                 else

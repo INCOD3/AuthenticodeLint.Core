@@ -141,7 +141,7 @@ namespace AuthenticodeLint.Core.x509
             {
                 throw new x509Exception("Version is not specified.");
             }
-            Version = (int)AsnReader.Read<AsnInteger>(version).Item1.Value;
+            Version = (int)AsnReader.Read<AsnInteger>(version).Value;
             var validity = AsnReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
             NotBefore = validity.Item1.Value;
             NotAfter = validity.Item2.Value;
@@ -151,27 +151,17 @@ namespace AuthenticodeLint.Core.x509
             {
                 throw new x509Exception("x509 certificate is version 1 but contains version 2 or 3 data.");
             }
-            AsnElement element;
-            ulong lastCustomTagRead = 0;
+            AsnConstructed element;
             while (reader.MoveNext(out element))
             {
-                if (!element.Tag.Constructed || element.Tag.AsnClass == AsnClass.Univeral)
-                {
-                    throw new x509Exception($"Unexpected tag type: {element.Tag.Tag}");
-                }
-                var tagNumber = (ulong)element.Tag.Tag;
-                if (tagNumber < lastCustomTagRead)
-                {
-                    throw new x509Exception("x509 certificate contains out-of-order elements.");
-                }
-                if (tagNumber == 1 || tagNumber == 2)
+                if (element.Tag.IsExImTag(1) || element.Tag.IsExImTag(2))
                 {
                     //We don't do anything with the issuerUniqueID or subjectUniqueID fields right now.
                     continue;
                 }
-                if (tagNumber == 3)
+                if (element.Tag.IsExImTag(3))
                 {
-                    var extensions = AsnReader.Read<AsnSequence>((AsnConstructed)element).Item1;
+                    var extensions = AsnReader.Read<AsnSequence>(element);
                     Extensions = new x509Extenions(extensions);
                 }
             }

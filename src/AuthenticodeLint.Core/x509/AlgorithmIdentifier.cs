@@ -17,7 +17,7 @@ namespace AuthenticodeLint.Core.x509
                 throw new x509Exception("Unable to read algorithm from sequence.");
             }
             Algorithm = algorithm.Value;
-            if (reader.MoveNext(out parameters))
+            if (reader.MoveNext(out parameters) && !(parameters is AsnNull))
             {
                 Parameters = parameters.ContentData;
             }

@@ -8,7 +8,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         public CmsMessageDigestAttibute(string attributeId, AsnSet content) : base(attributeId, content)
         {
             var digest = AsnReader.Read<AsnOctetString>(content);
-            Digest = digest.Item1.Value;
+            Digest = digest.Value;
         }
 
         public ArraySegment<byte> Digest { get; }

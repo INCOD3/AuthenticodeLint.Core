@@ -8,7 +8,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public CmsSigningCertificateAttribute(string attributeId, AsnSet content) : base(attributeId, content)
         {
-            var signerContent = AsnReader.Read<AsnSequence>(content).Item1;
+            var signerContent = AsnReader.Read<AsnSequence>(content);
             var signingCertificate = new CmsSigningCertificate(signerContent);
             SigningCertificate = signingCertificate;
         }

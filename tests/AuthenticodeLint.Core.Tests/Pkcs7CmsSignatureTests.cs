@@ -13,7 +13,6 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public async Task ShouldLoadFromPe()
         {
-            PathHelper.CombineWithProjectPath("");
             var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
             var decoded = new CmsSignature(rawPkcs7);
             Assert.Equal(ContentType.SignedData, decoded.ContentType);
@@ -23,9 +22,10 @@ namespace AuthenticodeLint.Core.Tests
             var signerInfo = content.SignerInfos[0];
             Assert.NotNull(signerInfo.IssuerAndSerialNumber);
             Assert.Equal(1, signerInfo.Version);
-            Assert.Equal("1.3.14.3.2.26", signerInfo.DigestAlgorithm.Algorithm);
+            Assert.Equal(KnownOids.Algorithms.Digest.sha1, signerInfo.DigestAlgorithm.Algorithm);
             Assert.Equal("1.2.840.10045.2.1", signerInfo.EncryptionAlgorithm.Algorithm);
             Assert.Equal(4, signerInfo.AuthenticatedAttributes.Count);
+
         }
 
         [Fact]
@@ -62,7 +62,50 @@ namespace AuthenticodeLint.Core.Tests
             var nestedSignature = Assert.IsType<CmsNestedSignatureAttribute>(signerInfo.UnauthenticatedAttributes[1]);
             Assert.Equal(ContentType.SignedData, nestedSignature.Signature.ContentType);
             var nestedContent = Assert.IsType<CmsSignedData>(nestedSignature.Signature.Content);
-            var nestedSignerInfo = nestedContent.SignerInfos[0];
+        }
+
+        [Fact]
+        public async Task ShouldHandleTimeStampContentInfo()
+        {
+            //this is mostly all just low-level parsing at this point. Eventually higher-level structures for handling
+            //these concepts, type assertions, and decoding will build a friendlier public API around the "guts" of the
+            //decoding.
+            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
+            var decoded = new CmsSignature(rawPkcs7);
+            Assert.Equal(ContentType.SignedData, decoded.ContentType);
+            var content = Assert.IsType<CmsSignedData>(decoded.Content);
+            var signerInfo = content.SignerInfos[0];
+            var nestedSignature = Assert.IsType<CmsNestedSignatureAttribute>(signerInfo.UnauthenticatedAttributes[1]);
+            var nestedContent = Assert.IsType<CmsSignedData>(nestedSignature.Signature.Content);
+            var rfc3161timestamp = Assert.IsType<CmsPkcsRfc3161TimestampAttribute>(nestedContent.SignerInfos[0].UnauthenticatedAttributes[0]);
+            var rfc3161signature = rfc3161timestamp.Signature;
+            var rfc3161content = Assert.IsType<CmsSignedData>(rfc3161signature.Content);
+
+            var octetContent = (AsnOctetString)rfc3161content.ContentInfo.Content;
+            var tst = new TstInfo((AsnSequence)AsnDecoder.Decode(octetContent.ContentData));
+
+            Assert.Equal(1, tst.Version);
+            //This is a time-stamping policy ID. It's owned by digicert.
+            Assert.Equal("2.16.840.1.114412.7.1", tst.PolicyId);
+            //sha256 timestamp
+            Assert.Equal(KnownOids.Algorithms.Digest.sha256, tst.MessageImprint.HashAlgorithm.Algorithm);
+            Assert.False(tst.MessageImprint.HashAlgorithm.Parameters.HasValue);
+            Assert.Null(tst.Nonce);
+        }
+
+        [Fact]
+        public async Task ShouldHandleSpcSigningData()
+        {
+            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
+            var decoded = new CmsSignature(rawPkcs7);
+            Assert.Equal(ContentType.SignedData, decoded.ContentType);
+            var content = Assert.IsType<CmsSignedData>(decoded.Content);
+            var contentSequence = (AsnSequence)content.ContentInfo.Content;
+            var spc = new SpcIndirectDataContent(contentSequence);
+            Assert.Equal(KnownOids.Algorithms.Digest.sha1, spc.DigestInfo.AlgorithmIdentifier.Algorithm);
+            Assert.Equal("1.3.6.1.4.1.311.2.1.15", spc.Data.Type);
+            Assert.Equal(20, spc.DigestInfo.Digest.Count);
+            AsnPrinter.Print(Console.Out, AsnDecoder.Decode(spc.Data.Contents.Value));
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

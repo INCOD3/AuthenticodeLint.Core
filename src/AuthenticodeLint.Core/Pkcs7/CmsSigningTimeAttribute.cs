@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         public CmsSigningTimeAttribute(string attributeId, AsnSet content) : base(attributeId, content)
         {
             var signingTime = AsnReader.Read<IAsnDateTime>(content);
-            SigningTime = signingTime.Item1.Value;
+            SigningTime = signingTime.Value;
         }
     }
 }

@@ -39,13 +39,15 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public IReadOnlyList<CmsSignerInfo> SignerInfos { get; }
 
+        public CmsContentInfo ContentInfo { get; }
+
         public CmsSignedData(AsnElement content) : base(content)
         {
-            _signedData = AsnReader.Read<AsnSequence>((AsnConstructed)content).Item1;
+            _signedData = AsnReader.Read<AsnSequence>((AsnConstructed)content);
             var reader = new AsnConstructedReader(_signedData);
             AsnInteger version;
             AsnSet digestAlgorithms;
-            AsnElement contentInfo;
+            AsnSequence contentInfo;
             var certs = new List<x509Certificate>();
             var signerInfos = new List<CmsSignerInfo>();
             if (!reader.MoveNext(out version) || version.Value > int.MaxValue)
@@ -94,6 +96,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             }
             SignerInfos = signerInfos;
             Certificates = certs;
+            ContentInfo = new CmsContentInfo(contentInfo);
         }
     }
 }
