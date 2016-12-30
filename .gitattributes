@@ -4,3 +4,4 @@
 *.sh    text eol=lf
 *.exe   -text
 *.crt   -text
+*.pkcs7 -text
