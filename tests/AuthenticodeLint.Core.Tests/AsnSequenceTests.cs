@@ -32,6 +32,32 @@ namespace AuthenticodeLint.Core.Tests
         }
 
         [Fact]
+        public void ShouldDecodeSimpleSequenceWithUnknownLengthBERStyle()
+        {
+            var data = new byte[]
+            {
+                0x30, //sequence tag
+                0x80, //with an unspecified length
+                0x02, //first item in sequence is an integer
+                0x01, //first item has a length of 1
+                0x10, //first item has a value of 16
+                0x02, //second item in sequence is an integer
+                0x01, //second item has a length of 1
+                0x20, //second item has a value of 32
+                0x00, 0x00 //terminator
+            };
+            var decoded = AsnDecoder.Decode(data);
+            var sequence = Assert.IsType<AsnSequence>(decoded);
+            Assert.Equal(2, sequence.Count);
+            Assert.All(sequence, (obj) => Assert.IsType<AsnInteger>(obj));
+            var integerOne = (AsnInteger)sequence[0];
+            var integerTwo = (AsnInteger)sequence[1];
+            Assert.Equal(16, integerOne.Value);
+            Assert.Equal(32, integerTwo.Value);
+            Assert.Equal(data, SerializeArraySegement(sequence.ElementData));
+        }
+
+        [Fact]
         public void ShouldThrowWhenSequenceChildDataIsGreaterThanSequenceData()
         {
             var data = new byte[]
@@ -60,6 +86,30 @@ namespace AuthenticodeLint.Core.Tests
                 0x02, //nested sequence contains an integer
                 0x01, //with a length of 1,
                 0x40, //with a value of 64
+            };
+            var decoded = AsnDecoder.Decode(data);
+            var sequence = Assert.IsType<AsnSequence>(decoded);
+            Assert.Equal(1, sequence.Count);
+            var childElement = sequence[0];
+            var childSequence = Assert.IsType<AsnSequence>(childElement);
+            var childInteger = Assert.IsType<AsnInteger>(childSequence[0]);
+            Assert.Equal(64, childInteger.Value);
+        }
+
+        [Fact]
+        public void ShouldDecodeNestedSequenceWithUnknownLengthBERStyle()
+        {
+            var data = new byte[]
+            {
+                0x30, //sequence tag
+                0x80, //with an unspecified length
+                0x30, //nested sequence tag
+                0x80, //nested sequence has an unspecified length
+                0x02, //nested sequence contains an integer
+                0x01, //with a length of 1,
+                0x40, //with a value of 64
+                0x00, 0x00, //inner sequence terminator
+                0x00, 0x00 //outer sequence terminator
             };
             var decoded = AsnDecoder.Decode(data);
             var sequence = Assert.IsType<AsnSequence>(decoded);
