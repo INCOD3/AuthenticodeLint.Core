@@ -121,6 +121,34 @@ namespace AuthenticodeLint.Core.Tests
         }
 
         [Fact]
+        public void ShouldDecodeDataCorrectlyAfterTerminatorWithNestingBER()
+        {
+            var data = new byte[]
+            {
+                0x30, //sequence tag
+                0x80, //with an unspecified length
+                0x30, //nested sequence tag
+                0x80, //nested sequence has an unspecified length
+                0x02, //nested sequence contains an integer
+                0x01, //with a length of 1,
+                0x40, //with a value of 64
+                0x00, 0x00, //inner sequence terminator
+                0x02, //nested integer tag
+                0x01, //with a length of one
+                0x20, //with a value of 32
+                0x00, 0x00 //outer sequence terminator
+            };
+            var decoded = AsnDecoder.Decode(data);
+            var sequence = Assert.IsType<AsnSequence>(decoded);
+            Assert.Equal(2, sequence.Count);
+            var childElement = sequence[0];
+            var childSequence = Assert.IsType<AsnSequence>(childElement);
+            var childInteger = Assert.IsType<AsnInteger>(childSequence[0]);
+            Assert.Equal(64, childInteger.Value);
+            Assert.Equal(32, Assert.IsType<AsnInteger>(sequence[1]).Value);
+        }
+
+        [Fact]
         public void ShouldDecodeSequenceOfWithNoItems()
         {
             var data = new byte[]
