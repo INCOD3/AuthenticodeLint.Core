@@ -5,18 +5,26 @@ namespace AuthenticodeLint.Core.Asn
     public sealed class AsnNumericString : AsnElement, IDirectoryString
     {
         public string Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
-        public AsnNumericString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnNumericString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of NumericString are not valid.");
             }
-            var arr = new char[contentData.Count];
-            for (int i = 0, j = contentData.Offset; i < contentData.Count; i++, j++)
+            if (contentLength == null)
             {
-                byte c = contentData.Array[j];
+                throw new AsnException("Undefined lengths for NumericString are not supported.");
+            }
+            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ContentData = contentData.Constrain(contentLength.Value);
+            var arr = new char[ContentData.Count];
+            for (int i = 0, j = ContentData.Offset; i < ContentData.Count; i++, j++)
+            {
+                byte c = ContentData.Array[j];
                 if (c != ' ' && (c < '0' || c > '9'))
                 {
                     throw new AsnException($"Invalid character \"{c:X2}\" for NumericString.");

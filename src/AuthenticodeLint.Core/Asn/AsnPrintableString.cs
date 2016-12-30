@@ -6,17 +6,25 @@ namespace AuthenticodeLint.Core.Asn
     public sealed class AsnPrintableString : AsnElement, IDirectoryString
     {
         public string Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
-        public AsnPrintableString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnPrintableString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of PrintableString are not valid.");
             }
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for PrintableString are not supported.");
+            }
             try
             {
-                Value = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ContentData = contentData.Constrain(contentLength.Value);
+                Value = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
             catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
             {

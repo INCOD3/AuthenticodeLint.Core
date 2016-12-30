@@ -13,19 +13,27 @@ namespace AuthenticodeLint.Core.Asn
         /// The value of the integer.
         /// </summary>
         public BigInteger Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
-        public AsnInteger(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnInteger(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of Integer are not valid.");
             }
-            var buffer = new byte[contentData.Count];
-            //BigInteger expects the number in little endian.
-            for (int i = contentData.Count - 1, j = 0; i >= 0; i--, j++)
+            if (contentLength == null)
             {
-                buffer[j] = contentData.Array[contentData.Offset + i];
+                throw new AsnException("Undefined lengths for Integer are not supported.");
+            }
+            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ContentData = contentData.Constrain(contentLength.Value);
+            var buffer = new byte[ContentData.Count];
+            //BigInteger expects the number in little endian.
+            for (int i = ContentData.Count - 1, j = 0; i >= 0; i--, j++)
+            {
+                buffer[j] = ContentData.Array[ContentData.Offset + i];
             }
             Value = new BigInteger(buffer);
         }

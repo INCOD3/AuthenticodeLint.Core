@@ -4,14 +4,23 @@ namespace AuthenticodeLint.Core.Asn
 {
     public sealed class AsnNull : AsnElement
     {
-        public AsnNull(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
+
+        public AsnNull(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of NULL are not valid.");
             }
-            if (contentData.Count > 0)
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for NULL are not supported.");
+            }
+            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ContentData = contentData.Constrain(contentLength.Value);
+            if (ContentData.Count > 0)
             {
                 throw new AsnException("Null data cannot have a length.");
             }

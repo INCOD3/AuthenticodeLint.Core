@@ -6,25 +6,33 @@ namespace AuthenticodeLint.Core.Asn
     public sealed class AsnObjectIdentifier : AsnElement
     {
         public string Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
-        public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of ObjectIdentifier are not valid.");
             }
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for ObjectIdentifier are not supported.");
+            }
+            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ContentData = contentData.Constrain(contentLength.Value);
             var builder = new System.Text.StringBuilder();
-            var firstOctet = contentData.Array[contentData.Offset] / 40;
-            var secondOctet = contentData.Array[contentData.Offset] % 40;
+            var firstOctet = ContentData.Array[ContentData.Offset] / 40;
+            var secondOctet = ContentData.Array[ContentData.Offset] % 40;
             builder.Append(firstOctet);
             builder.Append('.');
             builder.Append(secondOctet);
             var value = 0L;
             //Start at one since the first octet has special handling above
-            for (var i = 1; i < contentData.Count; i++)
+            for (var i = 1; i < ContentData.Count; i++)
             {
-                var item = contentData.Array[contentData.Offset + i];
+                var item = ContentData.Array[ContentData.Offset + i];
                 //Shift the current value over to the left by 7 bits. OIDs are essentially
                 //an array of 7-bit numbers where the 8th bit indicates if the value is continued
                 //on to the next byte.

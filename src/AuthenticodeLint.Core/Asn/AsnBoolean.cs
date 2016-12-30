@@ -11,17 +11,25 @@ namespace AuthenticodeLint.Core.Asn
         /// The value of the asn element.
         /// </summary>
         public bool Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
-        public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (contentData.Count == 0)
             {
                 throw new AsnException("asn.1 boolean value cannot be empty.");
             }
-            for (var i = 0; i < contentData.Count; i++)
+            if (contentLength == null)
             {
-                if (contentData.Array[contentData.Offset + i] > 0)
+                throw new AsnException("Undefined lengths for AsnBoolean are not supported.");
+            }
+            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ContentData = contentData.Constrain(contentLength.Value);
+            for (var i = 0; i < ContentData.Count; i++)
+            {
+                if (ContentData.Array[ContentData.Offset + i] > 0)
                 {
                     Value = true;
                     return;

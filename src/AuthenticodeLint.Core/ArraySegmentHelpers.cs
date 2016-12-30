@@ -25,9 +25,46 @@ namespace AuthenticodeLint.Core
             return arr;
         }
 
+        public static ArraySegment<T> Constrain<T>(this ArraySegment<T> ars, long to)
+        {
+            return new ArraySegment<T>(ars.Array, ars.Offset, checked((int)to));
+        }
+
+        public static ArraySegment<T> Constrain<T>(this ArraySegment<T> ars, ulong to)
+        {
+            return new ArraySegment<T>(ars.Array, ars.Offset, checked((int)to));
+        }
+
+        public static ArraySegment<T> ConstrainWith<T>(this ArraySegment<T> ars, ArraySegment<T> other, ulong to)
+        {
+            return Constrain(ars, to + checked((ulong)(other.Offset - ars.Offset)));
+        }
+
+        public static ArraySegment<T> ConstrainWith<T>(this ArraySegment<T> ars, ArraySegment<T> other, long to)
+        {
+            return Constrain(ars, to + (long)(other.Offset - ars.Offset));
+        }
+
         public static ArraySegment<T> Advance<T>(this ArraySegment<T> ars, int by)
         {
             return new ArraySegment<T>(ars.Array, ars.Offset + by, ars.Count - by);
+        }
+
+        public static bool StartsWith<T>(this ArraySegment<T> ars, T[] items)
+            where T : IEquatable<T>
+        {
+            if (ars.Count < items.Length)
+            {
+                return false;
+            }
+            for (int i = 0, j = ars.Offset; i < items.Length; i++, j++)
+            {
+                if (!items[i].Equals(ars.Array[j]))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public static int Compare<T>(this ArraySegment<T> ars, ArraySegment<T> other)
