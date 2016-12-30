@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 
 namespace AuthenticodeLint.Core.Asn
 {
@@ -11,22 +10,20 @@ namespace AuthenticodeLint.Core.Asn
         /// <summary>
         /// Gets the segement of data for the content of the element.
         /// </summary>
-        public ArraySegment<byte> ContentData { get; private set; }
+        public abstract ArraySegment<byte> ContentData { get; }
 
         /// <summary>
         /// Gets the segement of data for the entire element triplet.
         /// </summary>
-        public ArraySegment<byte> ElementData { get; private set; }
+        public abstract ArraySegment<byte> ElementData { get; }
 
         /// <summary>
         /// The tag of the asn1 element.
         /// </summary>
         public AsnTag Tag { get; private set; }
 
-        protected AsnElement(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
+        protected AsnElement(AsnTag tag)
         {
-            ContentData = contentData;
-            ElementData = elementData;
             Tag = tag;
         }
 
@@ -55,7 +52,7 @@ namespace AuthenticodeLint.Core.Asn
         public TType Reinterpret<TType>() where TType : AsnElement
         {
             //Yuck, but, yuck.
-            return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData);
+            return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData, (ulong?)ContentData.Count);
         }
 
         public override string ToString() => ContentData.Join();

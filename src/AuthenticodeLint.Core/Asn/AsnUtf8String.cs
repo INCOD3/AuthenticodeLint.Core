@@ -16,20 +16,28 @@ namespace AuthenticodeLint.Core.Asn
         /// </summary>
         /// <value>A string of the value.</value>
         public string Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsnUtf8String"/> with a segement of data.
         /// </summary>
-        public AsnUtf8String(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnUtf8String(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of Utf8String are not valid.");
             }
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for Utf8String are not supported.");
+            }
             try
             {
-                Value = Encoding.UTF8.GetString(contentData.Array, contentData.Offset, contentData.Count);
+                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ContentData = contentData.Constrain(contentLength.Value);
+                Value = Encoding.UTF8.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
             catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
             {

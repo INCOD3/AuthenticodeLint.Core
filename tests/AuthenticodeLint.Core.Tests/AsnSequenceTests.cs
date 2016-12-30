@@ -1,3 +1,4 @@
+using System;
 using AuthenticodeLint.Core.Asn;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace AuthenticodeLint.Core.Tests
             var integerTwo = (AsnInteger)sequence[1];
             Assert.Equal(16, integerOne.Value);
             Assert.Equal(32, integerTwo.Value);
+            Assert.Equal(data, SerializeArraySegement(sequence.ElementData));
         }
 
         [Fact]
@@ -79,6 +81,16 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = AsnDecoder.Decode(data);
             var sequence = Assert.IsType<AsnSequence>(decoded);
             Assert.Equal(0, sequence.Count);
+        }
+
+        private static T[] SerializeArraySegement<T>(ArraySegment<T> segement)
+        {
+            var arr = new T[segement.Count];
+            for (var i = 0; i < segement.Count; i++)
+            {
+                arr[i] = segement.Array[segement.Offset + i];
+            }
+            return arr;
         }
     }
 }

@@ -7,6 +7,8 @@ namespace AuthenticodeLint.Core.Asn
     public class AsnUtcTime : AsnElement, IAsnDateTime
     {
         private static readonly CultureInfo _parsingCulture;
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
         static AsnUtcTime()
         {
@@ -16,17 +18,23 @@ namespace AuthenticodeLint.Core.Asn
 
         public DateTimeOffset Value { get; }
 
-        public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of UTCTime are not valid.");
             }
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for UTCTime are not supported.");
+            }
             string strData;
             try
             {
-                strData = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ContentData = contentData.Constrain(contentLength.Value);
+                strData = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
             catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
             {
@@ -41,7 +49,7 @@ namespace AuthenticodeLint.Core.Asn
             DateTimeOffset val;
             if (!DateTimeOffset.TryParseExact(strData, formats, _parsingCulture, DateTimeStyles.AssumeUniversal, out val))
             {
-                throw new AsnException("Encoded UTCDate is not valid.");
+                throw new AsnException("Encoded UTCTime is not valid.");
             }
             Value = val;
         }

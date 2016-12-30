@@ -7,22 +7,30 @@ namespace AuthenticodeLint.Core.Asn
     public sealed class AsnBitString : AsnElement
     {
         public ArraySegment<byte> Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
         public int UnusedBits { get; }
 
-        public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of BitString are not valid.");
             }
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for BitString are not supported.");
+            }
             if (contentData.Count == 0)
             {
                 throw new AsnException("asn.1 BitString does not have enough data.");
             }
-            UnusedBits = contentData.Array[contentData.Offset];
-            Value = new ArraySegment<byte>(contentData.Array, contentData.Offset + 1, contentData.Count - 1);
+            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ContentData = contentData.Constrain(contentLength.Value);
+            UnusedBits = contentData.Array[ContentData.Offset];
+            Value = new ArraySegment<byte>(ContentData.Array, ContentData.Offset + 1, ContentData.Count - 1);
         }
 
         public override string ToString()

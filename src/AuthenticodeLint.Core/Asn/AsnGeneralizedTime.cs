@@ -7,18 +7,26 @@ namespace AuthenticodeLint.Core.Asn
     public sealed class AsnGeneralizedTime : AsnElement, IAsnDateTime
     {
         public DateTimeOffset Value { get; }
+        public override ArraySegment<byte> ContentData { get; }
+        public override ArraySegment<byte> ElementData { get; }
 
-        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData)
-            : base(tag, contentData, elementData)
+        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+            : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of GeneralizeTime are not valid.");
             }
+            if (contentLength == null)
+            {
+                throw new AsnException("Undefined lengths for BitString are not supported.");
+            }
             string strData;
             try
             {
-                strData = Encoding.ASCII.GetString(contentData.Array, contentData.Offset, contentData.Count);
+                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ContentData = contentData.Constrain(contentLength.Value);
+                strData = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
             catch (Exception e) when (e is DecoderFallbackException || e is ArgumentException)
             {
