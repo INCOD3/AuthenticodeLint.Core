@@ -129,7 +129,6 @@ namespace AuthenticodeLint.Core.Asn
         private static ulong? ReadTagLength(ArraySegment<byte> data, out int octetLength)
         {
             var firstByte = data.Array[data.Offset];
-            //This is a "unknown" length, which we don't support right now.
             if (firstByte == 0x80)
             {
                 octetLength = 1;

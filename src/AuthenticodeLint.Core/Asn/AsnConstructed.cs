@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AuthenticodeLint.Core.Asn
 {
@@ -12,7 +11,7 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        private static readonly byte[] _terminator = new byte[] {0, 0};
+        private static readonly byte[] _terminator = new byte[] { 0, 0 };
         internal const int MAX_ITEMS = 65535;
 
         public AsnConstructed(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)

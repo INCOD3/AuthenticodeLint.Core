@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 
 namespace AuthenticodeLint.Core.Asn
 {
@@ -165,40 +164,6 @@ namespace AuthenticodeLint.Core.Asn
                 throw new AsnException($"Item in sequence is not the expected type. Expected {typeof(T3)} but was {item3?.GetType()}.");
             }
             return ValueTuple.Create(item1, item2, item3);
-        }
-
-        private static ValueTuple<Type, bool> GetElementType<TType>()
-        {
-            var t1Type = typeof(TType);
-            var t1TypeInfo = t1Type.GetTypeInfo();
-            Type asnType;
-            bool optional;
-            if (typeof(AsnElement).GetTypeInfo().IsAssignableFrom(t1TypeInfo))
-            {
-                asnType = t1Type;
-                optional = false;
-            }
-            else if (t1Type.IsConstructedGenericType && t1Type.GetGenericTypeDefinition() == typeof(AsnOptional<>))
-            {
-                asnType = t1Type.GenericTypeArguments[0];
-                optional = true;
-            }
-            else
-            {
-                throw new AsnException("Unexpected, non-asn type.");
-            }
-            return ValueTuple.Create(asnType, optional);
-        }
-    }
-
-    public sealed class AsnOptional<TElement>
-        where TElement : class, IAsnElement
-    {
-        public TElement Element { get; }
-
-        internal AsnOptional(AsnElement element)
-        {
-            Element = (TElement)(object)element;
         }
     }
 }
