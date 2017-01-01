@@ -81,6 +81,8 @@ namespace AuthenticodeLint.Core.Asn
                         return new AsnBmpString(tag, contentData, elementData, contentLength);
                     case AsnTagValue.Utf8String:
                         return new AsnUtf8String(tag, contentData, elementData, contentLength);
+                    case AsnTagValue.VisibleStringIso646String:
+                        return new AsnVisibleString(tag, contentData, elementData, contentLength);
                 }
             }
             if (tag.Constructed)
