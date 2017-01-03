@@ -5,10 +5,7 @@ using AuthenticodeLint.Core.PE;
 
 class Program
 {
-    static int Main(string[] args)
-    {
-        return Run(args).GetAwaiter().GetResult();
-    }
+    static int Main(string[] args) => Run(args).GetAwaiter().GetResult();
 
     static async Task<int> Run(string[] args)
     {

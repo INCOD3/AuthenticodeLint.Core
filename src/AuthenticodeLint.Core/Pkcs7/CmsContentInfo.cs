@@ -1,3 +1,4 @@
+using System;
 using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.Pkcs7
@@ -6,10 +7,11 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public string ContentType { get; }
         public AsnElement Content { get; }
-
+        internal ArraySegment<byte> CmsContentInfoData { get; }
 
         public CmsContentInfo(AsnSequence sequence)
         {
+            CmsContentInfoData = sequence.ElementData;
             var reader = new AsnConstructedReader(sequence);
             AsnObjectIdentifier contentType;
             AsnConstructed content;
@@ -23,8 +25,6 @@ namespace AuthenticodeLint.Core.Pkcs7
             }
             ContentType = contentType.Value;
             Content = AsnReader.Read<AsnElement>(content);
-            //System.Console.WriteLine(contentType);
-            //System.Console.WriteLine(Content.GetType());
         }
     }
 }
