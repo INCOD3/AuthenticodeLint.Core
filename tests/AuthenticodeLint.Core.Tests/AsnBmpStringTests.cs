@@ -1,3 +1,4 @@
+using System.Text;
 using AuthenticodeLint.Core.Asn;
 using Xunit;
 
@@ -16,6 +17,18 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = AsnDecoder.Decode(data);
             var bmpString = Assert.IsType<AsnBmpString>(decoded);
             Assert.Equal("hello", bmpString.Value);
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWithInvalidUnicodeSequence()
+        {
+            var data = new byte[] {
+                0x1E, //asn.1 bmp string
+                0x02, //with a length of two
+                0xD8, 0x00 //bad surrogate
+            };
+            var exception = Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
+            Assert.IsType<DecoderFallbackException>(exception.InnerException);
         }
     }
 }
