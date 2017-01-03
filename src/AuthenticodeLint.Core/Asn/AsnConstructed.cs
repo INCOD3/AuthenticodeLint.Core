@@ -140,6 +140,7 @@ namespace AuthenticodeLint.Core.Asn
                 bytes.Insert(0, (byte)(length & 0xFF));
                 length >>= 8;
             }
+            bytes.Insert(0, (byte)(0x80 | bytes.Count));
             return bytes.ToArray();
         }
 

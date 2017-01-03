@@ -205,9 +205,12 @@ namespace AuthenticodeLint.Core.Tests
             Assert.IsNotType<AsnSequence>(decoded);
             var constructed = Assert.IsType<AsnConstructed>(decoded);
             var sequence = constructed.Reinterpret<AsnSequence>();
+            Assert.Equal(data.Length, sequence.ElementData.Count);
             Assert.Equal(127, Assert.IsType<AsnInteger>(sequence[0]).Value);
-            Assert.Equal(130, sequence.ElementData.Count);
             Assert.Equal(128, sequence.ContentData.Count);
+
+            var reDecode = AsnDecoder.Decode(sequence.ElementData);
+            Assert.Equal(sequence, reDecode);
         }
 
         private static T[] SerializeArraySegement<T>(ArraySegment<T> segement)
