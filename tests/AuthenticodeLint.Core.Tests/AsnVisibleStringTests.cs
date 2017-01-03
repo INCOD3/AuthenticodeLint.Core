@@ -43,7 +43,7 @@ namespace AuthenticodeLint.Core.Tests
                 0x68, 0x65, 0x6c, 0x6F, 0xFF //with a value of "helo?"
             };
             var exception = Assert.Throws<AsnException>(() => AsnDecoder.Decode(data));
-            Assert.IsType<DecoderFallbackException>(exception);
+            Assert.IsType<DecoderFallbackException>(exception.InnerException);
         }
 
         [Fact]
