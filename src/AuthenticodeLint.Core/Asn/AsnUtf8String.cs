@@ -37,7 +37,7 @@ namespace AuthenticodeLint.Core.Asn
             {
                 ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
                 ContentData = contentData.Constrain(contentLength.Value);
-                Value = Encoding.UTF8.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
+                Value = AsnTextEncoding.UTF8.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
             catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
             {
