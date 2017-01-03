@@ -125,16 +125,22 @@ namespace AuthenticodeLint.Core.Asn
 
         private static byte[] EncodeLength(long length)
         {
-            var contents = new List<byte>();
-            var copy = length;
-            while (copy > 0x7F)
+            if (length < 0)
             {
-                var octet = 0x80 | (copy & 0x7F);
-                contents.Add((byte)octet);
-                copy >>= 7;
+                throw new ArgumentException(nameof(length));
             }
-            contents.Add((byte)copy);
-            return contents.ToArray();
+            if (length < 0x80)
+            {
+                return new byte[] { (byte)length };
+            }
+            var bytes = new List<byte>();
+            var copy = length;
+            while (length > 0)
+            {
+                bytes.Insert(0, (byte)(length & 0xFF));
+                length >>= 8;
+            }
+            return bytes.ToArray();
         }
 
         private static AsnTagValue TagValueForType(Type type)
