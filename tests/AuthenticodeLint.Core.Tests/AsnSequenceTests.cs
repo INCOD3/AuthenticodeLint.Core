@@ -161,6 +161,58 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal(0, sequence.Count);
         }
 
+        [Fact]
+        public void ShouldSupportRealConversionFromConstructed()
+        {
+            var data = new byte[]
+            {
+                0xA0, //constructed, application specific,
+                0x04, //with a length of four
+                0x02, //asn.1 integer
+                0x02, //with a length of 2
+                0x00, 0xFF, //with a value of 255.
+            };
+            var decoded = AsnDecoder.Decode(data);
+            Assert.IsNotType<AsnSequence>(decoded);
+            var constructed = Assert.IsType<AsnConstructed>(decoded);
+            var sequence = constructed.Reinterpret<AsnSequence>();
+            Assert.Equal(0x30, sequence.ElementData.Array[sequence.ElementData.Offset]);
+            Assert.Equal(1, sequence.Count);
+            Assert.Equal(255, Assert.IsType<AsnInteger>(sequence[0]).Value);
+            Assert.Equal(data.Length, sequence.ElementData.Count);
+            Assert.Equal(4, sequence.ContentData.Count);
+        }
+
+        [Fact]
+        public void ShouldSupportRealConversionFromConstructedWithLongLength()
+        {
+            var data = new byte[]
+            {
+                0xA0, //constructed, application specific,
+                0x81, 0x80, //with a length of 128
+                0x02, //asn.1 integer
+                0x7E, //with a length of 126
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F,
+            };
+            var decoded = AsnDecoder.Decode(data);
+            Assert.IsNotType<AsnSequence>(decoded);
+            var constructed = Assert.IsType<AsnConstructed>(decoded);
+            var sequence = constructed.Reinterpret<AsnSequence>();
+            Assert.Equal(data.Length, sequence.ElementData.Count);
+            Assert.Equal(127, Assert.IsType<AsnInteger>(sequence[0]).Value);
+            Assert.Equal(128, sequence.ContentData.Count);
+
+            var reDecode = AsnDecoder.Decode(sequence.ElementData);
+            Assert.Equal(sequence, reDecode);
+        }
+
         private static T[] SerializeArraySegement<T>(ArraySegment<T> segement)
         {
             var arr = new T[segement.Count];

@@ -105,7 +105,6 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal(KnownOids.Algorithms.Digest.sha1, spc.DigestInfo.AlgorithmIdentifier.Algorithm);
             Assert.Equal("1.3.6.1.4.1.311.2.1.15", spc.Data.Type);
             Assert.Equal(20, spc.DigestInfo.Digest.Count);
-            AsnPrinter.Print(Console.Out, AsnDecoder.Decode(spc.Data.Contents.Value));
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

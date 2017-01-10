@@ -49,7 +49,7 @@ namespace AuthenticodeLint.Core.Asn
         /// Reinterprets the current element as another element type.
         /// This is useful for implicit tags.
         /// </summary>
-        public TType Reinterpret<TType>() where TType : AsnElement
+        public virtual TType Reinterpret<TType>() where TType : AsnElement
         {
             //Yuck, but, yuck.
             return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData, (ulong?)ContentData.Count);
