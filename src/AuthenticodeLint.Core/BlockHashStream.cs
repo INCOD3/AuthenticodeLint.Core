@@ -136,13 +136,13 @@ namespace AuthenticodeLint.Core
             throw new NotSupportedException();
         }
 
-        public async Task<byte[]> Digest()
+        public async Task<ArraySegment<byte>> Digest()
         {
             _complete = true;
             _writeEvent.Wait(); //Wait until the stream is writable, signaling the digest has read everything.
             _readEvent.Set(); //Let the digest know it can read "zero".
             Debug.Assert(_bytesAvailable == 0);
-            return await _work.ConfigureAwait(false);
+            return new ArraySegment<byte>(await _work.ConfigureAwait(false));
         }
 
         protected override void Dispose(bool disposing)

@@ -111,8 +111,7 @@ namespace AuthenticodeLint.Core
 
             for (var i = 0; i < ars.Count; i++)
             {
-                var index = i + ars.Offset;
-                var compare = ars.Array[index].CompareTo(other.Array[index]);
+                var compare = ars.Array[ars.Offset + i].CompareTo(other.Array[other.Offset + i]);
                 if (compare != 0)
                 {
                     return compare;

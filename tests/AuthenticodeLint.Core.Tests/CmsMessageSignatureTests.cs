@@ -11,9 +11,10 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public async Task ShouldVerifySignature()
         {
-            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
+            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/certinspector.exe"));
             var decoded = new CmsSignature(rawPkcs7);
             var verify = await decoded.VerifySignature();
+            Assert.True(verify);
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

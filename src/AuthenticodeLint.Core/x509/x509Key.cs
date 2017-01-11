@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Security.Cryptography;
 using AuthenticodeLint.Core.Asn;
 
@@ -15,12 +16,39 @@ namespace AuthenticodeLint.Core.x509
                 case "1.2.840.10045.2.1":
                     _algorithm = FromEcDsa(spki);
                     break;
+                case "1.2.840.113549.1.1.1":
+                    _algorithm = FromRsa(spki);
+                    break;
+                default:
+                    throw new NotSupportedException($"Signing algorithm {spki.Algorithm.Algorithm} is not supported.");
             }
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature)
+        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid)
         {
-            return _algorithm.VerifyHash(hash, signature);
+            return _algorithm.VerifyHash(hash, signature, digestAlgorithmOid);
+        }
+
+        public bool VerifyHash(ArraySegment<byte> hash, ArraySegment<byte> signature, string digestAlgorithmOid) =>
+            VerifyHash(hash.AsArray(), signature.AsArray(), digestAlgorithmOid);
+
+        private static RsaSign FromRsa(SubjectPublicKeyInfo spki)
+        {
+            var publicKey = spki.PublicKey.TrimOff(b => b == 0);
+            var publicKeyDecoded = AsnDecoder.Decode(publicKey) as AsnSequence;
+            if (publicKeyDecoded == null)
+            {
+                throw new InvalidOperationException("Could not decode RSA key.");
+            }
+            var rsaComponents = AsnReader.Read<AsnInteger, AsnInteger>(publicKeyDecoded);
+            var parameters = new RSAParameters
+            {
+                Modulus = rsaComponents.Item1.ContentData.AsArray(),
+                Exponent = rsaComponents.Item2.ContentData.AsArray()
+            };
+            var rsa = RSA.Create();
+            rsa.ImportParameters(parameters);
+            return new RsaSign(rsa);
         }
 
 
@@ -97,11 +125,39 @@ namespace AuthenticodeLint.Core.x509
             _algorithm = algorithm;
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature) => _algorithm.VerifyHash(hash, signature);
+        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid) => _algorithm.VerifyHash(hash, signature);
+    }
+
+    internal class RsaSign : ISign
+    {
+        private readonly RSA _algorithm;
+
+        public RsaSign(RSA algorithm)
+        {
+            _algorithm = algorithm;
+        }
+
+        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid)
+        {
+            return _algorithm.VerifyHash(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid), RSASignaturePadding.Pkcs1);
+        }
+
+        private static HashAlgorithmName OidToHashAlgorithmName(string oid)
+        {
+            switch (oid)
+            {
+                case KnownOids.Algorithms.Digest.sha1:
+                    return HashAlgorithmName.SHA1;
+                case KnownOids.Algorithms.Digest.sha256:
+                    return HashAlgorithmName.SHA256;
+                default:
+                    throw new NotSupportedException($"Unknown hash algorithm oid {oid}.");
+            }
+        }
     }
 
     internal interface ISign
     {
-        bool VerifyHash(byte[] hash, byte[] signature);
+        bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid);
     }
 }
