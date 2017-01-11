@@ -121,10 +121,9 @@ namespace AuthenticodeLint.Core.Pkcs7
                     bhs.Write(authenticatedSet.ElementData);
                     authenticatedAttributeDigest = await bhs.Digest();
                 }
-
-                //TODO: select the right certificate
-                var testCert = data.Certificates.First();
-                var key = new x509Key(testCert.PublicKey);
+                var certificateCollection = new x509CertificateCollection(data.Certificates);
+                var cert = certificateCollection.FindSingleBy(signer.IssuerAndSerialNumber);
+                var key = new x509Key(cert.PublicKey);
                 var result = key.VerifyHash(authenticatedAttributeDigest, signer.EncryptedDigest.Value, signer.DigestAlgorithm.Algorithm);
                 if (!result)
                 {

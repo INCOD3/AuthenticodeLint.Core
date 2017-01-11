@@ -1,17 +1,32 @@
+using System;
+using AuthenticodeLint.Core.Asn;
+
 namespace AuthenticodeLint.Core.x509
 {
 
-    public class RelativeDistinguishedNameComponent
+    public class RelativeDistinguishedNameComponent : IEquatable<RelativeDistinguishedNameComponent>
     {
         public string ObjectIdentifier { get; }
         public string Value { get; }
         public byte[] RawValue { get; }
+        private AsnSequence AsnData {get; }
 
-        public RelativeDistinguishedNameComponent(string objectIdentifier, string value, byte[] rawValue)
+        public RelativeDistinguishedNameComponent(AsnSequence asnData, string objectIdentifier, string value, byte[] rawValue)
         {
+            AsnData = asnData;
             ObjectIdentifier = objectIdentifier;
             Value = value;
             RawValue = rawValue;
         }
+
+        public bool Equals(RelativeDistinguishedNameComponent other)
+        {
+            if (ReferenceEquals(other, null)) return false;
+            return AsnData.Equals(other.AsnData);
+        }
+
+        public override bool Equals(object obj) => Equals(obj as RelativeDistinguishedNameComponent);
+
+        public override int GetHashCode()  => AsnData.GetHashCode();
     }
 }

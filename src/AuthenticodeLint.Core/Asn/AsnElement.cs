@@ -29,7 +29,15 @@ namespace AuthenticodeLint.Core.Asn
 
         public override bool Equals(object obj) => Equals(obj as AsnElement);
 
-        public override int GetHashCode() => ContentData.GetHashCode();
+        public override int GetHashCode()
+        {
+            var builder = new HashCodeBuilder();
+            foreach (var b in ElementData)
+            {
+                builder.Push(b);
+            }
+            return builder.GetHashCode();
+        }
 
         public virtual bool Equals(AsnElement other)
         {

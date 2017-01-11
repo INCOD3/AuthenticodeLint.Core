@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using AuthenticodeLint.Core.Asn;
 namespace AuthenticodeLint.Core.x509
 {
 
-    public class RelativeDistinguishedName : IReadOnlyList<RelativeDistinguishedNameComponent>
+    public class RelativeDistinguishedName : IReadOnlyList<RelativeDistinguishedNameComponent>, IEquatable<RelativeDistinguishedName>
     {
         private readonly IReadOnlyList<RelativeDistinguishedNameComponent> _components;
 
@@ -24,7 +25,7 @@ namespace AuthenticodeLint.Core.x509
                 {
                     throw new x509Exception("Distinguished Name component does not contain a valid ObjectIdentifer or directory string.");
                 }
-                dnList.Add(new RelativeDistinguishedNameComponent(identifier.Value, value.Value, value.ContentData.AsArray()));
+                dnList.Add(new RelativeDistinguishedNameComponent(dn, identifier.Value, value.Value, value.ContentData.AsArray()));
             }
             _components = dnList;
         }
@@ -53,6 +54,16 @@ namespace AuthenticodeLint.Core.x509
             }
             return builder.ToString();
         }
-    }
 
+        public bool Equals(RelativeDistinguishedName other)
+        {
+            if (ReferenceEquals(other, null))
+            {
+                return false;
+            }
+            var meSet = new HashSet<RelativeDistinguishedNameComponent>(this);
+            var otherSet = new HashSet<RelativeDistinguishedNameComponent>(other);
+            return meSet.SetEquals(otherSet);
+        }
+    }
 }
