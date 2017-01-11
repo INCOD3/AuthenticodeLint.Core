@@ -7,11 +7,11 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public string ContentType { get; }
         public AsnElement Content { get; }
-        internal ArraySegment<byte> CmsContentInfoData { get; }
+        public ArraySegment<byte> CmsContentInfoData { get; }
 
         public CmsContentInfo(AsnSequence sequence)
         {
-            CmsContentInfoData = sequence.ElementData;
+            CmsContentInfoData = sequence.ContentData;
             var reader = new AsnConstructedReader(sequence);
             AsnObjectIdentifier contentType;
             AsnConstructed content;

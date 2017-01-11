@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Core.x509
             Algorithm = algorithm.Value;
             if (reader.MoveNext(out parameters) && !(parameters is AsnNull))
             {
-                Parameters = parameters.ContentData;
+                Parameters = parameters.ElementData;
             }
             else
             {

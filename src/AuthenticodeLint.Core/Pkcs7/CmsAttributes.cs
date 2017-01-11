@@ -14,11 +14,13 @@ namespace AuthenticodeLint.Core.Pkcs7
         public int Count => _internalList.Count;
 
         public IEnumerator<CmsGenericAttribute> GetEnumerator() => _internalList.GetEnumerator();
+        internal AsnConstructed AsnElement { get; }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public CmsAttributes(AsnConstructed constructed)
         {
+            AsnElement = constructed;
             _internalList = new List<CmsGenericAttribute>(constructed.Count);
 
             foreach(var sequence in constructed.Cast<AsnSequence>())

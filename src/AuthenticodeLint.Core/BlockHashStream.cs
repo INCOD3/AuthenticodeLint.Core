@@ -27,10 +27,9 @@ namespace AuthenticodeLint.Core
             _writeBuffer = new byte[_hashSizeBytes];
             _readEvent = new ManualResetEventSlim(false);
             _writeEvent = new ManualResetEventSlim(true);
-            _work = Task.Factory.StartNew(self => {
-                var me = ((BlockHashStream)self);
-                return me._hashAlgorithm.ComputeHash(me);
-            }, this);
+            _work = Task.Run(() => {
+                return this._hashAlgorithm.ComputeHash(this);
+            });
             _complete = false;
         }
 
