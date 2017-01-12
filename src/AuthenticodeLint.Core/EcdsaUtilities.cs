@@ -6,18 +6,42 @@ namespace AuthenticodeLint.Core
     public static class EcdsaUtilities
     {
         /// <summary>
-        /// Converts an asn.1 sequence encoded ECDSA signature into an X || Y encoded
+        /// Converts an asn.1 sequence encoded ECDSA signature into an R || S encoded
         /// signature.
         /// </summary>
-        public static byte[] AsnPointSignatureToConcatSignature(AsnSequence signature)
+        public static byte[] AsnPointSignatureToConcatSignature(AsnSequence signature, int sizeBits)
         {
+            var size = (sizeBits + 7) / 8; //Round up to nearest multiple of 8, then divide by 8.
             var ecPoint = AsnReader.Read<AsnInteger, AsnInteger>(signature);
-            var x = ecPoint.Item1.ContentData.TrimOff(b => b == 0).AsArray();
-            var y = ecPoint.Item2.ContentData.TrimOff(b => b == 0).AsArray();
-            var concated = new byte[x.Length + y.Length];
-            Buffer.BlockCopy(x, 0, concated, 0, x.Length);
-            Buffer.BlockCopy(y, 0, concated, y.Length, x.Length);
+            var r = ExpandShrinkToSize(ecPoint.Item1.ContentData, size);
+            var s = ExpandShrinkToSize(ecPoint.Item2.ContentData, size);
+            var concated = new byte[r.Count + s.Count];
+            Buffer.BlockCopy(r.Array, r.Offset, concated, 0, r.Count);
+            Buffer.BlockCopy(s.Array, s.Offset, concated, r.Count, s.Count);
             return concated;
+        }
+
+        public static ArraySegment<byte> ExpandShrinkToSize(ArraySegment<byte> value, int size)
+        {
+            //Just right. Leave it alone.
+            if (value.Count == size)
+            {
+                return value;
+            }
+            //The value is one greater than the size because it is using zero to encode the value
+            //as positive. Since we don't really have a sign in field elements, just take it off.
+            if (value.Count == size + 1 && value.At(0) == 0)
+            {
+                return value.Advance(1);
+            }
+            if (value.Count < size)
+            {
+                var additional = new byte[size];
+                var move = size - value.Count;
+                Buffer.BlockCopy(value.Array, value.Offset, additional, move, value.Count);
+                return new ArraySegment<byte>(additional);
+            }
+            throw new InvalidOperationException("Unable to transform point value.");
         }
     }
 }

@@ -128,10 +128,15 @@ namespace AuthenticodeLint.Core.x509
         {
             byte[] transformSignature;
             AsnElement element;
+
+            //In PKCS#7 an ECC signature is encoded as a Sequence of (R, S). However the
+            //.NET Framework Core expects the signature to be encoded as R || S. Here we
+            //try and sniff out how the signature was encoded. If it's a DER Sequence,
+            //convert it. Otherwise, continue as-is.
             if (AsnDecoder.TryDecode(signature, out element) && element is AsnSequence)
             {
                 var ecPoint = (AsnSequence)element;
-                transformSignature = EcdsaUtilities.AsnPointSignatureToConcatSignature(ecPoint);
+                transformSignature = EcdsaUtilities.AsnPointSignatureToConcatSignature(ecPoint, _algorithm.KeySize);
             }
             else
             {
