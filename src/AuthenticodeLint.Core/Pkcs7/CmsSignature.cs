@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AuthenticodeLint.Core.Asn;
 using AuthenticodeLint.Core.x509;
@@ -122,7 +120,7 @@ namespace AuthenticodeLint.Core.Pkcs7
                     authenticatedAttributeDigest = await bhs.Digest();
                 }
                 var certificateCollection = new x509CertificateCollection(data.Certificates);
-                var cert = certificateCollection.FindSingleBy(signer.IssuerAndSerialNumber);
+                var cert = certificateCollection.FindFirstBy(signer.IssuerAndSerialNumber);
                 var key = new x509Key(cert.PublicKey);
                 var result = key.VerifyHash(authenticatedAttributeDigest, signer.EncryptedDigest.Value, signer.DigestAlgorithm.Algorithm);
                 if (!result)
@@ -131,11 +129,6 @@ namespace AuthenticodeLint.Core.Pkcs7
                 }
             }
             return true;
-        }
-
-        private void Dump(byte[] data)
-        {
-            Console.WriteLine(string.Join("", data.Select(b => b.ToString("X2"))));
         }
     }
 }

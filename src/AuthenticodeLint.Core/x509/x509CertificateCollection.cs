@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Core.x509
             }
         }
 
-        public x509Certificate FindSingleBy(CmsIssuerAndSerialNumber ias)
+        public x509Certificate FindFirstBy(CmsIssuerAndSerialNumber ias)
         {
             foreach (var certificate in this)
             {

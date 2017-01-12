@@ -9,9 +9,19 @@ namespace AuthenticodeLint.Core.Tests
     public class CmsMessageSignatureTests
     {
         [Fact]
-        public async Task ShouldVerifySignature()
+        public async Task ShouldVerifyRSASignature()
         {
             var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/certinspector.exe"));
+            var decoded = new CmsSignature(rawPkcs7);
+            var verify = await decoded.VerifySignature();
+            Assert.True(verify);
+        }
+
+
+        [Fact]
+        public async Task ShouldVerifyECDSASignature()
+        {
+            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
             var decoded = new CmsSignature(rawPkcs7);
             var verify = await decoded.VerifySignature();
             Assert.True(verify);

@@ -125,7 +125,21 @@ namespace AuthenticodeLint.Core.x509
             _algorithm = algorithm;
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid) => _algorithm.VerifyHash(hash, signature);
+        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid)
+        {
+            byte[] transformSignature;
+            AsnElement element;
+            if (AsnDecoder.TryDecode(signature, out element) && element is AsnSequence)
+            {
+                var ecPoint = (AsnSequence)element;
+                transformSignature = EcdsaUtilities.AsnPointSignatureToConcatSignature(ecPoint);
+            }
+            else
+            {
+                transformSignature = signature;
+            }
+            return _algorithm.VerifyHash(hash, transformSignature);
+        }
     }
 
     internal class RsaSign : ISign
