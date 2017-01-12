@@ -4,7 +4,7 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
 {
-    public sealed class x509Key
+    public sealed class x509Key : IDisposable
     {
         private readonly ISign _algorithm;
 
@@ -107,6 +107,11 @@ namespace AuthenticodeLint.Core.x509
             };
         }
 
+        public void Dispose()
+        {
+            _algorithm.Dispose();
+        }
+
         private enum PointType : byte
         {
             Uncompressed = 0x04,
@@ -144,6 +149,8 @@ namespace AuthenticodeLint.Core.x509
             }
             return _algorithm.VerifyHash(hash, transformSignature);
         }
+
+        public void Dispose() => _algorithm.Dispose();
     }
 
     internal class RsaSign : ISign
@@ -172,9 +179,11 @@ namespace AuthenticodeLint.Core.x509
                     throw new NotSupportedException($"Unknown hash algorithm oid {oid}.");
             }
         }
+
+        public void Dispose() =>_algorithm.Dispose();
     }
 
-    internal interface ISign
+    internal interface ISign : IDisposable
     {
         bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid);
     }

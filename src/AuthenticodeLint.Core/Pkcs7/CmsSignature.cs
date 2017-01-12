@@ -129,12 +129,14 @@ namespace AuthenticodeLint.Core.Pkcs7
                 }
                 var certificateCollection = new x509CertificateCollection(data.Certificates);
                 var cert = certificateCollection.FindFirstBy(signer.IssuerAndSerialNumber);
-                var key = new x509Key(cert.PublicKey);
-                var result = key.VerifyHash(authenticatedAttributeDigest, signer.EncryptedDigest.Value, signer.DigestAlgorithm.Algorithm);
-                if (!result)
+                using (var key = new x509Key(cert.PublicKey))
                 {
-                    //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
-                    return false;
+                    var result = key.VerifyHash(authenticatedAttributeDigest, signer.EncryptedDigest.Value, signer.DigestAlgorithm.Algorithm);
+                    if (!result)
+                    {
+                        //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
+                        return false;
+                    }
                 }
             }
 
