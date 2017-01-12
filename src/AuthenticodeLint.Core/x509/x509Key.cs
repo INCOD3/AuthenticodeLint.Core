@@ -175,6 +175,12 @@ namespace AuthenticodeLint.Core.x509
                     return HashAlgorithmName.SHA1;
                 case KnownOids.Algorithms.Digest.sha256:
                     return HashAlgorithmName.SHA256;
+                case KnownOids.Algorithms.Digest.sha384:
+                    return HashAlgorithmName.SHA384;
+                case KnownOids.Algorithms.Digest.sha512:
+                    return HashAlgorithmName.SHA512;
+                case KnownOids.Algorithms.Digest.md5:
+                    return HashAlgorithmName.MD5;
                 default:
                     throw new NotSupportedException($"Unknown hash algorithm oid {oid}.");
             }
