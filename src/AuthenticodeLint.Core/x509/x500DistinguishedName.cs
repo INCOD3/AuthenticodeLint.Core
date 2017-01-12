@@ -71,5 +71,17 @@ namespace AuthenticodeLint.Core.x509
             }
             return true;
         }
+
+        public override bool Equals(object obj) => Equals(obj as x500DistinguishedName);
+
+        public override int GetHashCode()
+        {
+            var builder = new HashCodeBuilder();
+            foreach(var item in this)
+            {
+                builder.Push(item.GetHashCode());
+            }
+            return builder.GetHashCode();
+        }
     }
 }

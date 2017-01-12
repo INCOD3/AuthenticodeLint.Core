@@ -61,9 +61,23 @@ namespace AuthenticodeLint.Core.x509
             {
                 return false;
             }
+            //We use HashSets here because we don't care about the order
+            //of the components. They're a set, which is unordered.
             var meSet = new HashSet<RelativeDistinguishedNameComponent>(this);
             var otherSet = new HashSet<RelativeDistinguishedNameComponent>(other);
             return meSet.SetEquals(otherSet);
+        }
+
+        public override bool Equals(object obj) => Equals(obj as RelativeDistinguishedName);
+
+        public override int GetHashCode()
+        {
+            var builder = new HashCodeBuilder();
+            foreach (var component in this)
+            {
+                builder.Push(component.GetHashCode());
+            }
+            return builder.GetHashCode();
         }
     }
 }
