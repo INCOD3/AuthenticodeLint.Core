@@ -24,6 +24,8 @@ namespace AuthenticodeLint.Core.Pkcs7
                     return new CmsSigningTimeAttribute(attributeId, properties.Item2);
                 case KnownOids.CmsPkcs9AttributeIds.signing_certificate:
                     return new CmsSigningCertificateAttribute(attributeId, properties.Item2);
+                case KnownOids.CmsPkcs9AttributeIds.contentType:
+                    return new CmsContentTypeAttribute(attributeId, properties.Item2);
                 default:
                     return new CmsGenericAttribute(attributeId, properties.Item2);
             }

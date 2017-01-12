@@ -81,6 +81,9 @@ namespace AuthenticodeLint.Core.Pkcs7
                 throw new NotSupportedException();
             }
             var data = (CmsSignedData)Content;
+
+            //This could be done in parallel, but Authenticode signatures don't typically (can't?)
+            //have more than one SignerInfo. Instead they use signature nesting.
             foreach (var signer in data.SignerInfos)
             {
                 if (!data.DigestAlgorithms.Contains(signer.DigestAlgorithm))
@@ -97,12 +100,17 @@ namespace AuthenticodeLint.Core.Pkcs7
                 }
                 if (signer.AuthenticatedAttributes.Count == 0)
                 {
-                    throw new InvalidOperationException("AuthenticatedAttribute required for non-detached signatures.");
+                    throw new Pkcs7Exception("AuthenticatedAttribute required for non-detached signatures.");
                 }
+                var contentTypeAttribute = signer.AuthenticatedAttributes[KnownOids.CmsPkcs9AttributeIds.contentType] as CmsContentTypeAttribute;
                 var digestAttribute = signer.AuthenticatedAttributes[KnownOids.CmsPkcs9AttributeIds.messageDigest] as CmsMessageDigestAttibute;
                 if (digestAttribute == null)
                 {
-                    throw new InvalidOperationException("MessageDigest attribute missing from authenticated attribute set.");
+                    throw new Pkcs7Exception("MessageDigest attribute missing from authenticated attribute set.");
+                }
+                if (contentTypeAttribute == null)
+                {
+                    throw new Pkcs7Exception("Signature attributes is missing the content type attribute.");
                 }
                 if (digest.Compare(digestAttribute.Digest) != 0)
                 {
@@ -125,9 +133,12 @@ namespace AuthenticodeLint.Core.Pkcs7
                 var result = key.VerifyHash(authenticatedAttributeDigest, signer.EncryptedDigest.Value, signer.DigestAlgorithm.Algorithm);
                 if (!result)
                 {
+                    //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
                     return false;
                 }
             }
+
+            //If we got here then every SignerInfo didn't return "false", so the signature must be valid.
             return true;
         }
     }

@@ -20,6 +20,7 @@ namespace AuthenticodeLint.Core.Asn
             public const string rsa_authenticode_timestamp = "1.2.840.113549.1.9.6";
             public const string signing_time = "1.2.840.113549.1.9.5";
             public const string signing_certificate = "1.2.840.113549.1.9.16.2.12";
+            public const string contentType = "1.2.840.113549.1.9.3";
         }
 
         public static class CmsContentTypes
