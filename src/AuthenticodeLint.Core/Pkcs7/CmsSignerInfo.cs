@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using AuthenticodeLint.Core.Asn;
 using AuthenticodeLint.Core.x509;
 
