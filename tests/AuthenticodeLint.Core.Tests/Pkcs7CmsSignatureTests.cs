@@ -23,7 +23,7 @@ namespace AuthenticodeLint.Core.Tests
             Assert.NotNull(signerInfo.IssuerAndSerialNumber);
             Assert.Equal(1, signerInfo.Version);
             Assert.Equal(KnownOids.Algorithms.Digest.sha1, signerInfo.DigestAlgorithm.Algorithm);
-            Assert.Equal("1.2.840.10045.2.1", signerInfo.EncryptionAlgorithm.Algorithm);
+            Assert.Equal(KnownOids.Algorithms.SigningAlgorithms.ecc, signerInfo.EncryptionAlgorithm.Algorithm);
             Assert.Equal(4, signerInfo.AuthenticatedAttributes.Count);
 
         }

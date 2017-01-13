@@ -12,10 +12,10 @@ namespace AuthenticodeLint.Core.x509
         {
             switch(spki.Algorithm.Algorithm)
             {
-                case "1.2.840.10045.2.1":
+                case KnownOids.Algorithms.SigningAlgorithms.ecc:
                     _algorithm = FromEcDsa(spki);
                     break;
-                case "1.2.840.113549.1.1.1":
+                case KnownOids.Algorithms.SigningAlgorithms.rsa:
                     _algorithm = FromRsa(spki);
                     break;
                 default:

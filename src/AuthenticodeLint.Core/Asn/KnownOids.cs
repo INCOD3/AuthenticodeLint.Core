@@ -19,6 +19,12 @@ namespace AuthenticodeLint.Core.Asn
                 public const string ecdsa_nist_p384 = "1.3.132.0.34";
                 public const string ecdsa_nist_p521 = "1.3.132.0.35";
             }
+
+            public static class SigningAlgorithms
+            {
+                public const string ecc = "1.2.840.10045.2.1";
+                public const string rsa = "1.2.840.113549.1.1.1";
+            }
         }
 
         public static class CmsPkcs9AttributeIds
