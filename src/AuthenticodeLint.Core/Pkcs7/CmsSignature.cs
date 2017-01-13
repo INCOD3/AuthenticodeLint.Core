@@ -9,6 +9,7 @@ namespace AuthenticodeLint.Core.Pkcs7
     public sealed class CmsSignature
     {
         private readonly AsnSequence _contentInfo;
+        private readonly bool _isNestedSignature;
 
         public CmsSignature(byte[] data) : this(new ArraySegment<byte>(data))
         {
@@ -18,8 +19,9 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
         }
 
-        public CmsSignature(AsnSequence sequence)
+        public CmsSignature(AsnSequence sequence, bool isNestedSignature)
         {
+            _isNestedSignature = isNestedSignature;
             _contentInfo = sequence;
             var items = AsnReader.Read<AsnObjectIdentifier, AsnElement>(_contentInfo);
             ContentType = MapFromOid(items.Item1.Value);
@@ -35,6 +37,10 @@ namespace AuthenticodeLint.Core.Pkcs7
                 default:
                     throw new Pkcs7Exception($"ContentType {ContentType} is not supported.");
             }
+        }
+
+        public CmsSignature(AsnSequence sequence) : this(sequence, false)
+        {
         }
 
         private static AsnSequence Decode(ArraySegment<byte> data)
@@ -108,10 +114,15 @@ namespace AuthenticodeLint.Core.Pkcs7
                 {
                     throw new Pkcs7Exception("MessageDigest attribute missing from authenticated attribute set.");
                 }
-                if (contentTypeAttribute == null)
+                if (contentTypeAttribute == null && !_isNestedSignature)
                 {
                     throw new Pkcs7Exception("Signature attributes is missing the content type attribute.");
                 }
+                else if (contentTypeAttribute != null && _isNestedSignature)
+                {
+                    throw new Pkcs7Exception("Nested signatures should not have a content type attribute.");
+                }
+
                 if (digest.Compare(digestAttribute.Digest) != 0)
                 {
                     //This is the case where the messageDigest attribute does not match the digest of the

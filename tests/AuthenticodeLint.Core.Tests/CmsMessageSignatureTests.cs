@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AuthenticodeLint.Core.PE;
 using AuthenticodeLint.Core.Pkcs7;
@@ -25,6 +26,15 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = new CmsSignature(rawPkcs7);
             var verify = await decoded.VerifySignature();
             Assert.True(verify);
+        }
+
+        [Fact]
+        public async Task ShouldVerifyNestedSignatures()
+        {
+            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
+            var decoded = new CmsSignature(rawPkcs7);
+            var all = decoded.VisitAll().ToArray();
+            Assert.Equal(1, all.Length);
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)
