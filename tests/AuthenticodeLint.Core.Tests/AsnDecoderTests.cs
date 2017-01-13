@@ -58,6 +58,17 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal(expected, SerializeArraySegement(octetString.Value));
         }
 
+        [Fact]
+        public void ShouldDecodeLongFormTag()
+        {
+            var data = new byte[]
+            {
+                0xDF, 0xFF, 0x01, 0x00
+            };
+            var decoded = AsnDecoder.Decode(data);
+            Assert.Equal(16257UL, (ulong)decoded.Tag.Tag);
+        }
+
         private static T[] SerializeArraySegement<T>(ArraySegment<T> segement)
         {
             var arr = new T[segement.Count];
