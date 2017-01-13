@@ -20,12 +20,12 @@ namespace AuthenticodeLint.Core.x509
 
     public sealed class ExtendedKeyUsageExtension : x509Extension
     {
-        public IReadOnlyList<string> KeyPurposeIds { get; }
+        public IReadOnlyList<Oid> KeyPurposeIds { get; }
 
         public ExtendedKeyUsageExtension(string oid, ArraySegment<byte> data, bool critical)
             : base(oid, data, critical)
         {
-            var keyPurposes = new List<string>();
+            var keyPurposes = new List<Oid>();
             var keyPurposeSequence = AsnDecoder.Decode(data) as AsnSequence;
             if (keyPurposeSequence == null)
             {

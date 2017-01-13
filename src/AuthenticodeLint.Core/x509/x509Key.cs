@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.x509
 
         public x509Key(SubjectPublicKeyInfo spki)
         {
-            switch(spki.Algorithm.Algorithm)
+            switch(spki.Algorithm.Algorithm.Value)
             {
                 case KnownOids.Algorithms.SigningAlgorithms.ecc:
                     _algorithm = FromEcDsa(spki);
@@ -23,12 +23,12 @@ namespace AuthenticodeLint.Core.x509
             }
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid)
+        public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
         {
             return _algorithm.VerifyHash(hash, signature, digestAlgorithmOid);
         }
 
-        public bool VerifyHash(ArraySegment<byte> hash, ArraySegment<byte> signature, string digestAlgorithmOid) =>
+        public bool VerifyHash(ArraySegment<byte> hash, ArraySegment<byte> signature, Oid digestAlgorithmOid) =>
             VerifyHash(hash.AsArray(), signature.AsArray(), digestAlgorithmOid);
 
         private static RsaSign FromRsa(SubjectPublicKeyInfo spki)
@@ -62,7 +62,7 @@ namespace AuthenticodeLint.Core.x509
             {
                 throw new InvalidOperationException("Unknown ECC curve.");
             }
-            var curve = ECCurve.CreateFromValue(decodedParameters.Value);
+            var curve = ECCurve.CreateFromValue(decodedParameters.Value.Value);
             var point = DecodePoint(spki.PublicKey);
             var parameters = new ECParameters()
             {
@@ -129,7 +129,7 @@ namespace AuthenticodeLint.Core.x509
             _algorithm = algorithm;
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid)
+        public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
         {
             byte[] transformSignature;
             AsnElement element;
@@ -162,14 +162,14 @@ namespace AuthenticodeLint.Core.x509
             _algorithm = algorithm;
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid)
+        public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
         {
             return _algorithm.VerifyHash(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid), RSASignaturePadding.Pkcs1);
         }
 
-        private static HashAlgorithmName OidToHashAlgorithmName(string oid)
+        private static HashAlgorithmName OidToHashAlgorithmName(Oid oid)
         {
-            switch (oid)
+            switch (oid.Value)
             {
                 case KnownOids.Algorithms.Digest.sha1:
                     return HashAlgorithmName.SHA1;
@@ -191,6 +191,6 @@ namespace AuthenticodeLint.Core.x509
 
     internal interface ISign : IDisposable
     {
-        bool VerifyHash(byte[] hash, byte[] signature, string digestAlgorithmOid);
+        bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid);
     }
 }

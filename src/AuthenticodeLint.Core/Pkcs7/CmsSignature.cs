@@ -57,9 +57,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public CmsContent Content { get; }
 
-        private static ContentType MapFromOid(string oid)
+        private static ContentType MapFromOid(Oid oid)
         {
-            switch (oid)
+            switch (oid.Value)
             {
                 case KnownOids.CmsContentTypes.signedData:
                     return ContentType.SignedData;

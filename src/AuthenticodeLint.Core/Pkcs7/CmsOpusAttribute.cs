@@ -5,7 +5,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 {
     public sealed class CmsOpusAttribute : CmsGenericAttribute
     {
-        public CmsOpusAttribute(string attributeId, AsnSet content) : base(attributeId, content)
+        public CmsOpusAttribute(Oid attributeId, AsnSet content) : base(attributeId, content)
         {
             var items = AsnReader.Read<AsnSequence>(content);
             AsnConstructed programName = null, moreInfo = null;

@@ -7,7 +7,7 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public DateTimeOffset SigningTime { get; }
 
-        public CmsSigningTimeAttribute(string attributeId, AsnSet content) : base(attributeId, content)
+        public CmsSigningTimeAttribute(Oid attributeId, AsnSet content) : base(attributeId, content)
         {
             var signingTime = AsnReader.Read<IAsnDateTime>(content);
             SigningTime = signingTime.Value;

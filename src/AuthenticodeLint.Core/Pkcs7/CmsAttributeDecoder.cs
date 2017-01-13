@@ -8,7 +8,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             var properties = AsnReader.Read<AsnObjectIdentifier, AsnSet>(sequence);
             var attributeId = properties.Item1.Value;
-            switch (attributeId)
+            switch (attributeId.Value)
             {
                 case KnownOids.CmsPkcs9AttributeIds.messageDigest:
                     return new CmsMessageDigestAttibute(attributeId, properties.Item2);

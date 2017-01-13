@@ -28,10 +28,10 @@ namespace AuthenticodeLint.Core.x509
         }
 
         public ArraySegment<byte> RawData { get; }
-        public string Algorithm { get; }
+        public Oid Algorithm { get; }
         public ArraySegment<byte>? Parameters { get; }
 
-        public override string ToString() => Algorithm;
+        public override string ToString() => Algorithm.Value;
 
         public bool Equals(AlgorithmIdentifier other)
         {

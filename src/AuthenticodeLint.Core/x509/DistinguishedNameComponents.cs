@@ -4,9 +4,9 @@ namespace AuthenticodeLint.Core.x509
 {
     internal static class DistinguishedNameComponents
     {
-        public static string GetComponentName(string oid)
+        public static string GetComponentName(Oid oid)
         {
-            switch (oid)
+            switch (oid.Value)
             {
                 case KnownOids.DistinguishedName.id_at_commonName:
                     return "CN";
@@ -23,7 +23,7 @@ namespace AuthenticodeLint.Core.x509
                 case KnownOids.DistinguishedName.e_mailAddress:
                     return "E";
                 default:
-                    return oid;
+                    return oid.Value;
             }
         }
     }

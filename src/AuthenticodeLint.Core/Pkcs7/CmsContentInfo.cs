@@ -5,7 +5,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 {
     public sealed class CmsContentInfo
     {
-        public string ContentType { get; }
+        public Oid ContentType { get; }
         public AsnElement Content { get; }
         public ArraySegment<byte> CmsContentInfoData { get; }
 

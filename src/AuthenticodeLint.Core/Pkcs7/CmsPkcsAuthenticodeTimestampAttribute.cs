@@ -6,7 +6,7 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public CmsSignerInfo SignerInfo { get; }
 
-        public CmsPkcsAuthenticodeTimestampAttribute(string attributeId, AsnSet content) : base(attributeId, content)
+        public CmsPkcsAuthenticodeTimestampAttribute(Oid attributeId, AsnSet content) : base(attributeId, content)
         {
             var signerContent = AsnReader.Read<AsnSequence>(content);
             var signerInfo = new CmsSignerInfo(signerContent);

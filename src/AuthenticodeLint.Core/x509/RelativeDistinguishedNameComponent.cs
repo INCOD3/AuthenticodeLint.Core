@@ -6,12 +6,12 @@ namespace AuthenticodeLint.Core.x509
 
     public class RelativeDistinguishedNameComponent : IEquatable<RelativeDistinguishedNameComponent>
     {
-        public string ObjectIdentifier { get; }
+        public Oid ObjectIdentifier { get; }
         public string Value { get; }
         public byte[] RawValue { get; }
         private AsnSequence AsnData {get; }
 
-        public RelativeDistinguishedNameComponent(AsnSequence asnData, string objectIdentifier, string value, byte[] rawValue)
+        public RelativeDistinguishedNameComponent(AsnSequence asnData, Oid objectIdentifier, string value, byte[] rawValue)
         {
             AsnData = asnData;
             ObjectIdentifier = objectIdentifier;

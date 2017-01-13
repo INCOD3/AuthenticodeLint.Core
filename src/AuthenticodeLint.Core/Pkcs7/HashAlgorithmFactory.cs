@@ -6,9 +6,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 {
     public static class HashAlgorithmFactory
     {
-        public static HashAlgorithm FromOid(string oid)
+        public static HashAlgorithm FromOid(Oid oid)
         {
-            switch (oid)
+            switch (oid.Value)
             {
                 case sha1:
                     return SHA1.Create();

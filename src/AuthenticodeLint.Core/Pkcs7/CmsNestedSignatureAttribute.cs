@@ -6,7 +6,7 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public CmsSignature Signature { get; }
 
-        public CmsNestedSignatureAttribute(string attributeId, AsnSet content) : base(attributeId, content)
+        public CmsNestedSignatureAttribute(Oid attributeId, AsnSet content) : base(attributeId, content)
         {
             var nestedSignature = AsnReader.Read<AsnSequence>(content);
             Signature = new CmsSignature(nestedSignature);
