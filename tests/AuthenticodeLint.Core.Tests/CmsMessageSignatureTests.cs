@@ -34,7 +34,7 @@ namespace AuthenticodeLint.Core.Tests
             var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
             var decoded = new CmsSignature(rawPkcs7);
             var all = decoded.VisitAll().ToArray();
-            Assert.Equal(1, all.Length);
+            Assert.Equal(3, all.Length);
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

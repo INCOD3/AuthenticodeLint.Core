@@ -2,7 +2,7 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.Pkcs7
 {
-    public sealed class CmsPkcsRfc3161TimestampAttribute : CmsGenericAttribute
+    public sealed class CmsPkcsRfc3161TimestampAttribute : CmsGenericAttribute, ICmsSignatureAttribute
     {
         public CmsSignature Signature { get; }
 

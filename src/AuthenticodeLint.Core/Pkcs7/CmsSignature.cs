@@ -6,7 +6,7 @@ using AuthenticodeLint.Core.x509;
 
 namespace AuthenticodeLint.Core.Pkcs7
 {
-    public sealed class CmsSignature
+    public sealed class CmsSignature : IVerifiableSignature
     {
         private readonly AsnSequence _contentInfo;
         private readonly bool _isNestedSignature;

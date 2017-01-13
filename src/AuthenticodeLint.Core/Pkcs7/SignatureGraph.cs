@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
     public static class SignatureGraphExtensions
     {
-        public static IEnumerable<CmsSignature> VisitAll(this CmsSignature signature)
+        public static IEnumerable<IVerifiableSignature> VisitAll(this CmsSignature signature)
         {
             if (signature.ContentType != ContentType.SignedData)
             {
@@ -21,7 +21,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 foreach (var attribute in signer.UnauthenticatedAttributes)
                 {
-                    var nested = attribute as CmsNestedSignatureAttribute;
+                    var nested = attribute as ICmsSignatureAttribute;
                     if (nested != null)
                     {
                         yield return nested.Signature;
@@ -30,6 +30,12 @@ namespace AuthenticodeLint.Core.Pkcs7
                         {
                             yield return item;
                         }
+                    }
+                    var authenticodeTimestamp = attribute as CmsPkcsAuthenticodeTimestampAttribute;
+                    if (authenticodeTimestamp != null)
+                    {
+                        var nestedTs = new AuthenticodeTimestampSignature(authenticodeTimestamp.SignerInfo, signature);
+                        yield return nestedTs;
                     }
                 }
             }
