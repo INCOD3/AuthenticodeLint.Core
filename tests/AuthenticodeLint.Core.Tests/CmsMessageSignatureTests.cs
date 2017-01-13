@@ -35,6 +35,12 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = new CmsSignature(rawPkcs7);
             var all = decoded.VisitAll().ToArray();
             Assert.Equal(3, all.Length);
+            var i = 0;
+            foreach(var sig in all)
+            {
+                Assert.True(await sig.VerifySignature());
+                i++;
+            }
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

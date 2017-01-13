@@ -37,7 +37,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 throw new Pkcs7Exception("AuthenticatedAttribute required for non-detached signatures.");
             }
-            var contentTypeAttribute = signer.AuthenticatedAttributes[KnownOids.CmsPkcs9AttributeIds.contentType] as CmsContentTypeAttribute;
+
             var digestAttribute = signer.AuthenticatedAttributes[KnownOids.CmsPkcs9AttributeIds.messageDigest] as CmsMessageDigestAttibute;
             if (digestAttribute == null)
             {
