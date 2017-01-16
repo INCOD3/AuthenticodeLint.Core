@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,13 @@ namespace AuthenticodeLint.Core.Pkcs7
         public int Count => _internalList.Count;
 
         public IEnumerator<CmsGenericAttribute> GetEnumerator() => _internalList.GetEnumerator();
+        internal AsnConstructed AsnElement { get; }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public CmsAttributes(AsnConstructed constructed)
         {
+            AsnElement = constructed;
             _internalList = new List<CmsGenericAttribute>(constructed.Count);
 
             foreach(var sequence in constructed.Cast<AsnSequence>())
@@ -30,6 +33,26 @@ namespace AuthenticodeLint.Core.Pkcs7
         public CmsAttributes()
         {
             _internalList = new List<CmsGenericAttribute>(0);
+        }
+
+        public CmsGenericAttribute this[string attributeId]
+        {
+            get
+            {
+                CmsGenericAttribute result = null;
+                foreach(var attribute in this)
+                {
+                    if (attribute.AttributeId == attributeId)
+                    {
+                        if (result != null)
+                        {
+                            throw new InvalidOperationException("More than one attribute found.");
+                        }
+                        result = attribute;
+                    }
+                }
+                return result;
+            }
         }
     }
 }

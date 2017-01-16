@@ -21,7 +21,7 @@ RUN apt-get install -y --no-install-recommends \
 	git
 
 # Install .NET Core
-RUN curl -sSL -o dotnet.tar.gz https://go.microsoft.com/fwlink/?LinkID=827530 \
+RUN curl -sSL -o dotnet.tar.gz https://go.microsoft.com/fwlink/?LinkID=835021 \
     && mkdir -p /opt/dotnet && tar zxf dotnet.tar.gz -C /opt/dotnet \
     && ln -s /opt/dotnet/dotnet /usr/local/bin
 
@@ -33,4 +33,4 @@ RUN mkdir -p /var/tmp/dotnet-prime \
 # Install surf
 RUN npm install -g surf-build@1.0.0-beta.15
 
-CMD surf-run -r https://github.com/vcsjones/AuthenticodeLint.Core -- surf-build -n 'surf-netcore-1.0.1'
+CMD surf-run -r https://github.com/vcsjones/AuthenticodeLint.Core -- surf-build -n 'surf-netcore-1.1.0'

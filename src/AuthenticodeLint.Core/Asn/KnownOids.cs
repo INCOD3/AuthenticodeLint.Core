@@ -6,8 +6,24 @@ namespace AuthenticodeLint.Core.Asn
         {
             public static class Digest
             {
+                public const string md5 = "1.2.840.113549.2.5";
                 public const string sha1 = "1.3.14.3.2.26";
                 public const string sha256 = "2.16.840.1.101.3.4.2.1";
+                public const string sha384 = "2.16.840.1.101.3.4.2.2";
+                public const string sha512 = "2.16.840.1.101.3.4.2.3";
+            }
+
+            public static class EcdsaCurves
+            {
+                public const string ecdsa_nist_p256 = "1.2.840.10045.3.1.7";
+                public const string ecdsa_nist_p384 = "1.3.132.0.34";
+                public const string ecdsa_nist_p521 = "1.3.132.0.35";
+            }
+
+            public static class SigningAlgorithms
+            {
+                public const string ecc = "1.2.840.10045.2.1";
+                public const string rsa = "1.2.840.113549.1.1.1";
             }
         }
 
@@ -20,6 +36,7 @@ namespace AuthenticodeLint.Core.Asn
             public const string rsa_authenticode_timestamp = "1.2.840.113549.1.9.6";
             public const string signing_time = "1.2.840.113549.1.9.5";
             public const string signing_certificate = "1.2.840.113549.1.9.16.2.12";
+            public const string contentType = "1.2.840.113549.1.9.3";
         }
 
         public static class CmsContentTypes

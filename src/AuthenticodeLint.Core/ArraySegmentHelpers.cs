@@ -56,6 +56,24 @@ namespace AuthenticodeLint.Core
             return new ArraySegment<T>(ars.Array, ars.Offset + by, ars.Count - by);
         }
 
+        public static ArraySegment<T> TrimOff<T>(this ArraySegment<T> ars, Func<T, bool> selector)
+        {
+            for (int i = 0, j = i + ars.Offset; i < ars.Count; i++, j++)
+            {
+                if (!selector(ars.Array[j]))
+                {
+                    return ars.Advance(i);
+                }
+            }
+            return new ArraySegment<T>(ars.Array, ars.Array.Length, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T At<T>(this ArraySegment<T> ars, int index)
+        {
+            return ars.Array[index + ars.Offset];
+        }
+
         public static bool StartsWith<T>(this ArraySegment<T> ars, T[] items)
             where T : IEquatable<T>
         {
@@ -93,8 +111,7 @@ namespace AuthenticodeLint.Core
 
             for (var i = 0; i < ars.Count; i++)
             {
-                var index = i + ars.Offset;
-                var compare = ars.Array[index].CompareTo(other.Array[index]);
+                var compare = ars.Array[ars.Offset + i].CompareTo(other.Array[other.Offset + i]);
                 if (compare != 0)
                 {
                     return compare;

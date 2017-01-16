@@ -40,6 +40,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         public IReadOnlyList<CmsSignerInfo> SignerInfos { get; }
 
         public CmsContentInfo ContentInfo { get; }
+        public IReadOnlyList<AlgorithmIdentifier> DigestAlgorithms { get; }
 
         public CmsSignedData(AsnElement content) : base(content)
         {
@@ -97,6 +98,12 @@ namespace AuthenticodeLint.Core.Pkcs7
             SignerInfos = signerInfos;
             Certificates = certs;
             ContentInfo = new CmsContentInfo(contentInfo);
+            var digestAlgsList = new List<AlgorithmIdentifier>();
+            foreach (var alg in digestAlgorithms)
+            {
+                digestAlgsList.Add(new AlgorithmIdentifier((AsnSequence)alg));
+            }
+            DigestAlgorithms = digestAlgsList.AsReadOnly();
         }
     }
 }

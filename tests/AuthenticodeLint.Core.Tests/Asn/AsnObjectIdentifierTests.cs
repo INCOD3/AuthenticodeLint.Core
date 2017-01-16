@@ -16,7 +16,7 @@ namespace AuthenticodeLint.Core.Tests
             };
             var decoded = AsnDecoder.Decode(data);
             var objectIdentifier = Assert.IsType<AsnObjectIdentifier>(decoded);
-            Assert.Equal("1.2.840.10045.3.1.7", objectIdentifier.Value);
+            Assert.Equal("1.2.840.10045.3.1.7", objectIdentifier.Value.Value);
             Assert.Equal("1.2.840.10045.3.1.7", objectIdentifier.ToString());
         }
 

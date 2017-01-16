@@ -14,7 +14,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             AsnInteger version;
             AsnSequence issuerAndSerial;
             AsnSequence digestAlgorithm, encryptionAlgorithm = null;
-            AsnOctetString encryptedDigest;
+            AsnOctetString encryptedDigest = null;
             AsnConstructed authAttributes = null, unauthAttributes = null;
             var hasEncryptionAlgorithm = false;
             if (!reader.MoveNext(out version))
@@ -60,6 +60,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             AuthenticatedAttributes = authAttributes == null ? new CmsAttributes() : new CmsAttributes(authAttributes);
             UnauthenticatedAttributes = unauthAttributes == null ? new CmsAttributes() : new CmsAttributes(unauthAttributes);
             EncryptionAlgorithm = new AlgorithmIdentifier(encryptionAlgorithm);
+            EncryptedDigest = encryptedDigest;
         }
 
         public AlgorithmIdentifier DigestAlgorithm { get; }
@@ -68,5 +69,6 @@ namespace AuthenticodeLint.Core.Pkcs7
         public CmsIssuerAndSerialNumber IssuerAndSerialNumber { get; }
         public CmsAttributes AuthenticatedAttributes { get; }
         public CmsAttributes UnauthenticatedAttributes { get; }
+        public AsnOctetString EncryptedDigest { get; }
     }
 }

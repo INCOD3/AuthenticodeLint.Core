@@ -22,8 +22,8 @@ namespace AuthenticodeLint.Core.Tests
             var signerInfo = content.SignerInfos[0];
             Assert.NotNull(signerInfo.IssuerAndSerialNumber);
             Assert.Equal(1, signerInfo.Version);
-            Assert.Equal(KnownOids.Algorithms.Digest.sha1, signerInfo.DigestAlgorithm.Algorithm);
-            Assert.Equal("1.2.840.10045.2.1", signerInfo.EncryptionAlgorithm.Algorithm);
+            Assert.Equal(KnownOids.Algorithms.Digest.sha1, signerInfo.DigestAlgorithm.Algorithm.Value);
+            Assert.Equal(KnownOids.Algorithms.SigningAlgorithms.ecc, signerInfo.EncryptionAlgorithm.Algorithm.Value);
             Assert.Equal(4, signerInfo.AuthenticatedAttributes.Count);
 
         }
@@ -86,9 +86,9 @@ namespace AuthenticodeLint.Core.Tests
 
             Assert.Equal(1, tst.Version);
             //This is a time-stamping policy ID. It's owned by digicert.
-            Assert.Equal("2.16.840.1.114412.7.1", tst.PolicyId);
+            Assert.Equal("2.16.840.1.114412.7.1", tst.PolicyId.Value);
             //sha256 timestamp
-            Assert.Equal(KnownOids.Algorithms.Digest.sha256, tst.MessageImprint.HashAlgorithm.Algorithm);
+            Assert.Equal(KnownOids.Algorithms.Digest.sha256, tst.MessageImprint.HashAlgorithm.Algorithm.Value);
             Assert.False(tst.MessageImprint.HashAlgorithm.Parameters.HasValue);
             Assert.Null(tst.Nonce);
         }
@@ -102,8 +102,8 @@ namespace AuthenticodeLint.Core.Tests
             var content = Assert.IsType<CmsSignedData>(decoded.Content);
             var contentSequence = (AsnSequence)content.ContentInfo.Content;
             var spc = new SpcIndirectDataContent(contentSequence);
-            Assert.Equal(KnownOids.Algorithms.Digest.sha1, spc.DigestInfo.AlgorithmIdentifier.Algorithm);
-            Assert.Equal("1.3.6.1.4.1.311.2.1.15", spc.Data.Type);
+            Assert.Equal(KnownOids.Algorithms.Digest.sha1, spc.DigestInfo.AlgorithmIdentifier.Algorithm.Value);
+            Assert.Equal("1.3.6.1.4.1.311.2.1.15", spc.Data.Type.Value);
             Assert.Equal(20, spc.DigestInfo.Digest.Count);
         }
 

@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Core.x509
             Algorithm = algorithm.Value;
             if (reader.MoveNext(out parameters) && !(parameters is AsnNull))
             {
-                Parameters = parameters.ContentData;
+                Parameters = parameters.ElementData;
             }
             else
             {
@@ -28,10 +28,10 @@ namespace AuthenticodeLint.Core.x509
         }
 
         public ArraySegment<byte> RawData { get; }
-        public string Algorithm { get; }
+        public Oid Algorithm { get; }
         public ArraySegment<byte>? Parameters { get; }
 
-        public override string ToString() => Algorithm;
+        public override string ToString() => Algorithm.Value;
 
         public bool Equals(AlgorithmIdentifier other)
         {

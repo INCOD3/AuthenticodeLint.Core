@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
     public sealed class SpcAttributeTypeAndOptionalValue
     {
-        public string Type { get; }
+        public Oid Type { get; }
         public ArraySegment<byte>? Contents { get; }
 
 

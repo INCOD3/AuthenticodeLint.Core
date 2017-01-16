@@ -38,16 +38,16 @@ namespace AuthenticodeLint.Core.x509
                 {
                     throw new x509Exception("asn.1 extension is missing content.");
                 }
-                switch (identifier.Value)
+                switch (identifier.Value.Value)
                 {
                     case KnownOids.CertificateExtensions.id_ce_basicConsraints:
-                        _internalList.Add(new BasicConstraintsExtension(identifier.Value, content.Value, isCritical));
+                        _internalList.Add(new BasicConstraintsExtension(identifier.Value.Value, content.Value, isCritical));
                         break;
                     case KnownOids.CertificateExtensions.id_ce_extKeyUsage:
-                        _internalList.Add(new ExtendedKeyUsageExtension(identifier.Value, content.Value, isCritical));
+                        _internalList.Add(new ExtendedKeyUsageExtension(identifier.Value.Value, content.Value, isCritical));
                         break;
                     default:
-                        _internalList.Add(new x509Extension(identifier.Value, content.Value, isCritical));
+                        _internalList.Add(new x509Extension(identifier.Value.Value, content.Value, isCritical));
                         break;
                 }
             }

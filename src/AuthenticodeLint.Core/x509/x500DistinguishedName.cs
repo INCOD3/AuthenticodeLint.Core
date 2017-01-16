@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
 {
-    public class x500DistinguishedName : IReadOnlyList<RelativeDistinguishedName>
+    public class x500DistinguishedName : IReadOnlyList<RelativeDistinguishedName>, IEquatable<x500DistinguishedName>
     {
         private readonly RelativeDistinguishedName[] _rdns;
         private readonly AsnSequence _underlyingSequence;
@@ -54,6 +55,33 @@ namespace AuthenticodeLint.Core.x509
             }
 
             return builder.ToString();
+        }
+
+        public bool Equals(x500DistinguishedName other)
+        {
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (Count != other.Count) return false;
+            for (var i = 0; i < Count; i++)
+            {
+                if (!this[i].Equals(other[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as x500DistinguishedName);
+
+        public override int GetHashCode()
+        {
+            var builder = new HashCodeBuilder();
+            foreach(var item in this)
+            {
+                builder.Push(item.GetHashCode());
+            }
+            return builder.GetHashCode();
         }
     }
 }

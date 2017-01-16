@@ -25,8 +25,8 @@ namespace AuthenticodeLint.Core.Tests
                 };
             Assert.Equal(expectedSerial, certificate.SerialNumber);
             Assert.Equal(expectedSha1Thumbprint, certificate.Thumbprint);
-            Assert.Equal("1.2.840.10045.4.3.2", certificate.AlgorithmIdentifier.Algorithm);
-            Assert.Equal("1.2.840.10045.4.3.2", certificate.SignatureAlgorithmIdentifier.Algorithm);
+            Assert.Equal("1.2.840.10045.4.3.2", certificate.AlgorithmIdentifier.Algorithm.Value);
+            Assert.Equal("1.2.840.10045.4.3.2", certificate.SignatureAlgorithmIdentifier.Algorithm.Value);
             Assert.Null(certificate.AlgorithmIdentifier.Parameters);
             Assert.Equal(2, certificate.Version);
             Assert.Equal(5, certificate.Issuer.Count);
@@ -66,7 +66,7 @@ namespace AuthenticodeLint.Core.Tests
             var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
             var ekuExtension = (ExtendedKeyUsageExtension)certificate.Extensions.Single(ext => ext.Oid == KnownOids.CertificateExtensions.id_ce_extKeyUsage);
             Assert.Equal(2, ekuExtension.KeyPurposeIds.Count);
-            Assert.Equal(new [] { "1.3.6.1.5.5.7.3.1", "1.3.6.1.5.5.7.3.2" }, ekuExtension.KeyPurposeIds);
+            Assert.Equal(new [] { "1.3.6.1.5.5.7.3.1", "1.3.6.1.5.5.7.3.2" }, ekuExtension.KeyPurposeIds.Select(kp => kp.Value));
             Assert.False(ekuExtension.Critical);
         }
 
@@ -90,7 +90,7 @@ namespace AuthenticodeLint.Core.Tests
             var dn = new x500DistinguishedName(data);
             Assert.Equal(1, dn.Count);
             Assert.Equal(1, dn[0].Count);
-            Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier);
+            Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier.Value);
             Assert.Equal("Kevin Jones", dn[0][0].Value);
             Assert.Equal("CN=Kevin Jones", dn.ToString());
         }
@@ -109,9 +109,9 @@ namespace AuthenticodeLint.Core.Tests
             Assert.Equal(2, dn.Count);
             Assert.Equal(1, dn[0].Count);
             Assert.Equal(1, dn[1].Count);
-            Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier);
+            Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier.Value);
             Assert.Equal("Kevin Jones", dn[0][0].Value);
-            Assert.Equal(id_at_countryName, dn[1][0].ObjectIdentifier);
+            Assert.Equal(id_at_countryName, dn[1][0].ObjectIdentifier.Value);
             Assert.Equal("US", dn[1][0].Value);
             Assert.Equal("CN=Kevin Jones, C=US", dn.ToString());
         }
@@ -133,8 +133,8 @@ namespace AuthenticodeLint.Core.Tests
             var dn = new x500DistinguishedName(data);
             Assert.Equal(2, dn.Count);
             Assert.Equal(2, dn[0].Count);
-            Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier);
-            Assert.Equal(id_at_countryName, dn[0][1].ObjectIdentifier);
+            Assert.Equal(id_at_commonName, dn[0][0].ObjectIdentifier.Value);
+            Assert.Equal(id_at_countryName, dn[0][1].ObjectIdentifier.Value);
             Assert.Equal("Kevin Jones", dn[0][0].Value);
             Assert.Equal("US", dn[0][1].Value);
             Assert.Equal("CN=Kevin Jones + C=US, CN=Turtle", dn.ToString());

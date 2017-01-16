@@ -5,9 +5,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 {
     public class CmsGenericAttribute
     {
-        public string AttributeId { get; protected set; }
+        public Oid AttributeId { get; protected set; }
 
-        public CmsGenericAttribute(string attributeId, AsnSet content)
+        public CmsGenericAttribute(Oid attributeId, AsnSet content)
         {
             AttributeId = attributeId;
             Content = content.ElementData;

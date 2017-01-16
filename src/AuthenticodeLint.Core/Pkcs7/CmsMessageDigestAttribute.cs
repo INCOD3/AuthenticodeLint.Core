@@ -5,7 +5,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 {
     public sealed class CmsMessageDigestAttibute : CmsGenericAttribute
     {
-        public CmsMessageDigestAttibute(string attributeId, AsnSet content) : base(attributeId, content)
+        public CmsMessageDigestAttibute(Oid attributeId, AsnSet content) : base(attributeId, content)
         {
             var digest = AsnReader.Read<AsnOctetString>(content);
             Digest = digest.Value;

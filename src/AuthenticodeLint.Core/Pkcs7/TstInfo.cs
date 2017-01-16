@@ -12,7 +12,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         private readonly AsnSequence _sequence;
 
         public int Version { get; }
-        public string PolicyId { get; }
+        public Oid PolicyId { get; }
         public TstInfoMessageImprint MessageImprint { get; }
         public ArraySegment<byte> SerialNumber { get; }
         public DateTimeOffset GeneralizedTime { get; }
