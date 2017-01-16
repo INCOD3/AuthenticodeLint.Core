@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
         }
 
-        public CmsSignature(AsnSequence sequence, bool isNestedSignature)
+        internal CmsSignature(AsnSequence sequence, bool isNestedSignature)
         {
             _isNestedSignature = isNestedSignature;
             _contentInfo = sequence;
