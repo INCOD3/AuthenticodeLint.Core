@@ -28,25 +28,24 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 return false;
             }
-            var signer = _signature;
-            if (!data.DigestAlgorithms.Contains(signer.DigestAlgorithm))
+            if (!data.DigestAlgorithms.Contains(_signature.DigestAlgorithm))
             {
                 // The SignerInfo uses an algorithm that was not declared in the SignedData.
                 return false;
             }
             ArraySegment<byte> digest;
-            using (var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm))
+            using (var algorithm = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm))
             {
                 //We already know there is exactly one SignerInfo.
                 var encryptedDigest = data.SignerInfos[0].EncryptedDigest.Value;
                 digest = new ArraySegment<byte>(algorithm.ComputeHash(encryptedDigest.Array, encryptedDigest.Offset, encryptedDigest.Count));
             }
-            if (signer.AuthenticatedAttributes.Count == 0)
+            if (_signature.AuthenticatedAttributes.Count == 0)
             {
                 throw new Pkcs7Exception("AuthenticatedAttribute required for non-detached signatures.");
             }
 
-            var digestAttribute = signer.AuthenticatedAttributes[KnownOids.CmsPkcs9AttributeIds.messageDigest] as CmsMessageDigestAttibute;
+            var digestAttribute = _signature.AuthenticatedAttributes[KnownOids.CmsPkcs9AttributeIds.messageDigest] as CmsMessageDigestAttibute;
             if (digestAttribute == null)
             {
                 throw new Pkcs7Exception("MessageDigest attribute missing from authenticated attribute set.");
@@ -59,19 +58,19 @@ namespace AuthenticodeLint.Core.Pkcs7
                 return false;
             }
 
-            var authenticatedSet = signer.AuthenticatedAttributes.AsnElement.Reinterpret<AsnSet>();
+            var authenticatedSet = _signature.AuthenticatedAttributes.AsnElement.Reinterpret<AsnSet>();
             ArraySegment<byte> authenticatedAttributeDigest;
-            using (var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm))
+            using (var algorithm = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm))
             using (var bhs = new BlockHashStream(algorithm))
             {
                 bhs.Write(authenticatedSet.ElementData);
                 authenticatedAttributeDigest = await bhs.Digest();
             }
             var certificateCollection = new x509CertificateCollection(data.Certificates);
-            var cert = certificateCollection.FindFirstBy(signer.IssuerAndSerialNumber);
+            var cert = certificateCollection.FindFirstBy(_signature.IssuerAndSerialNumber);
             using (var key = new x509Key(cert.PublicKey))
             {
-                var result = key.VerifyHash(authenticatedAttributeDigest, signer.EncryptedDigest.Value, signer.DigestAlgorithm.Algorithm);
+                var result = key.VerifyHash(authenticatedAttributeDigest, _signature.EncryptedDigest.Value, _signature.DigestAlgorithm.Algorithm);
                 if (!result)
                 {
                     //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
