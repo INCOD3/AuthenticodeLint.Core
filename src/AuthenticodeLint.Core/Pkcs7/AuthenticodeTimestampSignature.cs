@@ -20,6 +20,14 @@ namespace AuthenticodeLint.Core.Pkcs7
         public async Task<bool> VerifySignature()
         {
             var data = (CmsSignedData) _pkcs7parent.Content;
+
+            //We can't verify a parent signature that has more than one SignerInfo. That shouldn't
+            //ever happen with Authenticode in the first place, but, we explicitly fail here if for
+            //whatever reason it's encountered.
+            if (data.SignerInfos.Count != 1)
+            {
+                return false;
+            }
             var signer = _signature;
             if (!data.DigestAlgorithms.Contains(signer.DigestAlgorithm))
             {
@@ -28,10 +36,10 @@ namespace AuthenticodeLint.Core.Pkcs7
             }
             ArraySegment<byte> digest;
             using (var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm))
-            using (var bhs = new BlockHashStream(algorithm))
             {
-                bhs.Write(data.ContentInfo.Content.ContentData);
-                digest = await bhs.Digest();
+                //We already know there is exactly one SignerInfo.
+                var encryptedDigest = data.SignerInfos[0].EncryptedDigest.Value;
+                digest = new ArraySegment<byte>(algorithm.ComputeHash(encryptedDigest.Array, encryptedDigest.Offset, encryptedDigest.Count));
             }
             if (signer.AuthenticatedAttributes.Count == 0)
             {
