@@ -1,4 +1,4 @@
-*.cs    text eol=lf
+*.cs    text eol=lf diff=csharp
 *.md    text eol=lf
 *.json  text eol=lf
 *.sh    text eol=lf
