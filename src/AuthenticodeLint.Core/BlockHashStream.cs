@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace AuthenticodeLint.Core
     public sealed class BlockHashStream : Stream
     {
         public int BufferSize { get; } = 0x1000;
+        private long _length = 0;
 
         private readonly HashAlgorithm _hashAlgorithm;
         private readonly byte[] _writeBuffer;
@@ -20,14 +22,16 @@ namespace AuthenticodeLint.Core
         private volatile bool _complete;
         private int _bytesAvailable = 0, _offset = 0;
 
-        public BlockHashStream(HashAlgorithm hashAlgorithm)
+        public BlockHashStream(HashAlgorithm hashAlgorithm, int bufferSize = 0x1000)
         {
             _hashAlgorithm = hashAlgorithm;
-            _hashSizeBytes = BufferSize;
+            BufferSize = bufferSize;
+            _hashSizeBytes = bufferSize;
             _writeBuffer = new byte[_hashSizeBytes];
             _readEvent = new ManualResetEventSlim(false);
             _writeEvent = new ManualResetEventSlim(true);
-            _work = Task.Run(() => {
+            _work = Task.Run(() =>
+            {
                 return this._hashAlgorithm.ComputeHash(this);
             });
             _complete = false;
@@ -39,13 +43,7 @@ namespace AuthenticodeLint.Core
 
         public override bool CanWrite => true;
 
-        public override long Length
-        {
-            get
-            {
-                throw new NotSupportedException();
-            }
-        }
+        public override long Length => _length;
 
         public override long Position
         {
@@ -101,6 +99,7 @@ namespace AuthenticodeLint.Core
                 //Console.WriteLine("ALLOWING WRITE");
                 _writeEvent.Set();
             }
+            _length += read;
             return read;
         }
 
@@ -124,6 +123,57 @@ namespace AuthenticodeLint.Core
             _writeEvent.Reset();
             //Console.WriteLine("ALLOWING READ");
             _readEvent.Set();
+        }
+
+        public void WriteNativeBlock(IntPtr handle, int offset, int count)
+        {
+            if (count > _hashSizeBytes)
+            {
+                throw new InvalidOperationException($"Cannot write data larger than {count}.");
+            }
+            if (_complete)
+            {
+                throw new InvalidOperationException("Stream is complete.");
+            }
+            _writeEvent.Wait();
+            Debug.Assert(_bytesAvailable == 0);
+            Marshal.Copy(handle + offset, _writeBuffer, 0, count);
+            _bytesAvailable = count;
+            _writeEvent.Reset();
+            _readEvent.Set();
+        }
+
+        public void Write(SafeHandle handle, int offset, int count)
+        {
+            bool handled = false;
+            handle.DangerousAddRef(ref handled);
+            if (!handled)
+            {
+                throw new InvalidOperationException("Unable to read native memory.");
+            }
+            var address = handle.DangerousGetHandle();
+            try
+            {
+                if (count <= _hashSizeBytes)
+                {
+                    WriteNativeBlock(address, offset, count);
+                    return;
+                }
+                var blocks = count / _hashSizeBytes;
+                var remainder = count % _hashSizeBytes;
+                for (var i = 0; i < blocks; i++)
+                {
+                    WriteNativeBlock(address, offset + (i * _hashSizeBytes), _hashSizeBytes);
+                }
+                if (remainder != 0)
+                {
+                    WriteNativeBlock(address, offset + (blocks * _hashSizeBytes), remainder);
+                }
+            }
+            finally
+            {
+                handle.DangerousRelease();
+            }
         }
 
         public override long Seek(long offset, SeekOrigin origin)

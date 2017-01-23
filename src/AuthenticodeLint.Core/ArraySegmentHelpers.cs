@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AuthenticodeLint.Core
 {
-    internal static class ArraySegmentHelpers
+    public static class ArraySegmentHelpers
     {
         public static string Join(this ArraySegment<byte> ars)
         {

@@ -7,7 +7,8 @@
     },
     "dependencies": {
         "System.IO.MemoryMappedFiles": "4.3.0",
-        "System.ValueTuple": "4.3.0"
+        "System.ValueTuple": "4.3.0",
+        "System.Buffers": "4.3.0"
     },
     "frameworks": {
         "netstandard1.6": {

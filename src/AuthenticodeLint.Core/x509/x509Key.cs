@@ -64,7 +64,7 @@ namespace AuthenticodeLint.Core.x509
             }
             var curve = ECCurve.CreateFromValue(decodedParameters.Value.Value);
             var point = DecodePoint(spki.PublicKey);
-            var parameters = new ECParameters()
+            var parameters = new ECParameters
             {
                 Curve = curve,
                 Q = point
@@ -135,9 +135,10 @@ namespace AuthenticodeLint.Core.x509
             AsnElement element;
 
             //In PKCS#7 an ECC signature is encoded as a Sequence of (R, S). However the
-            //.NET Framework Core expects the signature to be encoded as R || S. Here we
-            //try and sniff out how the signature was encoded. If it's a DER Sequence,
-            //convert it. Otherwise, continue as-is.
+            //.NET Framework Core expects the signature to be encoded as R || S. We need
+            //to unpack the sequence and concat them. To make matters more difficult, the
+            //asn sequence is signed since it's encoded as integers. Field points don't really
+            //have a "sign" so we need to strip off octets that exist purely to preserve sign.
             if (AsnDecoder.TryDecode(signature, out element) && element is AsnSequence)
             {
                 var ecPoint = (AsnSequence)element;
@@ -145,7 +146,7 @@ namespace AuthenticodeLint.Core.x509
             }
             else
             {
-                transformSignature = signature;
+                throw new InvalidOperationException("Signature was not encoded correctly.");
             }
             return _algorithm.VerifyHash(hash, transformSignature);
         }
@@ -186,7 +187,7 @@ namespace AuthenticodeLint.Core.x509
             }
         }
 
-        public void Dispose() =>_algorithm.Dispose();
+        public void Dispose() => _algorithm.Dispose();
     }
 
     internal interface ISign : IDisposable
