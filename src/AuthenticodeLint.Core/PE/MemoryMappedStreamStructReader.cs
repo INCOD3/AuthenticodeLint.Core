@@ -13,6 +13,63 @@ namespace AuthenticodeLint.Core.PE
     /// </summary>
     internal static class MemoryMappedStreamStructReader
     {
+        public static T ReadStruct<T>(this MemoryMappedViewAccessor va, int offset = 0) where T : struct
+        {
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+            if (!typeInfo.IsLayoutSequential)
+            {
+                throw new InvalidOperationException("Type must have a sequential layout.");
+            }
+            var handle = va.SafeMemoryMappedViewHandle;
+            var inc = false;
+            handle.DangerousAddRef(ref inc);
+            if (!inc)
+            {
+                throw new InvalidOperationException("Could not increment reference.");
+            }
+            try
+            {
+                return Marshal.PtrToStructure<T>(handle.DangerousGetHandle());
+            }
+            finally
+            {
+                handle.DangerousRelease();
+            }
+        }
+
+        public static T[] ReadStructArray<T>(this MemoryMappedViewAccessor va, int count, int offset = 0) where T : struct
+        {
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+            if (!typeInfo.IsLayoutSequential)
+            {
+                throw new InvalidOperationException("Type must have a sequential layout.");
+            }
+            var handle = va.SafeMemoryMappedViewHandle;
+            var inc = false;
+            handle.DangerousAddRef(ref inc);
+            if (!inc)
+            {
+                throw new InvalidOperationException("Could not increment reference.");
+            }
+            try
+            {
+                var ptr = handle.DangerousGetHandle();
+                var size = Marshal.SizeOf<T>();
+                var buffer = new T[count];
+                for(var i = 0; i < count; i++)
+                {
+                    buffer[i] = Marshal.PtrToStructure<T>(ptr + (i * size));
+                }
+                return buffer;
+            }
+            finally
+            {
+                handle.DangerousRelease();
+            }
+        }
+
         public static async Task<T> ReadStructAsync<T>(this MemoryMappedViewStream stream, int offset = 0) where T : struct
         {
             var type = typeof(T);

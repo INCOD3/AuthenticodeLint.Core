@@ -3,7 +3,7 @@
 namespace AuthenticodeLint.Core.PE
 {
     [type: StructLayout(LayoutKind.Sequential)]
-    internal struct DosHeaderMap
+    public struct DosHeaderMap
     {
         public ushort e_magic;
         public ushort e_cblp;
@@ -114,5 +114,21 @@ namespace AuthenticodeLint.Core.PE
     {
         public uint VirtualAddress;
         public uint Size;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct ImageNtHeaders32
+    {
+        public uint Signature;
+        public ImageFileHeaderMap FileHeader;
+        public ImageOptionHeader32Map OptionalHeader;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct ImageNtHeaders64
+    {
+        public uint Signature;
+        public ImageFileHeaderMap FileHeader;
+        public ImageOptionHeader64Map OptionalHeader;
     }
 }

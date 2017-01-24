@@ -14,7 +14,8 @@ namespace AuthenticodeLint.Core.Tests
         [Fact]
         public async Task ShouldCalculateImageHash()
         {
-            var rawPkcs7 = await GetCmsForAuthenticodeFile(PathHelper.CombineWithProjectPath("files/authlint.exe"));
+            var path = PathHelper.CombineWithProjectPath("files/authlint.exe");
+            var rawPkcs7 = await GetCmsForAuthenticodeFile(path);
             var decoded = new CmsSignature(rawPkcs7);
             Assert.Equal(ContentType.SignedData, decoded.ContentType);
             var content = Assert.IsType<CmsSignedData>(decoded.Content);
@@ -22,14 +23,10 @@ namespace AuthenticodeLint.Core.Tests
             var spc = new SpcIndirectDataContent(contentSequence);
             Assert.Equal(KnownOids.Algorithms.Digest.sha1, spc.DigestInfo.AlgorithmIdentifier.Algorithm.Value);
             var theRealDigest = spc.DigestInfo.Digest;
-            using (var pe = new PortableExecutable(PathHelper.CombineWithProjectPath("files/authlint.exe")))
-            {
-                using (var sha1 = SHA1.Create())
-                {
-                    var digest = await PortableExecutableDigestProcessor.Calculate(pe, sha1);
-                    Assert.Equal(0, ArraySegmentHelpers.Compare(theRealDigest, digest));
-                }
-            }
+
+
+            var digest = PortableExecutableDigestProcessor.Calculate(path, HashAlgorithmName.SHA1);
+            Assert.Equal(0, ArraySegmentHelpers.Compare(theRealDigest, digest));
         }
 
         private static async Task<byte[]> GetCmsForAuthenticodeFile(string path)

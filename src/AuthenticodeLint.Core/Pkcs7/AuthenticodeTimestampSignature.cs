@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AuthenticodeLint.Core.Asn;
 using AuthenticodeLint.Core.x509;
@@ -17,7 +18,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             _pkcs7parent = pkcs7parent;
         }
 
-        public async Task<bool> VerifySignature()
+        public Task<bool> VerifySignature()
         {
             var data = (CmsSignedData) _pkcs7parent.Content;
 
@@ -26,19 +27,21 @@ namespace AuthenticodeLint.Core.Pkcs7
             //whatever reason it's encountered.
             if (data.SignerInfos.Count != 1)
             {
-                return false;
+                return Task.FromResult(false);
             }
             if (!data.DigestAlgorithms.Contains(_signature.DigestAlgorithm))
             {
                 // The SignerInfo uses an algorithm that was not declared in the SignedData.
-                return false;
+                return Task.FromResult(false);
             }
             ArraySegment<byte> digest;
-            using (var algorithm = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm))
+            var algorithmName = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm);
+            using (var ih = IncrementalHash.CreateHash(algorithmName))
             {
                 //We already know there is exactly one SignerInfo.
                 var encryptedDigest = data.SignerInfos[0].EncryptedDigest.Value;
-                digest = new ArraySegment<byte>(algorithm.ComputeHash(encryptedDigest.Array, encryptedDigest.Offset, encryptedDigest.Count));
+                ih.AppendData(encryptedDigest);
+                digest = ih.GetSegmentHashAndReset();
             }
             if (_signature.AuthenticatedAttributes.Count == 0)
             {
@@ -55,16 +58,16 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 //This is the case where the messageDigest attribute does not match the digest of the
                 //signed data structure.
-                return false;
+                return Task.FromResult(false);
             }
 
             var authenticatedSet = _signature.AuthenticatedAttributes.AsnElement.Reinterpret<AsnSet>();
             ArraySegment<byte> authenticatedAttributeDigest;
-            using (var algorithm = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm))
-            using (var bhs = new BlockHashStream(algorithm))
+            var digestAlgorithmName = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm);
+            using (var ih = IncrementalHash.CreateHash(digestAlgorithmName))
             {
-                bhs.Write(authenticatedSet.ElementData);
-                authenticatedAttributeDigest = await bhs.Digest();
+                ih.AppendData(authenticatedSet.ElementData);
+                authenticatedAttributeDigest = ih.GetSegmentHashAndReset();
             }
             var certificateCollection = new x509CertificateCollection(data.Certificates);
             var cert = certificateCollection.FindFirstBy(_signature.IssuerAndSerialNumber);
@@ -74,10 +77,10 @@ namespace AuthenticodeLint.Core.Pkcs7
                 if (!result)
                 {
                     //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
-                    return false;
+                    return Task.FromResult(false);
                 }
             }
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

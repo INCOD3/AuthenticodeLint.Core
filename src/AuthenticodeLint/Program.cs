@@ -4,8 +4,8 @@ class Program
 {
     static int Main(string[] args) => Run(args).GetAwaiter().GetResult();
 
-    static async Task<int> Run(string[] args)
+    static Task<int> Run(string[] args)
     {
-        return 0;
+        return Task.FromResult(0);
     }
 }

@@ -1,32 +1,37 @@
 using System;
+using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace AuthenticodeLint.Core.PE
 {
-    ///<code>Hello<T></code>
     public static class PortableExecutableDigestProcessor
     {
-        public static async Task<ArraySegment<byte>> Calculate(
-            this PortableExecutable pe,
-            HashAlgorithm algorithm,
+        public static ArraySegment<byte> Calculate(
+            string path,
+            HashAlgorithmName algorithm,
             PortableExecutableDigestKinds kinds = PortableExecutableDigestKinds.IncludeEverything)
         {
-            using (var processor = new BlockHashStream(algorithm))
+            using (var mmf = MemoryMappedFile.CreateFromFile(path, FileMode.Open, null, 0, MemoryMappedFileAccess.Read))
+            using (var processor = IncrementalHash.CreateHash(algorithm))
             {
-                var dosHeader = await pe.GetDosHeaderAsync();
-                var peHeader = await pe.GetPeHeaderAsync(dosHeader);
-                using (var stream = pe.file.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
+                using (var va = mmf.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read))
                 {
-                    //Copy from the beginning of the file and the DOS header up to the address of the
-                    //NT PE header.
-                    await stream.CopyUpToAsync(processor, dosHeader.ExeFileHeaderAddress, processor.BufferSize);
+                    var dosHeader = va.ReadStruct<DosHeaderMap>();
+                    if (dosHeader.e_magic != MagicValues.DOS_MAGIC)
+                    {
+                        throw new InvalidOperationException("Not a valid DOS application.");
+                    }
+                    processor.Write(va.SafeMemoryMappedViewHandle, 0, dosHeader.e_lfanew);
                 }
-                var digest = await processor.Digest();
-                var totalDigested = processor.Length;
+                var digest = processor.GetSegmentHashAndReset();
                 return digest;
             }
+        }
+
+        private static void WriteSection()
+        {
+
         }
     }
 
