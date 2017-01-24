@@ -9,5 +9,7 @@
         public const int IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
         public const ushort IMAGE_FILE_MACHINE_I386 = 0x014c;
         public const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
+
+        public const int IMAGE_SIZEOF_SHORT_NAME = 0x08;
     }
 }

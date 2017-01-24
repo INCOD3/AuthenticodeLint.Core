@@ -30,7 +30,7 @@ namespace AuthenticodeLint.Core.PE
             }
             try
             {
-                return Marshal.PtrToStructure<T>(handle.DangerousGetHandle());
+                return Marshal.PtrToStructure<T>(handle.DangerousGetHandle() + offset);
             }
             finally
             {
@@ -60,7 +60,7 @@ namespace AuthenticodeLint.Core.PE
                 var buffer = new T[count];
                 for(var i = 0; i < count; i++)
                 {
-                    buffer[i] = Marshal.PtrToStructure<T>(ptr + (i * size));
+                    buffer[i] = Marshal.PtrToStructure<T>(ptr + offset + (i * size));
                 }
                 return buffer;
             }

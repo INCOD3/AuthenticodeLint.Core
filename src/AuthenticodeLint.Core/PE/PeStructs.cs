@@ -117,6 +117,13 @@ namespace AuthenticodeLint.Core.PE
     }
 
     [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal struct ImageNtHeadersAny
+    {
+        public uint Signature;
+        public ImageFileHeaderMap FileHeader;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct ImageNtHeaders32
     {
         public uint Signature;
@@ -130,5 +137,29 @@ namespace AuthenticodeLint.Core.PE
         public uint Signature;
         public ImageFileHeaderMap FileHeader;
         public ImageOptionHeader64Map OptionalHeader;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    public struct IMAGE_SECTION_HEADER
+    {
+        public unsafe fixed byte Name[MagicValues.IMAGE_SIZEOF_SHORT_NAME];
+        public IMAGE_SECTION_HEADER_UNION Misc;
+        public uint VirtualAddress;
+        public uint SizeOfRawData;
+        public uint PointerToRawData;
+        public uint PointerToRelocations;
+        public uint PointerToLinenumbers;
+        public ushort NumberOfRelocations;
+        public ushort NumberOfLinenumbers;
+        public uint Characteristics;
+    }
+
+    [type: StructLayout(LayoutKind.Explicit)]
+    public struct IMAGE_SECTION_HEADER_UNION
+    {
+        [FieldOffset(0)]
+        public uint PhysicalAddress;
+        [FieldOffset(0)]
+        public uint VirtualSize;
     }
 }

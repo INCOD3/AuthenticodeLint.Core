@@ -55,7 +55,7 @@ namespace AuthenticodeLint.Core
             }
         }
 
-        public static void Write(this IncrementalHash ih, SafeHandle handle, int offset, int count)
+        public static void Write(this IncrementalHash ih, SafeHandle handle, int offset, int count, int bufferSize = 0x1000)
         {
             bool handled = false;
             handle.DangerousAddRef(ref handled);
@@ -66,7 +66,7 @@ namespace AuthenticodeLint.Core
             var address = handle.DangerousGetHandle();
             try
             {
-                Write(ih, address, offset, count);
+                Write(ih, address, offset, count, bufferSize);
             }
             finally
             {
