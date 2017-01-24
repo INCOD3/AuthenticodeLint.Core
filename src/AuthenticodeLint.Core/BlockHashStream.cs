@@ -99,7 +99,6 @@ namespace AuthenticodeLint.Core
                 //Console.WriteLine("ALLOWING WRITE");
                 _writeEvent.Set();
             }
-            _length += read;
             return read;
         }
 
@@ -119,13 +118,14 @@ namespace AuthenticodeLint.Core
             Debug.Assert(_bytesAvailable == 0);
             Buffer.BlockCopy(buffer, offset, _writeBuffer, 0, count);
             _bytesAvailable = count;
+            _length += count;
             //Console.WriteLine("BLOCKING WRITE");
             _writeEvent.Reset();
             //Console.WriteLine("ALLOWING READ");
             _readEvent.Set();
         }
 
-        public void WriteNativeBlock(IntPtr handle, int offset, int count)
+        private void WriteNativeBlock(IntPtr handle, int offset, int count)
         {
             if (count > _hashSizeBytes)
             {
@@ -139,6 +139,7 @@ namespace AuthenticodeLint.Core
             Debug.Assert(_bytesAvailable == 0);
             Marshal.Copy(handle + offset, _writeBuffer, 0, count);
             _bytesAvailable = count;
+            _length += count;
             _writeEvent.Reset();
             _readEvent.Set();
         }
