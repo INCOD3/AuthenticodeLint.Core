@@ -26,7 +26,7 @@ namespace AuthenticodeLint.Core.PE
         public int e_lfanew;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Size = 20, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Size = 20, Pack = 1)]
     internal struct ImageFileHeaderMap
     {
         public ushort Machine;
@@ -38,7 +38,7 @@ namespace AuthenticodeLint.Core.PE
         public ushort Characteristics;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ImageOptionHeader32Map
     {
         public ushort Magic;
@@ -74,7 +74,7 @@ namespace AuthenticodeLint.Core.PE
         //Remove data directory.
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ImageOptionHeader64Map
     {
         public ushort Magic;
@@ -109,21 +109,21 @@ namespace AuthenticodeLint.Core.PE
         //Remove data directory.
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ImageDataDirectoryMap
     {
         public uint VirtualAddress;
         public uint Size;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ImageNtHeadersAny
     {
         public uint Signature;
         public ImageFileHeaderMap FileHeader;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ImageNtHeaders32
     {
         public uint Signature;
@@ -131,7 +131,7 @@ namespace AuthenticodeLint.Core.PE
         public ImageOptionHeader32Map OptionalHeader;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ImageNtHeaders64
     {
         public uint Signature;
@@ -139,7 +139,7 @@ namespace AuthenticodeLint.Core.PE
         public ImageOptionHeader64Map OptionalHeader;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [type: StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct IMAGE_SECTION_HEADER
     {
         public unsafe fixed byte Name[MagicValues.IMAGE_SIZEOF_SHORT_NAME];

@@ -33,13 +33,15 @@ namespace AuthenticodeLint.Core.PE
                     ImageDataDirectoryMap[] dataDirectories;
                     int numberOfSections;
                     int sectionOffset;
+
+                    //write the non-specific platform headers first.
+                    processor.WriteStruct(header.Signature);
+                    processor.WriteStruct(header.FileHeader);
+
                     if (header.FileHeader.Machine == MagicValues.IMAGE_FILE_MACHINE_I386)
                     {
                         var fullHeader = va.ReadStruct<ImageNtHeaders32>(dosHeader.e_lfanew);
-                        fullHeader.OptionalHeader.SizeOfInitializedData = 0;
-                        fullHeader.OptionalHeader.CheckSum = 0;
-                        fullHeader.OptionalHeader.SizeOfImage = 0;
-                        processor.WriteStruct(fullHeader);
+                        WriteStructAndSkipUInt32Field(processor, fullHeader.OptionalHeader, nameof(fullHeader.OptionalHeader.CheckSum));
 
                         //we haven't written the DataDirectories yet because they aren't
                         //part of our optional header.
@@ -61,10 +63,7 @@ namespace AuthenticodeLint.Core.PE
                     else if (header.FileHeader.Machine == MagicValues.IMAGE_FILE_MACHINE_AMD64)
                     {
                         var fullHeader = va.ReadStruct<ImageNtHeaders64>(dosHeader.e_lfanew);
-                        fullHeader.OptionalHeader.SizeOfInitializedData = 0;
-                        fullHeader.OptionalHeader.CheckSum = 0;
-                        fullHeader.OptionalHeader.SizeOfImage = 0;
-                        processor.WriteStruct(fullHeader);
+                        WriteStructAndSkipUInt32Field(processor, fullHeader.OptionalHeader, nameof(fullHeader.OptionalHeader.CheckSum));
 
                         //we haven't written the DataDirectories yet because they aren't
                         //part of our optional header.
@@ -88,6 +87,19 @@ namespace AuthenticodeLint.Core.PE
                         throw new PlatformNotSupportedException();
                     }
                     //Write all of the directories, minus the "security" section.
+                    for (var i = 0; i < dataDirectories.Length; i++)
+                    {
+                        //directories are always ordered, so we know the one at the security index
+                        //can be skipped.
+                        //Windows skips the security section because that contains the signature itself,
+                        //and not skipping it would cause the the act of storing the signature to invalidate
+                        //itself.
+                        if (i == (int)ImageDataDirectoryEntry.IMAGE_DIRECTORY_ENTRY_SECURITY)
+                        {
+                            continue;
+                        }
+                        processor.WriteStruct(dataDirectories[i]);
+                    }
 
                     //Write all of the sections
                     var headers = va.ReadStructArray<IMAGE_SECTION_HEADER>(numberOfSections, sectionOffset);
@@ -97,6 +109,8 @@ namespace AuthenticodeLint.Core.PE
                         var sectionHeader = sortedHeaders[i];
                         unsafe
                         {
+                            //It's not clear if Win32 will ever use anything other than "do it all"
+                            //but we can support omitting sections if it turns out to be a real thing.
                             var name = System.Text.Encoding.UTF8.GetString(sectionHeader.Name, 8);
                             if (name == SectionNames.DEBUG && (kinds & PortableExecutableDigestKinds.IncludeDebugInfo) == 0)
                             {
@@ -120,6 +134,25 @@ namespace AuthenticodeLint.Core.PE
                 }
                 var digest = processor.GetSegmentHashAndReset();
                 return digest;
+            }
+        }
+
+        public static void WriteStructAndSkipUInt32Field<T>(IncrementalHash ih, T val, string fieldName)
+            where T : struct
+        {
+            var fieldOffset = Marshal.OffsetOf<T>(fieldName);
+            var size = Marshal.SizeOf<T>();
+            var ptr = IntPtr.Zero;
+            try
+            {
+                ptr = Marshal.AllocHGlobal(size);
+                Marshal.StructureToPtr<T>(val, ptr, false);
+                ih.Write(ptr, 0, fieldOffset.ToInt32());
+                ih.Write(ptr, fieldOffset.ToInt32() + Marshal.SizeOf<uint>(), size - 1 - Marshal.SizeOf<uint>());
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
             }
         }
     }
