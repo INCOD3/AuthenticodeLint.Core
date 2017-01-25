@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
@@ -44,7 +45,7 @@ namespace AuthenticodeLint.Core.PE
                         //part of our optional header.
                         var directoriesLocation = dosHeader.e_lfanew + Marshal.SizeOf<ImageNtHeaders32>();
 
-                        //we want to hash the directory table verbatim
+
                         var directoriesTableSize = MagicValues.IMAGE_NUMBEROF_DIRECTORY_ENTRIES * Marshal.SizeOf<ImageDataDirectoryMap>();
                         var size = fullHeader.FileHeader.SizeOfOptionalHeader;
                         if (directoriesTableSize + Marshal.SizeOf<ImageOptionHeader32Map>() != size)
@@ -56,7 +57,6 @@ namespace AuthenticodeLint.Core.PE
                         dataDirectories = va.ReadStructArray<ImageDataDirectoryMap>(MagicValues.IMAGE_NUMBEROF_DIRECTORY_ENTRIES, directoriesLocation);
                         numberOfSections = fullHeader.FileHeader.NumberOfSections;
                         sectionOffset = directoriesLocation + directoriesTableSize;
-                        processor.Write(va.SafeMemoryMappedViewHandle, directoriesLocation, directoriesTableSize);
                     }
                     else if (header.FileHeader.Machine == MagicValues.IMAGE_FILE_MACHINE_AMD64)
                     {
@@ -70,7 +70,7 @@ namespace AuthenticodeLint.Core.PE
                         //part of our optional header.
                         var directoriesLocation = dosHeader.e_lfanew + Marshal.SizeOf<ImageNtHeaders64>();
 
-                        //we want to hash the directory table verbatim
+
                         var directoriesTableSize = MagicValues.IMAGE_NUMBEROF_DIRECTORY_ENTRIES * Marshal.SizeOf<ImageDataDirectoryMap>();
                         var size = fullHeader.FileHeader.SizeOfOptionalHeader;
                         if (directoriesTableSize + Marshal.SizeOf<ImageOptionHeader64Map>() != size)
@@ -82,32 +82,45 @@ namespace AuthenticodeLint.Core.PE
                         dataDirectories = va.ReadStructArray<ImageDataDirectoryMap>(MagicValues.IMAGE_NUMBEROF_DIRECTORY_ENTRIES, directoriesLocation);
                         numberOfSections = fullHeader.FileHeader.NumberOfSections;
                         sectionOffset = directoriesLocation + directoriesTableSize;
-                        processor.Write(va.SafeMemoryMappedViewHandle, directoriesLocation, directoriesTableSize);
                     }
                     else
                     {
                         throw new PlatformNotSupportedException();
                     }
+                    //Write all of the directories, minus the "security" section.
+
+                    //Write all of the sections
                     var headers = va.ReadStructArray<IMAGE_SECTION_HEADER>(numberOfSections, sectionOffset);
-                    unsafe
+                    var sortedHeaders = headers.OrderBy(h => h.PointerToRawData).ToArray();
+                    for (var i = 0; i < numberOfSections; i++)
                     {
-                        for (var i = 0; i < headers.Length; i++)
+                        var sectionHeader = sortedHeaders[i];
+                        unsafe
                         {
-                            var h = headers[i];
-                            var name = h.Name;
-                            var str = System.Text.Encoding.UTF8.GetString(name, 8);
-                            Console.WriteLine(str);
+                            var name = System.Text.Encoding.UTF8.GetString(sectionHeader.Name, 8);
+                            if (name == SectionNames.DEBUG && (kinds & PortableExecutableDigestKinds.IncludeDebugInfo) == 0)
+                            {
+                                continue;
+                            }
+                            if (name == SectionNames.RESOURCES && (kinds & PortableExecutableDigestKinds.IncludeResources) == 0)
+                            {
+                                continue;
+                            }
+                            if (name == SectionNames.IMPORT_TABLE && (kinds & PortableExecutableDigestKinds.IncludeImportAddressTable) == 0)
+                            {
+                                continue;
+                            }
+                            if (sectionHeader.SizeOfRawData == 0)
+                            {
+                                continue;
+                            }
                         }
+                        processor.Write(va.SafeMemoryMappedViewHandle, (int)sectionHeader.PointerToRawData, (int)sectionHeader.SizeOfRawData);
                     }
                 }
                 var digest = processor.GetSegmentHashAndReset();
                 return digest;
             }
-        }
-
-        private static void WriteSection()
-        {
-
         }
     }
 
@@ -118,5 +131,13 @@ namespace AuthenticodeLint.Core.PE
         IncludeDebugInfo = 0x02,
         IncludeImportAddressTable = 0x04,
         IncludeEverything = 0xFF
+    }
+
+    public static class SectionNames
+    {
+        public const string RESOURCES = ".rsrc\0\0\0";
+        public const string DEBUG = ".debug\0\0";
+        public const string TEXT = ".text\0\0\0";
+        public const string IMPORT_TABLE = ".idata\0\0";
     }
 }
