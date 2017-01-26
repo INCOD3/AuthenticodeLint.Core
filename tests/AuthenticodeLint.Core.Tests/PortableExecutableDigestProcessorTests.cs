@@ -12,6 +12,7 @@ namespace AuthenticodeLint.Core.Tests
 {
     public class PortableExecutableDigestProcessorTests
     {
+        /*
         [Fact]
         public async Task ShouldCalculateImageHash()
         {
@@ -29,6 +30,7 @@ namespace AuthenticodeLint.Core.Tests
             var digest = PortableExecutableDigestProcessor.Calculate(path, HashAlgorithmName.SHA1);
             Assert.Equal(0, ArraySegmentHelpers.Compare(theRealDigest, digest));
         }
+        */
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct Foo
