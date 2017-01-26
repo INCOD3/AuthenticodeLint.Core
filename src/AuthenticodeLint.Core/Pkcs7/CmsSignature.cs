@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AuthenticodeLint.Core.Asn;
 using AuthenticodeLint.Core.x509;
@@ -80,7 +81,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         /// <summary>Verifies the signature of the contents.</summary>
         /// <returns>True if the signature is valid, otherwise false.</returns>
-        public async Task<bool> VerifySignature()
+        public Task<bool> VerifySignature()
         {
             if (ContentType != ContentType.SignedData)
             {
@@ -95,14 +96,14 @@ namespace AuthenticodeLint.Core.Pkcs7
                 if (!data.DigestAlgorithms.Contains(signer.DigestAlgorithm))
                 {
                     // The SignerInfo uses an algorithm that was not declared in the SignedData.
-                    return false;
+                    return Task.FromResult(false);
                 }
                 ArraySegment<byte> digest;
-                using (var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm))
-                using (var bhs = new BlockHashStream(algorithm))
+                var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm);
+                using (var ih = IncrementalHash.CreateHash(algorithm))
                 {
-                    bhs.Write(data.ContentInfo.Content.ContentData);
-                    digest = await bhs.Digest();
+                    ih.AppendData(data.ContentInfo.Content.ContentData);
+                    digest = ih.GetSegmentHashAndReset();
                 }
                 if (signer.AuthenticatedAttributes.Count == 0)
                 {
@@ -127,16 +128,16 @@ namespace AuthenticodeLint.Core.Pkcs7
                 {
                     //This is the case where the messageDigest attribute does not match the digest of the
                     //signed data structure.
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 var authenticatedSet = signer.AuthenticatedAttributes.AsnElement.Reinterpret<AsnSet>();
                 ArraySegment<byte> authenticatedAttributeDigest;
-                using (var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm))
-                using (var bhs = new BlockHashStream(algorithm))
+                var algorithmName = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm);
+                using (var ih = IncrementalHash.CreateHash(algorithmName))
                 {
-                    bhs.Write(authenticatedSet.ElementData);
-                    authenticatedAttributeDigest = await bhs.Digest();
+                    ih.AppendData(authenticatedSet.ElementData);
+                    authenticatedAttributeDigest = ih.GetSegmentHashAndReset();
                 }
                 var certificateCollection = new x509CertificateCollection(data.Certificates);
                 var cert = certificateCollection.FindFirstBy(signer.IssuerAndSerialNumber);
@@ -146,13 +147,13 @@ namespace AuthenticodeLint.Core.Pkcs7
                     if (!result)
                     {
                         //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
-                        return false;
+                        return Task.FromResult(false);
                     }
                 }
             }
 
             //If we got here then every SignerInfo didn't return "false", so the signature must be valid.
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

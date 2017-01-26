@@ -6,14 +6,14 @@ namespace AuthenticodeLint.Core.Pkcs7
 {
     public static class HashAlgorithmFactory
     {
-        public static HashAlgorithm FromOid(Oid oid)
+        public static HashAlgorithmName FromOid(Oid oid)
         {
             switch (oid.Value)
             {
                 case sha1:
-                    return SHA1.Create();
+                    return HashAlgorithmName.SHA1;
                 case sha256:
-                    return SHA256.Create();
+                    return HashAlgorithmName.SHA256;
                 default:
                     throw new InvalidOperationException($"Hash algorithm {oid} is not supported.");
             }

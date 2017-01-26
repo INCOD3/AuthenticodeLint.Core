@@ -11,28 +11,26 @@ namespace AuthenticodeLint.Core.PE
 {
     public class PortableExecutable : IDisposable
     {
-        private readonly MemoryMappedFile _file;
+        internal readonly MemoryMappedFile file;
 
         public PortableExecutable(string path)
         {
-            _file = MemoryMappedFile.CreateFromFile(path, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
+            file = MemoryMappedFile.CreateFromFile(path, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
         }
 
         /// <summary>
         /// Gets the DOS header from the image.
         /// </summary>
-        public async Task<DosHeader> GetDosHeaderAsync()
+        public async Task<DosHeaderMap> GetDosHeaderAsync()
         {
-            using (var stream = _file.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
+            using (var stream = file.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
             {
                 var header = await stream.ReadStructAsync<DosHeaderMap>();
                 if (header.e_magic != DOS_MAGIC)
                 {
                     throw new InvalidOperationException("File does not have a valid DOS header.");
                 }
-                var dosHeader = new DosHeader();
-                dosHeader.ExeFileHeaderAddress = header.e_lfanew;
-                return dosHeader;
+                return header;
             }
         }
 
@@ -41,9 +39,9 @@ namespace AuthenticodeLint.Core.PE
         /// </summary>
         /// <returns>The pe header.</returns>
         /// <param name="dosHeader">The DOS header. The header is used to know where the PE section is located.</param>
-        public async Task<PeHeader> GetPeHeaderAsync(DosHeader dosHeader)
+        public async Task<PeHeader> GetPeHeaderAsync(DosHeaderMap dosHeader)
         {
-            using (var stream = _file.CreateViewStream(dosHeader.ExeFileHeaderAddress, 0, MemoryMappedFileAccess.Read))
+            using (var stream = file.CreateViewStream(dosHeader.e_lfanew, 0, MemoryMappedFileAccess.Read))
             {
                 uint peMagicValue;
                 using (var reader = new BinaryReader(stream, Encoding.ASCII, true))
@@ -64,6 +62,7 @@ namespace AuthenticodeLint.Core.PE
                     {
                         throw new InvalidOperationException("File is x86-64 but has a image type other than PE32+.");
                     }
+                    peHeader.Checksum = header64.CheckSum;
                 }
                 else if (header.Machine == IMAGE_FILE_MACHINE_I386)
                 {
@@ -73,6 +72,7 @@ namespace AuthenticodeLint.Core.PE
                     {
                         throw new InvalidOperationException("File is x86 but has a image type other than PE32.");
                     }
+                    peHeader.Checksum = header32.CheckSum;
                 }
                 else
                 {
@@ -96,7 +96,7 @@ namespace AuthenticodeLint.Core.PE
             {
                 throw new ArgumentOutOfRangeException(nameof(directory), "Directory does not contain data.");
             }
-            return _file.CreateViewStream(directory.VirtualAddress, directory.Size, MemoryMappedFileAccess.Read);
+            return file.CreateViewStream(directory.VirtualAddress, directory.Size, MemoryMappedFileAccess.Read);
         }
 
         private static async Task<ImageDirectories> ReadDirectoryEntriesAsync(MemoryMappedViewStream stream, int count)
@@ -117,18 +117,14 @@ namespace AuthenticodeLint.Core.PE
 
         public void Dispose()
         {
-            _file.Dispose();
+            file.Dispose();
         }
-    }
-
-    public sealed class DosHeader
-    {
-        public int ExeFileHeaderAddress { get; internal set; }
     }
 
     public sealed class PeHeader
     {
         public MachineArchitecture Architecture { get; internal set; }
+        public long Checksum { get; internal set; }
         public ImageDirectories DataDirectories { get; internal set; }
     }
 

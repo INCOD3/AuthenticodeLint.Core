@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Core.Tests
             using (var pe = new PortableExecutable(PathHelper.CombineWithProjectPath("files/authlint.exe")))
             {
                 var header = await pe.GetDosHeaderAsync();
-                Assert.NotEqual(0, header.ExeFileHeaderAddress);
+                Assert.NotEqual(0, header.e_lfanew);
 
                 var peHeader = await pe.GetPeHeaderAsync(header);
                 Assert.Equal(MachineArchitecture.x86, peHeader.Architecture);
