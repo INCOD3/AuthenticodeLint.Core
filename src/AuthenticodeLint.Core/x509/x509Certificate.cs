@@ -244,12 +244,7 @@ namespace AuthenticodeLint.Core.x509
                 {
                     return false;
                 }
-                using (var ih = IncrementalHash.CreateHash(hash))
-                {
-                    ih.AppendData(_tbsCertificate.Array, _tbsCertificate.Offset, _tbsCertificate.Count);
-                    var digest = ih.GetSegmentHashAndReset();
-                    return signerKey.VerifyHash(digest, Signature, hash);
-                }
+                return signerKey.VerifyData(_tbsCertificate, Signature, hash);
             }
         }
 

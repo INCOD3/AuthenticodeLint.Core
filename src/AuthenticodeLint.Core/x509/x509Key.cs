@@ -43,6 +43,22 @@ namespace AuthenticodeLint.Core.x509
         public bool VerifyHash(ArraySegment<byte> hash, ArraySegment<byte> signature, HashAlgorithmName digestAlgorithm) =>
             VerifyHash(hash.AsArray(), signature.AsArray(), digestAlgorithm);
 
+        public bool VerifyData(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
+        {
+            return _algorithm.VerifyData(hash, signature, digestAlgorithmOid);
+        }
+
+        public bool VerifyData(ArraySegment<byte> hash, ArraySegment<byte> signature, Oid digestAlgorithmOid) =>
+            VerifyData(hash.AsArray(), signature.AsArray(), digestAlgorithmOid);
+
+        public bool VerifyData(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
+        {
+            return _algorithm.VerifyData(hash, signature, digestAlgorithm);
+        }
+
+        public bool VerifyData(ArraySegment<byte> hash, ArraySegment<byte> signature, HashAlgorithmName digestAlgorithm) =>
+            VerifyData(hash.AsArray(), signature.AsArray(), digestAlgorithm);
+
         private static RsaSign FromRsa(SubjectPublicKeyInfo spki)
         {
             var publicKey = spki.PublicKey.TrimOff(b => b == 0);
@@ -144,9 +160,21 @@ namespace AuthenticodeLint.Core.x509
         public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid) =>
             VerifyHash(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid));
 
+        public bool VerifyData(byte[] hash, byte[] signature, Oid digestAlgorithmOid) =>
+            VerifyData(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid));
+
         public bool VerifyHash(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
         {
-            byte[] transformSignature;
+            return _algorithm.VerifyHash(hash, DecodeSignature(signature));
+        }
+
+        public bool VerifyData(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
+        {
+            return _algorithm.VerifyData(hash, DecodeSignature(signature), digestAlgorithm);
+        }
+
+        private byte[] DecodeSignature(byte[] signature)
+        {
             AsnElement element;
 
             //In PKCS#7 an ECC signature is encoded as a Sequence of (R, S). However the
@@ -157,13 +185,12 @@ namespace AuthenticodeLint.Core.x509
             if (AsnDecoder.TryDecode(signature, out element) && element is AsnSequence)
             {
                 var ecPoint = (AsnSequence)element;
-                transformSignature = EcdsaUtilities.AsnPointSignatureToConcatSignature(ecPoint, _algorithm.KeySize);
+                return EcdsaUtilities.AsnPointSignatureToConcatSignature(ecPoint, _algorithm.KeySize);
             }
             else
             {
                 throw new InvalidOperationException("Signature was not encoded correctly.");
             }
-            return _algorithm.VerifyHash(hash, transformSignature);
         }
 
         private static HashAlgorithmName OidToHashAlgorithmName(Oid oid)
@@ -207,6 +234,17 @@ namespace AuthenticodeLint.Core.x509
             return _algorithm.VerifyHash(hash, signature, digestAlgorithm, RSASignaturePadding.Pkcs1);
         }
 
+
+        public bool VerifyData(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
+        {
+            return _algorithm.VerifyData(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid), RSASignaturePadding.Pkcs1);
+        }
+
+        public bool VerifyData(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
+        {
+            return _algorithm.VerifyData(hash, signature, digestAlgorithm, RSASignaturePadding.Pkcs1);
+        }
+
         private static HashAlgorithmName OidToHashAlgorithmName(Oid oid)
         {
             switch (oid.Value)
@@ -233,5 +271,8 @@ namespace AuthenticodeLint.Core.x509
     {
         bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid);
         bool VerifyHash(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm);
+
+        bool VerifyData(byte[] hash, byte[] signature, Oid digestAlgorithmOid);
+        bool VerifyData(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm);
     }
 }
