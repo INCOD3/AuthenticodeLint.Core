@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Core.x509
     public sealed class x509Certificate : IEquatable<x509Certificate>, IComparable<x509Certificate>
     {
         private readonly AsnSequence _certificate;
-        private ArraySegment<byte> _thumbprint;
+        private ArraySegment<byte> _thumbprint, _tbsCertificate;
         private bool _hasThumbprint = false;
 
         public x509Certificate(byte[] data) : this(new ArraySegment<byte>(data))
@@ -102,6 +102,7 @@ namespace AuthenticodeLint.Core.x509
 
         private void ReadTbsCertificate(AsnSequence tbsCertificate)
         {
+            _tbsCertificate = tbsCertificate.ElementData;
             AsnConstructed version;
             AsnInteger serialNumber;
             AsnSequence signature, issuer, validityPeriod, subject, spki;
@@ -215,6 +216,42 @@ namespace AuthenticodeLint.Core.x509
         public int CompareTo(x509Certificate other, IComparer<x509Certificate> comparer) => comparer.Compare(this, other);
 
         public override string ToString() => Subject.ToString();
+
+        /// <summary>
+        /// Validates the signature of this certificate against the issuing, signing certificate.
+        /// </summary>
+        public bool ValidateSignature(x509Certificate signingCertificate)
+        {
+            //X509 spec says that the algorithm in the TBSCertificate must be the same
+            //algorithm as the signatureAlgorithm.
+            if (AlgorithmIdentifier != SignatureAlgorithmIdentifier)
+            {
+                return false;
+            }
+            using (var signerKey = new x509Key(signingCertificate.PublicKey))
+            {
+                //This certificate was hashed with an algorithm we don't understand. Return false,
+                //later possibly try to include diagnostic information.
+                HashAlgorithmName hash;
+                SignatureAlgorithm signature;
+                if (!HashUtilities.TryHashNameFromSignatureHashOid(AlgorithmIdentifier.Algorithm, out hash, out signature))
+                {
+                    return false;
+                }
+                //The signature algorithm on the certificate does not explicitly match the algorithm
+                //so turn it down before we actually try to do the verification.
+                if (signature != signerKey.Algorithm)
+                {
+                    return false;
+                }
+                using (var ih = IncrementalHash.CreateHash(hash))
+                {
+                    ih.AppendData(_tbsCertificate.Array, _tbsCertificate.Offset, _tbsCertificate.Count);
+                    var digest = ih.GetSegmentHashAndReset();
+                    return signerKey.VerifyHash(digest, Signature, hash);
+                }
+            }
+        }
 
         /// <summary>
         /// Compares two certificates with byte-for-byte equality of their DER representation.

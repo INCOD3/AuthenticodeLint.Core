@@ -13,15 +13,19 @@ namespace AuthenticodeLint.Core.x509
             switch(spki.Algorithm.Algorithm.Value)
             {
                 case KnownOids.Algorithms.SigningAlgorithms.ecc:
+                    Algorithm = SignatureAlgorithm.Ecc;
                     _algorithm = FromEcDsa(spki);
                     break;
                 case KnownOids.Algorithms.SigningAlgorithms.rsa:
+                    Algorithm = SignatureAlgorithm.Rsa;
                     _algorithm = FromRsa(spki);
                     break;
                 default:
                     throw new NotSupportedException($"Signing algorithm {spki.Algorithm.Algorithm} is not supported.");
             }
         }
+
+        public SignatureAlgorithm Algorithm { get; }
 
         public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
         {
@@ -30,6 +34,14 @@ namespace AuthenticodeLint.Core.x509
 
         public bool VerifyHash(ArraySegment<byte> hash, ArraySegment<byte> signature, Oid digestAlgorithmOid) =>
             VerifyHash(hash.AsArray(), signature.AsArray(), digestAlgorithmOid);
+
+        public bool VerifyHash(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
+        {
+            return _algorithm.VerifyHash(hash, signature, digestAlgorithm);
+        }
+
+        public bool VerifyHash(ArraySegment<byte> hash, ArraySegment<byte> signature, HashAlgorithmName digestAlgorithm) =>
+            VerifyHash(hash.AsArray(), signature.AsArray(), digestAlgorithm);
 
         private static RsaSign FromRsa(SubjectPublicKeyInfo spki)
         {
@@ -129,7 +141,10 @@ namespace AuthenticodeLint.Core.x509
             _algorithm = algorithm;
         }
 
-        public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
+        public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid) =>
+            VerifyHash(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid));
+
+        public bool VerifyHash(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
         {
             byte[] transformSignature;
             AsnElement element;
@@ -151,6 +166,25 @@ namespace AuthenticodeLint.Core.x509
             return _algorithm.VerifyHash(hash, transformSignature);
         }
 
+        private static HashAlgorithmName OidToHashAlgorithmName(Oid oid)
+        {
+            switch (oid.Value)
+            {
+                case KnownOids.Algorithms.Digest.sha1:
+                    return HashAlgorithmName.SHA1;
+                case KnownOids.Algorithms.Digest.sha256:
+                    return HashAlgorithmName.SHA256;
+                case KnownOids.Algorithms.Digest.sha384:
+                    return HashAlgorithmName.SHA384;
+                case KnownOids.Algorithms.Digest.sha512:
+                    return HashAlgorithmName.SHA512;
+                case KnownOids.Algorithms.Digest.md5:
+                    return HashAlgorithmName.MD5;
+                default:
+                    throw new NotSupportedException($"Unknown hash algorithm oid {oid}.");
+            }
+        }
+
         public void Dispose() => _algorithm.Dispose();
     }
 
@@ -166,6 +200,11 @@ namespace AuthenticodeLint.Core.x509
         public bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid)
         {
             return _algorithm.VerifyHash(hash, signature, OidToHashAlgorithmName(digestAlgorithmOid), RSASignaturePadding.Pkcs1);
+        }
+
+        public bool VerifyHash(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm)
+        {
+            return _algorithm.VerifyHash(hash, signature, digestAlgorithm, RSASignaturePadding.Pkcs1);
         }
 
         private static HashAlgorithmName OidToHashAlgorithmName(Oid oid)
@@ -193,5 +232,6 @@ namespace AuthenticodeLint.Core.x509
     internal interface ISign : IDisposable
     {
         bool VerifyHash(byte[] hash, byte[] signature, Oid digestAlgorithmOid);
+        bool VerifyHash(byte[] hash, byte[] signature, HashAlgorithmName digestAlgorithm);
     }
 }

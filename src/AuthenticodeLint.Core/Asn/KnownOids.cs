@@ -4,6 +4,21 @@ namespace AuthenticodeLint.Core.Asn
     {
         public static class Algorithms
         {
+            public static class SignatureAlgorithms
+            {
+                public const string rsaWithMd5 = "1.2.840.113549.2.5";
+
+                public const string rsaWithSha1 = "1.2.840.113549.1.1.5";
+                public const string rsaWithSha256 = "1.2.840.113549.1.1.11";
+                public const string rsaWithSha384 = "1.2.840.113549.1.1.12";
+                public const string rsaWithSha512 = "1.2.840.113549.1.1.13";
+
+                public const string ecdsaWithSha1 = "1.2.840.10045.4.1";
+                public const string ecdsaWithSha256 = "1.2.840.10045.4.3.2";
+                public const string ecdsaWithSha384 = "1.2.840.10045.4.3.3";
+                public const string ecdsaWithSha512 = "1.2.840.10045.4.3.4";
+            }
+
             public static class Digest
             {
                 public const string md5 = "1.2.840.113549.2.5";
