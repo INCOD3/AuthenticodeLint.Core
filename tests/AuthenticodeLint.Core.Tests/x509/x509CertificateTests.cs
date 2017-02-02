@@ -15,6 +15,24 @@ namespace AuthenticodeLint.Core.Tests
     public class x509CertificateTests
     {
         [Fact]
+        public void ShouldValidateSignatureSuccessfully()
+        {
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
+            var signer = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com-issuer.crt"));
+            Assert.True(certificate.ValidateSignature(signer));
+        }
+
+        [Fact]
+        public void ShouldNotValidateSignatureWithUnreleatedAlgorithms()
+        {
+            //This tries to validate an ECDSA certificate with an RSA key. This shouldn't
+            //work.
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
+            var signer = new x509Certificate(PathHelper.CombineWithProjectPath("files/thycotic.com.crt"));
+            Assert.False(certificate.ValidateSignature(signer));
+        }
+
+        [Fact]
         public void ShouldDecodeSimpleCertificate()
         {
             var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
