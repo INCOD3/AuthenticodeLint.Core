@@ -6,6 +6,8 @@ namespace AuthenticodeLint.Core.Tests
 {
     public class AsnPrinterTests
     {
+        private static readonly string LE = System.Environment.NewLine;
+
         [Fact]
         public void ShouldSupportSequences()
         {
@@ -13,10 +15,7 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = AsnDecoder.Decode(seq);
             var writer = new StringWriter();
             AsnPrinter.Print(writer, decoded);
-            Assert.Equal(@"SequenceSequenceOf:
-  Integer: 1
-  Integer: 4
-", writer.ToString());
+            Assert.Equal($"SequenceSequenceOf:{LE}  Integer: 1{LE}  Integer: 4{LE}", writer.ToString());
         }
 
         [Fact]
@@ -26,7 +25,7 @@ namespace AuthenticodeLint.Core.Tests
             var decoded = AsnDecoder.Decode(seq);
             var writer = new StringWriter();
             AsnPrinter.Print(writer, decoded);
-            Assert.Equal("Integer: 1\n", writer.ToString());
+            Assert.Equal($"Integer: 1{LE}", writer.ToString());
         }
     }
 }
