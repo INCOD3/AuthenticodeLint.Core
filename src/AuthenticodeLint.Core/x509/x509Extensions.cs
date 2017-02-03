@@ -4,16 +4,16 @@ using AuthenticodeLint.Core.Asn;
 
 namespace AuthenticodeLint.Core.x509
 {
-    public sealed class x509Extenions : IReadOnlyList<x509Extension>
+    public sealed class x509Extensions : IReadOnlyList<x509Extension>
     {
         private readonly List<x509Extension> _internalList;
 
-        internal x509Extenions()
+        internal x509Extensions()
         {
             _internalList = new List<x509Extension>();
         }
 
-        internal x509Extenions(AsnSequence sequence)
+        internal x509Extensions(AsnSequence sequence)
         {
             _internalList = new List<x509Extension>();
             var reader = new AsnConstructedReader(sequence);

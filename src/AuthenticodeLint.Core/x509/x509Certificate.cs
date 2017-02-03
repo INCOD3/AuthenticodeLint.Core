@@ -67,7 +67,7 @@ namespace AuthenticodeLint.Core.x509
 
         public SubjectPublicKeyInfo PublicKey { get; private set; }
 
-        public x509Extenions Extensions { get; private set; }
+        public x509Extensions Extensions { get; private set; }
 
         public AlgorithmIdentifier SignatureAlgorithmIdentifier { get; private set; }
 
@@ -163,12 +163,12 @@ namespace AuthenticodeLint.Core.x509
                 if (element.Tag.IsExImTag(3))
                 {
                     var extensions = AsnReader.Read<AsnSequence>(element);
-                    Extensions = new x509Extenions(extensions);
+                    Extensions = new x509Extensions(extensions);
                 }
             }
             if (Extensions == null)
             {
-                Extensions = new x509Extenions();
+                Extensions = new x509Extensions();
             }
         }
 

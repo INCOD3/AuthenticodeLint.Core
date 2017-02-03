@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Pkcs7
         public bool Ordering { get; }
         public ArraySegment<byte>? Nonce { get; }
         public GeneralName Tsa { get; }
-        public x509Extenions Extensions { get; }
+        public x509Extensions Extensions { get; }
 
         public TstInfo(AsnSequence sequence)
         {
@@ -81,7 +81,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             SerialNumber = serialNumber.ContentData;
             GeneralizedTime = genTime.Value;
             Tsa = tsa == null ? null : new GeneralName(tsa);
-            Extensions = extensions == null ? new x509Extenions() : new x509Extenions(extensions);
+            Extensions = extensions == null ? new x509Extensions() : new x509Extensions(extensions);
         }
 
         public override int GetHashCode() => _sequence.GetHashCode();
