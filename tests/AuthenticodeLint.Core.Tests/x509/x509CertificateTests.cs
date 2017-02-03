@@ -89,6 +89,20 @@ namespace AuthenticodeLint.Core.Tests
         }
 
         [Fact]
+        public void ShouldDecodeAKIExtensionWithKeyIdentifier()
+        {
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
+            var akiExtension = (AuthorityKeyIdentifierExtension)certificate.Extensions.Single(ext => ext.Oid == KnownOids.CertificateExtensions.id_ce_authorityKeyIdentifier);
+            Assert.True(akiExtension.KeyIdentifier.HasValue);
+
+            var expectedAki = new byte[] {
+                0xBB, 0xFA, 0x08, 0xE0, 0xBF, 0x54, 0xEE, 0x5A, 0xFD, 0x16,
+                0xA4, 0x35, 0x02, 0x09, 0xA9, 0xA4, 0xC8, 0xEC, 0xFD, 0x4B };
+            Assert.Equal(expectedAki, akiExtension.KeyIdentifier.Value);
+            Assert.False(akiExtension.Critical);
+        }
+
+        [Fact]
         public async Task ShouldExportCertificateToStream()
         {
             var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
