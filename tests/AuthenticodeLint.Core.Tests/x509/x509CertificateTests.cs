@@ -103,6 +103,18 @@ namespace AuthenticodeLint.Core.Tests
         }
 
         [Fact]
+        public void ShouldDecodeSKIExtension()
+        {
+            var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));
+            var skiExtension = (SubjectKeyIdentifier)certificate.Extensions.Single(ext => ext.Oid == KnownOids.CertificateExtensions.id_ce_subjectKeyIdentifier);
+            var expectedSki = new byte[] {
+                0x12, 0x00, 0x13, 0x45, 0x4A, 0x38, 0x3C, 0x07, 0xE3, 0x0C,
+                0x1B, 0x55, 0x79, 0x5A, 0x00, 0x17, 0xA7, 0x93, 0xB0, 0x6A
+            };
+            Assert.Equal(expectedSki, skiExtension.KeyIdentifier.AsArray());
+        }
+
+        [Fact]
         public async Task ShouldExportCertificateToStream()
         {
             var certificate = new x509Certificate(PathHelper.CombineWithProjectPath("files/vcsjones.com.crt"));

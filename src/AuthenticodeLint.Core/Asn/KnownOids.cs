@@ -69,6 +69,7 @@ namespace AuthenticodeLint.Core.Asn
             public const string id_ce_basicConsraints = "2.5.29.19";
             public const string id_ce_extKeyUsage = "2.5.29.37";
             public const string id_ce_authorityKeyIdentifier = "2.5.29.35";
+            public const string id_ce_subjectKeyIdentifier = "2.5.29.14";
         }
 
         public static class DistinguishedName

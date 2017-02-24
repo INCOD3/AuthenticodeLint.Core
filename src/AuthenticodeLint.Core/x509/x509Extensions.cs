@@ -45,6 +45,9 @@ namespace AuthenticodeLint.Core.x509
                     case KnownOids.CertificateExtensions.id_ce_authorityKeyIdentifier:
                         _internalList.Add(new AuthorityKeyIdentifierExtension(identifier.Value.Value, content.Value, isCritical));
                         break;
+                    case KnownOids.CertificateExtensions.id_ce_subjectKeyIdentifier:
+                        _internalList.Add(new SubjectKeyIdentifier(identifier.Value.Value, content.Value, isCritical));
+                        break;
                     default:
                         _internalList.Add(new x509Extension(identifier.Value.Value, content.Value, isCritical));
                         break;

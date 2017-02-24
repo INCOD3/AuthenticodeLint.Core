@@ -66,6 +66,22 @@ namespace AuthenticodeLint.Core.x509
         }
     }
 
+    public sealed class SubjectKeyIdentifier : x509Extension
+    {
+        public SubjectKeyIdentifier(string oid, ArraySegment<byte> data, bool critical)
+            : base(oid, data, critical)
+        {
+            var keyIdentifier = AsnDecoder.Decode(data) as AsnOctetString;
+            if (keyIdentifier == null)
+            {
+                throw new AsnException("Failed to decode Subject Key Identifier extension.");
+            }
+            KeyIdentifier = keyIdentifier.ContentData;
+        }
+
+        public ArraySegment<byte> KeyIdentifier { get; }
+    }
+
     public sealed class AuthorityKeyIdentifierExtension : x509Extension
     {
         public AuthorityKeyIdentifierExtension(string oid, ArraySegment<byte> data, bool critical)
