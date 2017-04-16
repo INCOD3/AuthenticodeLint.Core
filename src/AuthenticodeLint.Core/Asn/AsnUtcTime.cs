@@ -46,8 +46,7 @@ namespace AuthenticodeLint.Core.Asn
                 "yyMMddHHmmZ",
                 "yyMMddHHmmssZ",
             };
-            DateTimeOffset val;
-            if (!DateTimeOffset.TryParseExact(strData, formats, _parsingCulture, DateTimeStyles.AssumeUniversal, out val))
+            if (!DateTimeOffset.TryParseExact(strData, formats, _parsingCulture, DateTimeStyles.AssumeUniversal, out var val))
             {
                 throw new AsnException("Encoded UTCTime is not valid.");
             }

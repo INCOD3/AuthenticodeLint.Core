@@ -51,8 +51,7 @@ namespace AuthenticodeLint.Core.Asn
                 "yyyyMMddHHmmsszzz",
                 "yyyyMMddHHmmss.fffzzz",
             };
-            DateTimeOffset val;
-            if (!DateTimeOffset.TryParseExact(strData, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out val))
+            if (!DateTimeOffset.TryParseExact(strData, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var val))
             {
                 throw new AsnException("Encoded GeneralizedTime is not valid.");
             }

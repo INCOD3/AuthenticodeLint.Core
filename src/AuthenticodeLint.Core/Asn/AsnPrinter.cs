@@ -9,25 +9,21 @@ namespace AuthenticodeLint.Core.Asn
         private static void Print(TextWriter writer, AsnElement element, int level)
         {
             var indent = level == 0 ? string.Empty : new string(' ', level * 2);
-            var asConstructed = element as AsnConstructed;
-            var displayTag = DisplayTag(element.Tag);
-            if (asConstructed != null)
+            switch (element)
             {
-                writer.Write(indent);
-                writer.Write(displayTag);
-                writer.WriteLine(':');
-                var sequence = (AsnConstructed)element;
-                foreach (var child in sequence)
-                {
-                    Print(writer, child, level + 1);
-                }
-            }
-            else
-            {
-                writer.Write(indent);
-                writer.Write(displayTag);
-                writer.Write(": ");
-                writer.WriteLine(element);
+                case AsnConstructed c:
+                    writer.WriteLine(':');
+                    foreach (var child in c)
+                    {
+                        Print(writer, child, level + 1);
+                    }
+                    break;
+                default:
+                    var displayTag = DisplayTag(element.Tag);
+                    writer.Write(displayTag);
+                    writer.Write(": ");
+                    writer.WriteLine(element);
+                    break;
             }
         }
 

@@ -19,12 +19,15 @@ namespace AuthenticodeLint.Core.Asn
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is AsnTag))
+            switch (obj)
             {
-                return false;
+                case null:
+                    return false;
+                case AsnTag other:
+                    return this == other;
+                default:
+                    return false;
             }
-            var other = (AsnTag)obj;
-            return _tag == other._tag && _asnClass == other._asnClass && _constructed == other._constructed;
         }
 
         public static bool operator ==(AsnTag left, AsnTag right)
