@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/AuthenticodeLint/bin/Debug/netcoreapp1.0/AuthenticodeLint.dll",
+            "program": "${workspaceRoot}/src/AuthenticodeLint/bin/Debug/netcoreapp1.1/AuthenticodeLint.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "externalConsole": false,

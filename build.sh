@@ -1,6 +1,5 @@
 #!/bin/bash
-dotnet restore
-cd tests/AuthenticodeLint.Core.Tests
-dotnet test 
+dotnet restore AuthenticodeLint.sln
+dotnet test tests/AuthenticodeLint.Core.Tests/AuthenticodeLint.Core.Tests.csproj
 RES=$?
 exit $RES
