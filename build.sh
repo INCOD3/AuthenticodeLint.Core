@@ -1,6 +1,7 @@
 #!/bin/bash
-dotnet restore
-cd tests/AuthenticodeLint.Core.Tests
+pushd tests/AuthenticodeLint.Core.Tests
+dotnet restore AuthenticodeLint.Core.Tests.csproj
 dotnet test 
 RES=$?
+popd
 exit $RES
