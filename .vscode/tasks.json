@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/src/AuthenticodeLint/project.json"
+                "${workspaceRoot}/src/AuthenticodeLint/AuthenticodeLint.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
@@ -15,7 +15,7 @@
         {
           "taskName": "test",
           "args": [
-            "${workspaceRoot}/tests/AuthenticodeLint.Core.Tests/project.json"
+            "${workspaceRoot}/tests/AuthenticodeLint.Core.Tests/AuthenticodeLint.Core.Tests.csproj"
           ],
           "isTestCommand": true
         }
