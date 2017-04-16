@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/src/AuthenticodeLint/AuthenticodeLint.csproj"
+                "${workspaceRoot}/AuthenticodeLint.sln"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
