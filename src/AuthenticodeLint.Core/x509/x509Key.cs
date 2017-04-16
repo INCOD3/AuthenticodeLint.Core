@@ -67,11 +67,11 @@ namespace AuthenticodeLint.Core.x509
             {
                 throw new InvalidOperationException("Could not decode RSA key.");
             }
-            var rsaComponents = AsnReader.Read<AsnInteger, AsnInteger>(publicKeyDecoded);
+            var (asnModulus, asnExponent) = AsnReader.Read<AsnInteger, AsnInteger>(publicKeyDecoded);
             var parameters = new RSAParameters
             {
-                Modulus = rsaComponents.Item1.ContentData.AsArray(),
-                Exponent = rsaComponents.Item2.ContentData.AsArray()
+                Modulus = asnModulus.ContentData.AsArray(),
+                Exponent = asnExponent.ContentData.AsArray()
             };
             var rsa = RSA.Create();
             rsa.ImportParameters(parameters);

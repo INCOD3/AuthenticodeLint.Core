@@ -11,9 +11,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public SpcIndirectDataContent(AsnSequence sequence)
         {
-            var contents = AsnReader.Read<AsnSequence, AsnSequence>(sequence);
-            DigestInfo = new SpcDigestInfo(contents.Item2);
-            Data = new SpcAttributeTypeAndOptionalValue(contents.Item1);
+            var (asnData, asnDigestInfo) = AsnReader.Read<AsnSequence, AsnSequence>(sequence);
+            DigestInfo = new SpcDigestInfo(asnDigestInfo);
+            Data = new SpcAttributeTypeAndOptionalValue(asnData);
         }
     }
 
@@ -51,9 +51,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public SpcDigestInfo(AsnSequence sequence)
         {
-            var contents = AsnReader.Read<AsnSequence, AsnOctetString>(sequence);
-            AlgorithmIdentifier = new AlgorithmIdentifier(contents.Item1);
-            Digest = contents.Item2.Value;
+            var (asnAlgorithmIdentifier, asnDigest) = AsnReader.Read<AsnSequence, AsnOctetString>(sequence);
+            AlgorithmIdentifier = new AlgorithmIdentifier(asnAlgorithmIdentifier);
+            Digest = asnDigest.Value;
         }
     }
 }

@@ -64,9 +64,7 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public CmsCertificateIssuerSerial(AsnSequence sequence)
         {
-            var issuerSerial = AsnReader.Read<AsnSequence, AsnInteger>(sequence);
-            var generalNames = issuerSerial.Item1;
-            var serialNumber = issuerSerial.Item2;
+            var (generalNames, serialNumber) = AsnReader.Read<AsnSequence, AsnInteger>(sequence);
             var generalNameReader = new AsnConstructedReader(generalNames);
             AsnElement generalName;
             //TODO: We need to read GeneralNames better. We need to read their implicit tags

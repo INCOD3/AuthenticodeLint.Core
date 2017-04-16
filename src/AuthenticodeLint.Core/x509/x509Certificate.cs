@@ -143,17 +143,16 @@ namespace AuthenticodeLint.Core.x509
                 throw new x509Exception("Version is not specified.");
             }
             Version = (int)AsnReader.Read<AsnInteger>(version).Value;
-            var validity = AsnReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
-            NotBefore = validity.Item1.Value;
-            NotAfter = validity.Item2.Value;
+            var (notBefore, notAfter) = AsnReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
+            NotBefore = notBefore.Value;
+            NotAfter = notAfter.Value;
             Subject = new x500DistinguishedName(subject);
             PublicKey = new SubjectPublicKeyInfo(spki);
             if (reader.CanMove() && Version == 0)
             {
                 throw new x509Exception("x509 certificate is version 1 but contains version 2 or 3 data.");
             }
-            AsnConstructed element;
-            while (reader.MoveNext(out element))
+            while (reader.MoveNext(out AsnConstructed element))
             {
                 if (element.Tag.IsExImTag(1) || element.Tag.IsExImTag(2))
                 {

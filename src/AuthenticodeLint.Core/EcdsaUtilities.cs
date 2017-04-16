@@ -12,9 +12,9 @@ namespace AuthenticodeLint.Core
         public static byte[] AsnPointSignatureToConcatSignature(AsnSequence signature, int sizeBits)
         {
             var size = (sizeBits + 7) / 8; //Round up to nearest multiple of 8, then divide by 8.
-            var ecPoint = AsnReader.Read<AsnInteger, AsnInteger>(signature);
-            var r = ExpandShrinkToSize(ecPoint.Item1.ContentData, size);
-            var s = ExpandShrinkToSize(ecPoint.Item2.ContentData, size);
+            var (asnR, asnS) = AsnReader.Read<AsnInteger, AsnInteger>(signature);
+            var r = ExpandShrinkToSize(asnR.ContentData, size);
+            var s = ExpandShrinkToSize(asnS.ContentData, size);
             var concated = new byte[r.Count + s.Count];
             Buffer.BlockCopy(r.Array, r.Offset, concated, 0, r.Count);
             Buffer.BlockCopy(s.Array, s.Offset, concated, r.Count, s.Count);

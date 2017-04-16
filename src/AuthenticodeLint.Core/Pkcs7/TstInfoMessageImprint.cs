@@ -11,9 +11,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public TstInfoMessageImprint(AsnSequence sequence)
         {
-            var items = AsnReader.Read<AsnSequence, AsnOctetString>(sequence);
-            HashAlgorithm = new AlgorithmIdentifier(items.Item1);
-            HashedMessage = items.Item2.Value;
+            var (asnAlgorithm, asnMessage) = AsnReader.Read<AsnSequence, AsnOctetString>(sequence);
+            HashAlgorithm = new AlgorithmIdentifier(asnAlgorithm);
+            HashedMessage = asnMessage.Value;
         }
     }
 }

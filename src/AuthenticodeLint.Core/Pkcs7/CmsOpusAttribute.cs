@@ -39,8 +39,8 @@ namespace AuthenticodeLint.Core.Pkcs7
                 else if (more.Tag.IsExImTag(1))
                 {
                     var serializedSeq = more.Reinterpret<AsnSequence>();
-                    var data = AsnReader.Read<AsnOctetString, AsnOctetString>(serializedSeq);
-                    MoreInfo = new SpcMoreInfoBinary(new Guid(data.Item1.Value.AsArray()), data.Item2.Value);
+                    var (asnGuid, asnData) = AsnReader.Read<AsnOctetString, AsnOctetString>(serializedSeq);
+                    MoreInfo = new SpcMoreInfoBinary(new Guid(asnGuid.Value.AsArray()), asnData.Value);
                 }
                 else if (more.Tag.IsExImTag(2))
                 {

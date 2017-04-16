@@ -24,9 +24,8 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             _isNestedSignature = isNestedSignature;
             _contentInfo = sequence;
-            var items = AsnReader.Read<AsnObjectIdentifier, AsnElement>(_contentInfo);
-            ContentType = MapFromOid(items.Item1.Value);
-            var content = items.Item2;
+            var (asnContentId, content) = AsnReader.Read<AsnObjectIdentifier, AsnElement>(_contentInfo);
+            ContentType = MapFromOid(asnContentId.Value);
             switch (ContentType)
             {
                 case ContentType.Data:
@@ -46,8 +45,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         private static AsnSequence Decode(ArraySegment<byte> data)
         {
-            AsnElement decoded;
-            if (!AsnDecoder.TryDecode(data, out decoded) || !(decoded is AsnSequence))
+            if (!AsnDecoder.TryDecode(data, out AsnElement decoded) || !(decoded is AsnSequence))
             {
                 throw new Pkcs7Exception("Unable to parse PKCS#7 signature.");
             }
