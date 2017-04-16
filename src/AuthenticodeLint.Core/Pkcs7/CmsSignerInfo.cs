@@ -11,26 +11,23 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             _sequence = sequence;
             var reader = new AsnConstructedReader(sequence);
-            AsnInteger version;
-            AsnSequence issuerAndSerial;
-            AsnSequence digestAlgorithm, encryptionAlgorithm = null;
+            AsnSequence encryptionAlgorithm = null;
             AsnOctetString encryptedDigest = null;
             AsnConstructed authAttributes = null, unauthAttributes = null;
             var hasEncryptionAlgorithm = false;
-            if (!reader.MoveNext(out version))
+            if (!reader.MoveNext(out AsnInteger version))
             {
                 throw new Pkcs7Exception("Unable to read SignerInfo version.");
             }
-            if (!reader.MoveNext(out issuerAndSerial))
+            if (!reader.MoveNext(out AsnSequence issuerAndSerial))
             {
                 throw new Pkcs7Exception("Unable to read SignerInfo issuerAndSerialNumber.");
             }
-            if (!reader.MoveNext(out digestAlgorithm))
+            if (!reader.MoveNext(out AsnSequence digestAlgorithm))
             {
                 throw new Pkcs7Exception("Unable to read digest algorithm identifier.");
             }
-            AsnElement next;
-            while (reader.MoveNext(out next))
+            while (reader.MoveNext(out AsnElement next))
             {
                 if (next.Tag.IsExImTag(0)) //authenticatedAttributes
                 {

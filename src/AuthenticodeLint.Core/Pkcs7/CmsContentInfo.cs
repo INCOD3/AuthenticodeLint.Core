@@ -13,13 +13,11 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             CmsContentInfoData = sequence.ContentData;
             var reader = new AsnConstructedReader(sequence);
-            AsnObjectIdentifier contentType;
-            AsnConstructed content;
-            if (!reader.MoveNext(out contentType))
+            if (!reader.MoveNext(out AsnObjectIdentifier contentType))
             {
                 throw new Pkcs7Exception("Unable to read ContentType from ContentInfo.");
             }
-            if (!reader.MoveNext(out content))
+            if (!reader.MoveNext(out AsnConstructed content))
             {
                 content = null;
             }

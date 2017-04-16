@@ -10,8 +10,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             var items = AsnReader.Read<AsnSequence>(content);
             AsnConstructed programName = null, moreInfo = null;
             var reader = new AsnConstructedReader(items);
-            AsnConstructed next;
-            while (reader.MoveNext(out next))
+            while (reader.MoveNext(out AsnConstructed next))
             {
                 if (next.Tag.IsExImTag(0))
                 {

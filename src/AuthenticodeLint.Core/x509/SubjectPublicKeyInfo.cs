@@ -14,13 +14,11 @@ namespace AuthenticodeLint.Core.x509
         {
             RawData = sequence.ElementData;
             var reader = new AsnConstructedReader(sequence);
-            AsnSequence algorithmIdentifier;
-            AsnBitString publicKey;
-            if (!reader.MoveNext(out algorithmIdentifier))
+            if (!reader.MoveNext(out AsnSequence algorithmIdentifier))
             {
                 throw new x509Exception("Missing SPKI algorithm identifier.");
             }
-            if (!reader.MoveNext(out publicKey))
+            if (!reader.MoveNext(out AsnBitString publicKey))
             {
                 throw new x509Exception("Missing public key.");
             }

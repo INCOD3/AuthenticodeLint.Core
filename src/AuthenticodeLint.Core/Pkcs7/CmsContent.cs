@@ -46,32 +46,27 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             _signedData = AsnReader.Read<AsnSequence>((AsnConstructed)content);
             var reader = new AsnConstructedReader(_signedData);
-            AsnInteger version;
-            AsnSet digestAlgorithms;
-            AsnSequence contentInfo;
             var certs = new List<x509Certificate>();
             var signerInfos = new List<CmsSignerInfo>();
-            if (!reader.MoveNext(out version) || version.Value > int.MaxValue)
+            if (!reader.MoveNext(out AsnInteger version) || version.Value > int.MaxValue)
             {
                 throw new Pkcs7Exception("Invalid SignedData version.");
             }
-            if (!reader.MoveNext(out digestAlgorithms))
+            if (!reader.MoveNext(out AsnSet digestAlgorithms))
             {
                 throw new Pkcs7Exception("Invalid digestAlgorithms.");
             }
-            if (!reader.MoveNext(out contentInfo))
+            if (!reader.MoveNext(out AsnSequence contentInfo))
             {
                 throw new Pkcs7Exception("Invalid contentInfo.");
             }
-            AsnConstructed next;
 
-            while (reader.MoveNext(out next))
+            while (reader.MoveNext(out AsnConstructed next))
             {
                 if (next.Tag.IsExImTag(0)) //certificates
                 {
-                    AsnSequence cert;
                     var certReader = new AsnConstructedReader(next);
-                    while (certReader.MoveNext(out cert))
+                    while (certReader.MoveNext(out AsnSequence cert))
                     {
                         certs.Add(new x509Certificate(cert));
                     }
@@ -82,9 +77,8 @@ namespace AuthenticodeLint.Core.Pkcs7
                 }
                 else if (next.Tag.IsUniTag(AsnTagValue.SetSetOf)) //signerInfos
                 {
-                    AsnSequence signerInfo;
                     var signerInfoReader = new AsnConstructedReader(next);
-                    while (signerInfoReader.MoveNext(out signerInfo))
+                    while (signerInfoReader.MoveNext(out AsnSequence signerInfo))
                     {
                         signerInfos.Add(new CmsSignerInfo(signerInfo));
                     }

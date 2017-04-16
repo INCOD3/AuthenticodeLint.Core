@@ -1,8 +1,5 @@
-using System;
-
 namespace AuthenticodeLint.Core.Asn
 {
-
     internal class AsnConstructedReader
     {
         private AsnConstructed _sequence;

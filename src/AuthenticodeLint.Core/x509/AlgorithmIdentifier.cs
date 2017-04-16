@@ -10,14 +10,12 @@ namespace AuthenticodeLint.Core.x509
         {
             RawData = sequence.ElementData;
             var reader = new AsnConstructedReader(sequence);
-            AsnObjectIdentifier algorithm;
-            AsnElement parameters;
-            if (!reader.MoveNext(out algorithm))
+            if (!reader.MoveNext(out AsnObjectIdentifier algorithm))
             {
                 throw new x509Exception("Unable to read algorithm from sequence.");
             }
             Algorithm = algorithm.Value;
-            if (reader.MoveNext(out parameters) && !(parameters is AsnNull))
+            if (reader.MoveNext(out AsnElement parameters) && !(parameters is AsnNull))
             {
                 Parameters = parameters.ElementData;
             }

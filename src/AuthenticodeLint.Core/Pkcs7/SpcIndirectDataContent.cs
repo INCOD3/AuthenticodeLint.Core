@@ -26,13 +26,15 @@ namespace AuthenticodeLint.Core.Pkcs7
         public SpcAttributeTypeAndOptionalValue(AsnSequence sequence)
         {
             var reader = new AsnConstructedReader(sequence);
-            AsnObjectIdentifier type;
-            AsnElement value;
-            if (!reader.MoveNext(out type))
+            if (reader.MoveNext(out AsnObjectIdentifier type))
+            {
+                Type = type.Value;
+            }
+            else
             {
                 throw new Pkcs7Exception("Unable to read ObjectIdentifier from PE.");
             }
-            if (reader.MoveNext(out value))
+            if (reader.MoveNext(out AsnElement value))
             {
                 Contents = value.ElementData;
             }
@@ -40,7 +42,6 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 Contents = null;
             }
-            Type = type.Value;
         }
     }
 
