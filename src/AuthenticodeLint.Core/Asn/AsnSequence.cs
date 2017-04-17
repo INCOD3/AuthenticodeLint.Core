@@ -8,8 +8,8 @@ namespace AuthenticodeLint.Core.Asn
     /// </summary>
     public sealed class AsnSequence : AsnConstructed
     {
-        public AsnSequence(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
-            : base(tag, contentData, elementData, contentLength)
+        public AsnSequence(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
+            : base(tag, contentData, elementData, contentLength, headerSize)
         {
         }
     }

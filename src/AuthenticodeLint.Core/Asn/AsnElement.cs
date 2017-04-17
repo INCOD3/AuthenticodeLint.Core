@@ -60,7 +60,7 @@ namespace AuthenticodeLint.Core.Asn
         public virtual TType Reinterpret<TType>() where TType : AsnElement
         {
             //Yuck, but, yuck.
-            return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData, (ulong?)ContentData.Count);
+            return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData, (ulong?)ContentData.Count, (ulong?)ElementData.Count);
         }
 
         public override string ToString() => ContentData.Join();

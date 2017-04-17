@@ -39,63 +39,63 @@ namespace AuthenticodeLint.Core.Asn
 
         public static AsnElement Decode(ArraySegment<byte> data)
         {
-            int octetLength, tagLength;
-            var tag = ReadTag(data, out tagLength);
+            var (tag, tagLength) = ReadTag(data);
             var lengthWindow = data.Advance(tagLength);
-            var contentLength = ReadTagLength(lengthWindow, out octetLength);
+            var (contentLength, octetLength) = ReadTagLength(lengthWindow);
             var allLength = lengthWindow.Array.Length - lengthWindow.Offset - octetLength;
             var contentData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, allLength);
             var elementLength = tagLength + octetLength + allLength;
+            var nonContentHeaderSize = (ulong)(tagLength + octetLength);
             var elementData = new ArraySegment<byte>(data.Array, data.Offset, elementLength);
             if (tag.AsnClass == AsnClass.Univeral)
             {
                 switch (tag.Tag)
                 {
                     case AsnTagValue.Integer:
-                        return new AsnInteger(tag, contentData, elementData, contentLength);
+                        return new AsnInteger(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.Boolean:
-                        return new AsnBoolean(tag, contentData, elementData, contentLength);
+                        return new AsnBoolean(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.BitString:
-                        return new AsnBitString(tag, contentData, elementData, contentLength);
+                        return new AsnBitString(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.OctetString:
-                        return new AsnOctetString(tag, contentData, elementData, contentLength);
+                        return new AsnOctetString(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.ObjectIdentifier:
-                        return new AsnObjectIdentifier(tag, contentData, elementData, contentLength);
+                        return new AsnObjectIdentifier(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.IA5String:
-                        return new AsnIA5String(tag, contentData, elementData, contentLength);
+                        return new AsnIA5String(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.AsnNull:
-                        return new AsnNull(tag, contentData, elementData, contentLength);
+                        return new AsnNull(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.SequenceSequenceOf:
-                        return new AsnSequence(tag, contentData, elementData, contentLength);
+                        return new AsnSequence(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.SetSetOf:
-                        return new AsnSet(tag, contentData, elementData, contentLength);
+                        return new AsnSet(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.PrintableString:
-                        return new AsnPrintableString(tag, contentData, elementData, contentLength);
+                        return new AsnPrintableString(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.UtcTime:
-                        return new AsnUtcTime(tag, contentData, elementData, contentLength);
+                        return new AsnUtcTime(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.GeneralizedTime:
-                        return new AsnGeneralizedTime(tag, contentData, elementData, contentLength);
+                        return new AsnGeneralizedTime(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.NumericString:
-                        return new AsnNumericString(tag, contentData, elementData, contentLength);
+                        return new AsnNumericString(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.BmpString:
-                        return new AsnBmpString(tag, contentData, elementData, contentLength);
+                        return new AsnBmpString(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.Utf8String:
-                        return new AsnUtf8String(tag, contentData, elementData, contentLength);
+                        return new AsnUtf8String(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                     case AsnTagValue.VisibleStringIso646String:
-                        return new AsnVisibleString(tag, contentData, elementData, contentLength);
+                        return new AsnVisibleString(tag, contentData, elementData, contentLength, nonContentHeaderSize);
                 }
             }
             if (tag.Constructed)
             {
-                return new AsnConstructed(tag, contentData, elementData, contentLength);
+                return new AsnConstructed(tag, contentData, elementData, contentLength, nonContentHeaderSize);
             }
             else
             {
-                return new AsnRaw(tag, contentData, elementData, contentLength);
+                return new AsnRaw(tag, contentData, elementData, contentLength, nonContentHeaderSize);
             }
         }
 
-        private static AsnTag ReadTag(ArraySegment<byte> tagData, out int tagLength)
+        private static (AsnTag, int) ReadTag(ArraySegment<byte> tagData)
         {
             var tag = tagData.Array[tagData.Offset];
             var asnClass = (AsnClass)((tag & 0xC0) >> 6);
@@ -103,8 +103,7 @@ namespace AuthenticodeLint.Core.Asn
             var highTagNumber = (tag & 0x1F) == 0x1F; //5 lower bits set
             if (!highTagNumber)
             {
-                tagLength = 1;
-                return new AsnTag((AsnTagValue)(tag & 0x1F), asnClass, constructed);
+                return (new AsnTag((AsnTagValue)(tag & 0x1F), asnClass, constructed), 1);
             }
             else
             {
@@ -120,37 +119,34 @@ namespace AuthenticodeLint.Core.Asn
                     tagNumber |= (byte)(item & 0x7F);
                     if ((item & 0x80) != 0x80)
                     {
-                        tagLength = i + 1;
-                        return new AsnTag((AsnTagValue)tagNumber, asnClass, constructed);
+                        return (new AsnTag((AsnTagValue)tagNumber, asnClass, constructed), i + 1);
                     }
                 }
                 throw new AsnException("asn.1 tag malformed. Expected more data.");
             }
         }
 
-        private static ulong? ReadTagLength(ArraySegment<byte> data, out int octetLength)
+        private static (ulong? tag, int length) ReadTagLength(ArraySegment<byte> data)
         {
             var firstByte = data.Array[data.Offset];
             if (firstByte == 0x80)
             {
-                octetLength = 1;
-                return null;
+                return (null, 1);
             }
             var isLongForm = (firstByte & 0x80) == 0x80;
             if (!isLongForm)
             {
-                octetLength = 1;
-                return firstByte;
+                return (firstByte, 1);
             }
             int length = firstByte & 0x7F;
-            octetLength = length + 1;
+            var octetLength = length + 1;
             ulong value = 0;
             for (var i = 0; i < length; i++)
             {
                 value <<= 8;
                 value |= data.Array[data.Offset + 1 + i];
             }
-            return value;
+            return (value, octetLength);
         }
     }
 

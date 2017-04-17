@@ -18,7 +18,7 @@ namespace AuthenticodeLint.Core.Asn
 
         public DateTimeOffset Value { get; }
 
-        public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (tag.Constructed)
@@ -32,7 +32,7 @@ namespace AuthenticodeLint.Core.Asn
             string strData;
             try
             {
-                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ElementData = elementData.Constrain(contentLength.Value + headerSize);
                 ContentData = contentData.Constrain(contentLength.Value);
                 strData = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }

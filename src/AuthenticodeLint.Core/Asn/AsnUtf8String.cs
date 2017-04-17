@@ -22,7 +22,7 @@ namespace AuthenticodeLint.Core.Asn
         /// <summary>
         /// Initializes a new instance of the <see cref="AsnUtf8String"/> with a segement of data.
         /// </summary>
-        public AsnUtf8String(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnUtf8String(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (tag.Constructed)
@@ -35,7 +35,7 @@ namespace AuthenticodeLint.Core.Asn
             }
             try
             {
-                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ElementData = elementData.Constrain(contentLength.Value + headerSize);
                 ContentData = contentData.Constrain(contentLength.Value);
                 Value = AsnTextEncoding.UTF8.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }

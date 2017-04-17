@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (tag.Constructed)
@@ -24,7 +24,7 @@ namespace AuthenticodeLint.Core.Asn
             string strData;
             try
             {
-                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ElementData = elementData.Constrain(contentLength.Value + headerSize);
                 ContentData = contentData.Constrain(contentLength.Value);
                 strData = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }

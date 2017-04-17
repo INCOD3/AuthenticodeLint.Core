@@ -9,7 +9,7 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnObjectIdentifier(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (tag.Constructed)
@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new AsnException("Undefined lengths for ObjectIdentifier are not supported.");
             }
-            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ElementData = elementData.Constrain(contentLength.Value + headerSize);
             ContentData = contentData.Constrain(contentLength.Value);
             Value = new Oid(ContentData);
         }

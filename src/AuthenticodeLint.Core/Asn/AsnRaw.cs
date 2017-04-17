@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnRaw(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnRaw(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
              if (tag.Constructed)
@@ -22,7 +22,7 @@ namespace AuthenticodeLint.Core.Asn
                 throw new AsnException("Undefined lengths for RAW are not supported.");
             }
             ContentData = contentData.Constrain(contentLength.Value);
-            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ElementData = elementData.Constrain(contentLength.Value + headerSize);
         }
     }
 }

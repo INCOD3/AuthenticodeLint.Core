@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (tag.Constructed)
@@ -23,7 +23,7 @@ namespace AuthenticodeLint.Core.Asn
             }
             try
             {
-                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ElementData = elementData.Constrain(contentLength.Value + headerSize);
                 ContentData = contentData.Constrain(contentLength.Value);
                 Value = AsnTextEncoding.BigEndianUnicode.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
