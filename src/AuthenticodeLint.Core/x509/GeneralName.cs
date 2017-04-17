@@ -69,9 +69,9 @@ namespace AuthenticodeLint.Core.x509
     {
         public GeneralNameAnotherName(AsnSequence sequence)
         {
-            var contents = AsnReader.Read<AsnObjectIdentifier, AsnConstructed>(sequence);
-            TypeId = contents.Item1.Value;
-            Contents = contents.Item2.ContentData;
+            var (type, contents) = AsnReader.Read<AsnObjectIdentifier, AsnConstructed>(sequence);
+            TypeId = type.Value;
+            Contents = contents.ContentData;
         }
 
         public Oid TypeId { get; }

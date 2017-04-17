@@ -93,8 +93,7 @@ namespace AuthenticodeLint.Core.x509
                 throw new AsnException("Failed to decode Authority Key Identifier extension.");
             }
             var reader = new AsnConstructedReader(akiSequence);
-            AsnElement element;
-            while (reader.MoveNext(out element))
+            while (reader.MoveNext(out AsnElement element))
             {
                 if (element.Tag.IsExImTag(0)) //keyIdentifier
                 {
