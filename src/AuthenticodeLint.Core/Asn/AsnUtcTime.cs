@@ -18,21 +18,21 @@ namespace AuthenticodeLint.Core.Asn
 
         public DateTimeOffset Value { get; }
 
-        public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnUtcTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong? elementContentLength)
             : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of UTCTime are not valid.");
             }
-            if (contentLength == null)
+            if (contentLength == null || elementContentLength == null)
             {
                 throw new AsnException("Undefined lengths for UTCTime are not supported.");
             }
             string strData;
             try
             {
-                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ElementData = elementData.Constrain(elementContentLength.Value);
                 ContentData = contentData.Constrain(contentLength.Value);
                 strData = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }

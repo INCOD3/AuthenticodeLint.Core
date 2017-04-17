@@ -11,14 +11,14 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ElementData { get; }
         public int UnusedBits { get; }
 
-        public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong? elementContentLength)
             : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of BitString are not valid.");
             }
-            if (contentLength == null)
+            if (contentLength == null || elementContentLength == null)
             {
                 throw new AsnException("Undefined lengths for BitString are not supported.");
             }
@@ -26,7 +26,7 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new AsnException("asn.1 BitString does not have enough data.");
             }
-            ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+            ElementData = elementData.Constrain(elementContentLength.Value);
             ContentData = contentData.Constrain(contentLength.Value);
             UnusedBits = contentData.Array[ContentData.Offset];
             Value = new ArraySegment<byte>(ContentData.Array, ContentData.Offset + 1, ContentData.Count - 1);

@@ -10,21 +10,21 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)
+        public AsnGeneralizedTime(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong? elementContentLength)
             : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of GeneralizeTime are not valid.");
             }
-            if (contentLength == null)
+            if (contentLength == null || elementContentLength == null)
             {
                 throw new AsnException("Undefined lengths for BitString are not supported.");
             }
             string strData;
             try
             {
-                ElementData = elementData.ConstrainWith(contentData, contentLength.Value);
+                ElementData = elementData.Constrain(elementContentLength.Value);
                 ContentData = contentData.Constrain(contentLength.Value);
                 strData = Encoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }

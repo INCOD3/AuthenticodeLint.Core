@@ -39,12 +39,6 @@ namespace AuthenticodeLint.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ArraySegment<T> ConstrainWith<T>(this ArraySegment<T> ars, ArraySegment<T> other, ulong to)
-        {
-            return Constrain(ars, to + checked((ulong)(other.Offset - ars.Offset)));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArraySegment<T> ConstrainWith<T>(this ArraySegment<T> ars, ArraySegment<T> other, long to)
         {
             return Constrain(ars, to + (long)(other.Offset - ars.Offset));
