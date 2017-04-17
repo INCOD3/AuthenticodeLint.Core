@@ -45,7 +45,7 @@ namespace AuthenticodeLint.Core.Asn
             var allLength = lengthWindow.Array.Length - lengthWindow.Offset - octetLength;
             var contentData = new ArraySegment<byte>(lengthWindow.Array, lengthWindow.Offset + octetLength, allLength);
             var elementLength = tagLength + octetLength + allLength;
-            var nonContentHeaderSize = tagLength + octetLength;
+            var nonContentHeaderSize = (ulong)(tagLength + octetLength);
             var elementData = new ArraySegment<byte>(data.Array, data.Offset, elementLength);
             if (tag.AsnClass == AsnClass.Univeral)
             {

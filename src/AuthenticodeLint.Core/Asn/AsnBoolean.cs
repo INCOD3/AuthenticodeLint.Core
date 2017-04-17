@@ -14,18 +14,18 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong? elementContentLength)
+        public AsnBoolean(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (contentData.Count == 0)
             {
                 throw new AsnException("asn.1 boolean value cannot be empty.");
             }
-            if (contentLength == null || elementContentLength == null)
+            if (contentLength == null)
             {
                 throw new AsnException("Undefined lengths for AsnBoolean are not supported.");
             }
-            ElementData = elementData.Constrain(elementContentLength.Value);
+            ElementData = elementData.Constrain(contentLength.Value + headerSize);
             ContentData = contentData.Constrain(contentLength.Value);
             for (var i = 0; i < ContentData.Count; i++)
             {

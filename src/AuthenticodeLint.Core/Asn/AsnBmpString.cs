@@ -10,20 +10,20 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong? elementContentLength)
+        public AsnBmpString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             if (tag.Constructed)
             {
                 throw new AsnException("Constructed forms of BmpString are not valid.");
             }
-            if (contentLength == null || elementContentLength == null)
+            if (contentLength == null)
             {
                 throw new AsnException("Undefined lengths for BmpString are not supported.");
             }
             try
             {
-                ElementData = elementData.Constrain(elementContentLength.Value);
+                ElementData = elementData.Constrain(contentLength.Value + headerSize);
                 ContentData = contentData.Constrain(contentLength.Value);
                 Value = AsnTextEncoding.BigEndianUnicode.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }

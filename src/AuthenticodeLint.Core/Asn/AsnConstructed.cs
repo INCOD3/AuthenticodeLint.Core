@@ -15,15 +15,11 @@ namespace AuthenticodeLint.Core.Asn
         private static readonly byte[] _terminator = new byte[] { 0, 0 };
         internal const int MAX_ITEMS = 65535;
 
-        public AsnConstructed(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong? elementContentLength)
+        public AsnConstructed(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
             : base(tag)
         {
             //unknownLengths mean the constructed form has a length that is unknown. Instead,
             //we need to look for the "end of data" terminator, which is 0x0000.
-            if (contentLength.HasValue != elementContentLength.HasValue)
-            {
-                throw new AsnException("The defined length of the element is ambiguous.");
-            }
             var isUnkownLength = contentLength == null;
             var collection = new List<AsnElement>();
             var segment = contentData;
@@ -78,7 +74,7 @@ namespace AuthenticodeLint.Core.Asn
                 throw new AsnException($"Calculated decoded length {runningContentLength} does not match specified length {contentLength}.");
             }
             ContentData = contentData.Constrain(runningContentLength);
-            ElementData = elementData.ConstrainWith(ContentData, isUnkownLength ? runningContentLength + _terminator.Length : runningContentLength);
+            ElementData = elementData.Constrain(headerSize + (ulong)(isUnkownLength ? runningContentLength + _terminator.Length : runningContentLength));
             _items = collection.ToArray();
         }
 
@@ -123,7 +119,7 @@ namespace AuthenticodeLint.Core.Asn
                 var tag = new AsnTag(tagValue, AsnClass.Univeral, true);
                 var newElementDataSegment = new ArraySegment<byte>(materialize);
                 var newContentDataSegment = new ArraySegment<byte>(materialize, 1 + length.Length, materialize.Length - 1 - length.Length);
-                return (TType)Activator.CreateInstance(typeof(TType), tag, newContentDataSegment, newElementDataSegment, (ulong?)newContentDataSegment.Count, (ulong?)newElementDataSegment.Count);
+                return (TType)Activator.CreateInstance(typeof(TType), tag, newContentDataSegment, newElementDataSegment, (ulong?)newContentDataSegment.Count, 1 + (ulong)length.Length);
             }
         }
 
