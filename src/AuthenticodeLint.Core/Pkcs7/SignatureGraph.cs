@@ -21,21 +21,19 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 foreach (var attribute in signer.UnauthenticatedAttributes)
                 {
-                    var nested = attribute as ICmsSignatureAttribute;
-                    if (nested != null)
+                    switch (attribute)
                     {
-                        yield return nested.Signature;
-                        var nestNest = nested.Signature.VisitAll();
-                        foreach (var item in nestNest)
-                        {
-                            yield return item;
-                        }
-                    }
-                    var authenticodeTimestamp = attribute as CmsPkcsAuthenticodeTimestampAttribute;
-                    if (authenticodeTimestamp != null)
-                    {
-                        var nestedTs = new AuthenticodeTimestampSignature(authenticodeTimestamp.SignerInfo, signature);
-                        yield return nestedTs;
+                        case ICmsSignatureAttribute nested:
+                            yield return nested.Signature;
+                            var nestNest = nested.Signature.VisitAll();
+                            foreach (var item in nestNest)
+                            {
+                                yield return item;
+                            }
+                        break;
+                        case CmsPkcsAuthenticodeTimestampAttribute authenticodeTimestamp:
+                            yield return new AuthenticodeTimestampSignature(authenticodeTimestamp.SignerInfo, signature);
+                        break;
                     }
                 }
             }

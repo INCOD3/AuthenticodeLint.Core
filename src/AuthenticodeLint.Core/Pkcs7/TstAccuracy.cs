@@ -53,11 +53,13 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public override bool Equals(object obj)
         {
-            if (!(obj is TstAccuracy))
+            switch (obj)
             {
-                return false;
+                case TstAccuracy tst:
+                    return Equals(tst);
+                default:
+                    return false;
             }
-            return Equals((TstAccuracy)obj);
         }
 
         public bool Equals(TstAccuracy other) => this == other;

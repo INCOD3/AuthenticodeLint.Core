@@ -70,7 +70,7 @@ namespace AuthenticodeLint.Core.Asn
             return item;
         }
 
-        public static (T1 first, T2 second) Read<T1, T2>(AsnConstructed sequence)
+        public static (T1, T2) Read<T1, T2>(AsnConstructed sequence)
             where T1 : class, IAsnElement
             where T2 : class, IAsnElement
         {
@@ -92,7 +92,7 @@ namespace AuthenticodeLint.Core.Asn
         }
 
 
-        public static (T1 first, T2 second, T3 third) Read<T1, T2, T3>(AsnConstructed sequence)
+        public static (T1, T2, T3) Read<T1, T2, T3>(AsnConstructed sequence)
             where T1 : class, IAsnElement
             where T2 : class, IAsnElement
             where T3 : class, IAsnElement

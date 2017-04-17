@@ -79,7 +79,7 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         /// <summary>Verifies the signature of the contents.</summary>
         /// <returns>True if the signature is valid, otherwise false.</returns>
-        public Task<bool> VerifySignature()
+        public ValueTask<bool> VerifySignature()
         {
             if (ContentType != ContentType.SignedData)
             {
@@ -94,7 +94,7 @@ namespace AuthenticodeLint.Core.Pkcs7
                 if (!data.DigestAlgorithms.Contains(signer.DigestAlgorithm))
                 {
                     // The SignerInfo uses an algorithm that was not declared in the SignedData.
-                    return Task.FromResult(false);
+                    return new ValueTask<bool>(false);
                 }
                 ArraySegment<byte> digest;
                 var algorithm = HashAlgorithmFactory.FromOid(signer.DigestAlgorithm.Algorithm);
@@ -126,7 +126,7 @@ namespace AuthenticodeLint.Core.Pkcs7
                 {
                     //This is the case where the messageDigest attribute does not match the digest of the
                     //signed data structure.
-                    return Task.FromResult(false);
+                    return new ValueTask<bool>(false);
                 }
 
                 var authenticatedSet = signer.AuthenticatedAttributes.AsnElement.Reinterpret<AsnSet>();
@@ -145,13 +145,13 @@ namespace AuthenticodeLint.Core.Pkcs7
                     if (!result)
                     {
                         //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
-                        return Task.FromResult(false);
+                        return new ValueTask<bool>(false);
                     }
                 }
             }
 
             //If we got here then every SignerInfo didn't return "false", so the signature must be valid.
-            return Task.FromResult(true);
+            return new ValueTask<bool>(true);
         }
     }
 }

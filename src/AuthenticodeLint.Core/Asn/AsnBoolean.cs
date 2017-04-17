@@ -44,12 +44,13 @@ namespace AuthenticodeLint.Core.Asn
         {
             //"True" can be respresented as any non-zero value. For the sake of boolean, we want to allow "true"
             //to always equal true, regardless of how it was encoded.
-            var boolean = other as AsnBoolean;
-            if (boolean == null)
+            switch (other)
             {
-                return base.Equals(other);
+                case AsnBoolean boolean:
+                    return boolean.Value == Value;
+                default:
+                    return base.Equals(other);
             }
-            return boolean.Value == Value;
         }
     }
 }

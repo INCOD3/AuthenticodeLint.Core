@@ -18,7 +18,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             _pkcs7parent = pkcs7parent;
         }
 
-        public Task<bool> VerifySignature()
+        public ValueTask<bool> VerifySignature()
         {
             var data = (CmsSignedData) _pkcs7parent.Content;
 
@@ -27,12 +27,12 @@ namespace AuthenticodeLint.Core.Pkcs7
             //whatever reason it's encountered.
             if (data.SignerInfos.Count != 1)
             {
-                return Task.FromResult(false);
+                return new ValueTask<bool>(false);
             }
             if (!data.DigestAlgorithms.Contains(_signature.DigestAlgorithm))
             {
                 // The SignerInfo uses an algorithm that was not declared in the SignedData.
-                return Task.FromResult(false);
+                return new ValueTask<bool>(false);
             }
             ArraySegment<byte> digest;
             var algorithmName = HashAlgorithmFactory.FromOid(_signature.DigestAlgorithm.Algorithm);
@@ -58,7 +58,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 //This is the case where the messageDigest attribute does not match the digest of the
                 //signed data structure.
-                return Task.FromResult(false);
+                return new ValueTask<bool>(false);
             }
 
             var authenticatedSet = _signature.AuthenticatedAttributes.AsnElement.Reinterpret<AsnSet>();
@@ -77,10 +77,10 @@ namespace AuthenticodeLint.Core.Pkcs7
                 if (!result)
                 {
                     //The signature over the authenticated attribute set is wrong. Stop processing all signatures and return "no".
-                    return Task.FromResult(false);
+                    return new ValueTask<bool>(false);
                 }
             }
-            return Task.FromResult(true);
+            return new ValueTask<bool>(true);
         }
     }
 }

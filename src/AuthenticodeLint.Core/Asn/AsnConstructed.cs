@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Asn
         {
             //unknownLengths mean the constructed form has a length that is unknown. Instead,
             //we need to look for the "end of data" terminator, which is 0x0000.
-            bool isUnkownLength = contentLength == null;
+            var isUnkownLength = contentLength == null;
             var collection = new List<AsnElement>();
             var segment = contentData;
 

@@ -9,6 +9,9 @@ namespace AuthenticodeLint.Core.Asn
         private static void Print(TextWriter writer, AsnElement element, int level)
         {
             var indent = level == 0 ? string.Empty : new string(' ', level * 2);
+            var displayTag = DisplayTag(element.Tag);
+            writer.Write(indent);
+            writer.Write(displayTag);
             switch (element)
             {
                 case AsnConstructed c:
@@ -19,8 +22,6 @@ namespace AuthenticodeLint.Core.Asn
                     }
                     break;
                 default:
-                    var displayTag = DisplayTag(element.Tag);
-                    writer.Write(displayTag);
                     writer.Write(": ");
                     writer.WriteLine(element);
                     break;
