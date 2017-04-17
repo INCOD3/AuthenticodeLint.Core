@@ -19,9 +19,7 @@ namespace AuthenticodeLint.Core.x509
             foreach (var dn in asnSet.Cast<AsnSequence>())
             {
                 seqReader.ReTarget(dn);
-                AsnObjectIdentifier identifier;
-                IDirectoryString value;
-                if (!seqReader.MoveNext(out identifier) || !seqReader.MoveNext(out value))
+                if (!seqReader.MoveNext(out AsnObjectIdentifier identifier) || !seqReader.MoveNext(out IDirectoryString value))
                 {
                     throw new x509Exception("Distinguished Name component does not contain a valid ObjectIdentifer or directory string.");
                 }

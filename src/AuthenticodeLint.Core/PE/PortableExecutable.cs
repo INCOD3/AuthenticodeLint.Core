@@ -21,7 +21,7 @@ namespace AuthenticodeLint.Core.PE
         /// <summary>
         /// Gets the DOS header from the image.
         /// </summary>
-        public async Task<DosHeaderMap> GetDosHeaderAsync()
+        public async ValueTask<DosHeaderMap> GetDosHeaderAsync()
         {
             using (var stream = file.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
             {
@@ -39,7 +39,7 @@ namespace AuthenticodeLint.Core.PE
         /// </summary>
         /// <returns>The pe header.</returns>
         /// <param name="dosHeader">The DOS header. The header is used to know where the PE section is located.</param>
-        public async Task<PeHeader> GetPeHeaderAsync(DosHeaderMap dosHeader)
+        public async ValueTask<PeHeader> GetPeHeaderAsync(DosHeaderMap dosHeader)
         {
             using (var stream = file.CreateViewStream(dosHeader.e_lfanew, 0, MemoryMappedFileAccess.Read))
             {
@@ -99,7 +99,7 @@ namespace AuthenticodeLint.Core.PE
             return file.CreateViewStream(directory.VirtualAddress, directory.Size, MemoryMappedFileAccess.Read);
         }
 
-        private static async Task<ImageDirectories> ReadDirectoryEntriesAsync(MemoryMappedViewStream stream, int count)
+        private static async ValueTask<ImageDirectories> ReadDirectoryEntriesAsync(MemoryMappedViewStream stream, int count)
         {
             var dictionary = new Dictionary<ImageDataDirectoryEntry, ImageDataDirectory>();
             var directories = await stream.ReadStructArrayAsync<ImageDataDirectoryMap>(count);

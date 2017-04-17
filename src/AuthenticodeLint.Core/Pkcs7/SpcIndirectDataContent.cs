@@ -11,9 +11,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public SpcIndirectDataContent(AsnSequence sequence)
         {
-            var contents = AsnReader.Read<AsnSequence, AsnSequence>(sequence);
-            DigestInfo = new SpcDigestInfo(contents.Item2);
-            Data = new SpcAttributeTypeAndOptionalValue(contents.Item1);
+            var (asnData, asnDigestInfo) = AsnReader.Read<AsnSequence, AsnSequence>(sequence);
+            DigestInfo = new SpcDigestInfo(asnDigestInfo);
+            Data = new SpcAttributeTypeAndOptionalValue(asnData);
         }
     }
 
@@ -26,13 +26,15 @@ namespace AuthenticodeLint.Core.Pkcs7
         public SpcAttributeTypeAndOptionalValue(AsnSequence sequence)
         {
             var reader = new AsnConstructedReader(sequence);
-            AsnObjectIdentifier type;
-            AsnElement value;
-            if (!reader.MoveNext(out type))
+            if (reader.MoveNext(out AsnObjectIdentifier type))
+            {
+                Type = type.Value;
+            }
+            else
             {
                 throw new Pkcs7Exception("Unable to read ObjectIdentifier from PE.");
             }
-            if (reader.MoveNext(out value))
+            if (reader.MoveNext(out AsnElement value))
             {
                 Contents = value.ElementData;
             }
@@ -40,7 +42,6 @@ namespace AuthenticodeLint.Core.Pkcs7
             {
                 Contents = null;
             }
-            Type = type.Value;
         }
     }
 
@@ -51,9 +52,9 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public SpcDigestInfo(AsnSequence sequence)
         {
-            var contents = AsnReader.Read<AsnSequence, AsnOctetString>(sequence);
-            AlgorithmIdentifier = new AlgorithmIdentifier(contents.Item1);
-            Digest = contents.Item2.Value;
+            var (asnAlgorithmIdentifier, asnDigest) = AsnReader.Read<AsnSequence, AsnOctetString>(sequence);
+            AlgorithmIdentifier = new AlgorithmIdentifier(asnAlgorithmIdentifier);
+            Digest = asnDigest.Value;
         }
     }
 }

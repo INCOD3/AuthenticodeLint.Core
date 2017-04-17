@@ -12,12 +12,11 @@ namespace AuthenticodeLint.Core.Pkcs7
         public CmsSigningCertificate(AsnSequence sequence)
         {
             var reader = new AsnConstructedReader(sequence);
-            AsnSequence essCertIds, policies;
-            if (!reader.MoveNext(out essCertIds))
+            if (!reader.MoveNext(out AsnSequence essCertIds))
             {
                 throw new Pkcs7Exception("Encoding SigningCertificate missing ESSCertId.");
             }
-            if (!reader.MoveNext(out policies))
+            if (!reader.MoveNext(out AsnSequence policies))
             {
                 policies = null;
             }
@@ -35,13 +34,11 @@ namespace AuthenticodeLint.Core.Pkcs7
         public CmsCertificateId(AsnSequence sequence)
         {
             var reader = new AsnConstructedReader(sequence);
-            AsnOctetString certHash;
-            AsnSequence issuerSerial;
-            if (!reader.MoveNext(out certHash))
+            if (!reader.MoveNext(out AsnOctetString certHash))
             {
                 throw new Pkcs7Exception("Certificate ID does not contain hash.");
             }
-            if (!reader.MoveNext(out issuerSerial))
+            if (!reader.MoveNext(out AsnSequence issuerSerial))
             {
                 issuerSerial = null;
             }
@@ -64,15 +61,12 @@ namespace AuthenticodeLint.Core.Pkcs7
     {
         public CmsCertificateIssuerSerial(AsnSequence sequence)
         {
-            var issuerSerial = AsnReader.Read<AsnSequence, AsnInteger>(sequence);
-            var generalNames = issuerSerial.Item1;
-            var serialNumber = issuerSerial.Item2;
+            var (generalNames, serialNumber) = AsnReader.Read<AsnSequence, AsnInteger>(sequence);
             var generalNameReader = new AsnConstructedReader(generalNames);
-            AsnElement generalName;
             //TODO: We need to read GeneralNames better. We need to read their implicit tags
             //and tease out the information from them.
             var generalNameList = new List<ArraySegment<byte>>(generalNames.Count);
-            while (generalNameReader.MoveNext(out generalName))
+            while (generalNameReader.MoveNext(out AsnElement generalName))
             {
                 generalNameList.Add(generalName.ContentData);
             }

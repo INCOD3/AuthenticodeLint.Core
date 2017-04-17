@@ -18,23 +18,19 @@ namespace AuthenticodeLint.Core.x509
             _internalList = new List<x509Extension>();
             var reader = new AsnConstructedReader(sequence);
             var itemReader = new AsnConstructedReader();
-            AsnSequence element;
-            while (reader.MoveNext(out element))
+            while (reader.MoveNext(out AsnSequence element))
             {
                 itemReader.ReTarget(element);
-                AsnObjectIdentifier identifier;
-                AsnBoolean critical;
-                AsnOctetString content;
                 bool isCritical = false;
-                if (!itemReader.MoveNext(out identifier))
+                if (!itemReader.MoveNext(out AsnObjectIdentifier identifier))
                 {
                     throw new x509Exception("asn.1 extension is missing ObjectIdentifier");
                 }
-                if (itemReader.MoveNext(out critical))
+                if (itemReader.MoveNext(out AsnBoolean critical))
                 {
                     isCritical = critical.Value;
                 }
-                if (!itemReader.MoveNext(out content))
+                if (!itemReader.MoveNext(out AsnOctetString content))
                 {
                     throw new x509Exception("asn.1 extension is missing content.");
                 }

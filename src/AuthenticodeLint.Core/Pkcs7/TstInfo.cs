@@ -26,33 +26,28 @@ namespace AuthenticodeLint.Core.Pkcs7
         {
             _sequence = sequence;
             var reader = new AsnConstructedReader(sequence);
-            AsnInteger version, serialNumber;
-            AsnObjectIdentifier policyId;
-            AsnSequence messageImprint;
-            AsnGeneralizedTime genTime;
-            if (!reader.MoveNext(out version))
+            if (!reader.MoveNext(out AsnInteger version))
             {
                 throw new Pkcs7Exception("Missing version number for TST.");
             }
-            if (!reader.MoveNext(out policyId))
+            if (!reader.MoveNext(out AsnObjectIdentifier policyId))
             {
                 throw new Pkcs7Exception("Missing PolicyId for TST.");
             }
-            if (!reader.MoveNext(out messageImprint))
+            if (!reader.MoveNext(out AsnSequence messageImprint))
             {
                 throw new Pkcs7Exception("Missing message imprint for TST.");
             }
-            if (!reader.MoveNext(out serialNumber))
+            if (!reader.MoveNext(out AsnInteger serialNumber))
             {
                 throw new Pkcs7Exception("Missing serial number for the TST.");
             }
-            if (!reader.MoveNext(out genTime))
+            if (!reader.MoveNext(out AsnGeneralizedTime genTime))
             {
                 throw new Pkcs7Exception("Missing genTime for the TST.");
             }
-            AsnElement next;
             AsnSequence extensions = null, tsa = null;
-            while (reader.MoveNext(out next))
+            while (reader.MoveNext(out AsnElement next))
             {
                 if (next.Tag.IsUniTag(AsnTagValue.Boolean)) //ordering
                 {

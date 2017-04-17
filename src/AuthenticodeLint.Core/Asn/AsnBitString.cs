@@ -9,7 +9,6 @@ namespace AuthenticodeLint.Core.Asn
         public ArraySegment<byte> Value { get; }
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
-
         public int UnusedBits { get; }
 
         public AsnBitString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength)

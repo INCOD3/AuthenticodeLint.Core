@@ -10,8 +10,7 @@ namespace AuthenticodeLint.Core.Pkcs7
             var items = AsnReader.Read<AsnSequence>(content);
             AsnConstructed programName = null, moreInfo = null;
             var reader = new AsnConstructedReader(items);
-            AsnConstructed next;
-            while (reader.MoveNext(out next))
+            while (reader.MoveNext(out AsnConstructed next))
             {
                 if (next.Tag.IsExImTag(0))
                 {
@@ -39,8 +38,8 @@ namespace AuthenticodeLint.Core.Pkcs7
                 else if (more.Tag.IsExImTag(1))
                 {
                     var serializedSeq = more.Reinterpret<AsnSequence>();
-                    var data = AsnReader.Read<AsnOctetString, AsnOctetString>(serializedSeq);
-                    MoreInfo = new SpcMoreInfoBinary(new Guid(data.Item1.Value.AsArray()), data.Item2.Value);
+                    var (asnGuid, asnData) = AsnReader.Read<AsnOctetString, AsnOctetString>(serializedSeq);
+                    MoreInfo = new SpcMoreInfoBinary(new Guid(asnGuid.Value.AsArray()), asnData.Value);
                 }
                 else if (more.Tag.IsExImTag(2))
                 {

@@ -32,8 +32,7 @@ namespace AuthenticodeLint.Core.x509
                 throw new AsnException("Failed to decode EKU extension.");
             }
             var reader = new AsnConstructedReader(keyPurposeSequence);
-            AsnObjectIdentifier purpose;
-            while(reader.MoveNext(out purpose))
+            while(reader.MoveNext(out AsnObjectIdentifier purpose))
             {
                 keyPurposes.Add(purpose.Value);
             }
@@ -55,13 +54,11 @@ namespace AuthenticodeLint.Core.x509
                 throw new AsnException("Failed to decode Basic Constraints extension.");
             }
             var reader = new AsnConstructedReader(basicConstraintData);
-            AsnBoolean isCa;
-            AsnInteger pathLengthConstraint;
-            if (reader.MoveNext(out isCa))
+            if (reader.MoveNext(out AsnBoolean isCa))
             {
                 CA = isCa.Value;
             }
-            if (reader.MoveNext(out pathLengthConstraint))
+            if (reader.MoveNext(out AsnInteger pathLengthConstraint))
             {
                 PathLengthConstraint = checked((int)pathLengthConstraint.Value);
             }

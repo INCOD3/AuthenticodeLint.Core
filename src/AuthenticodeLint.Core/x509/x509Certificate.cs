@@ -21,19 +21,16 @@ namespace AuthenticodeLint.Core.x509
         public x509Certificate(AsnSequence certificate)
         {
             _certificate = certificate;
-            AsnSequence tbsCertificate;
-            AsnSequence tbsSignatureAlgorithm;
-            AsnBitString tbsSignature;
             var certificateReader = new AsnConstructedReader(_certificate);
-            if (!certificateReader.MoveNext(out tbsCertificate))
+            if (!certificateReader.MoveNext(out AsnSequence tbsCertificate))
             {
                 ThrowRead(nameof(tbsCertificate));
             }
-            if (!certificateReader.MoveNext(out tbsSignatureAlgorithm))
+            if (!certificateReader.MoveNext(out AsnSequence tbsSignatureAlgorithm))
             {
                 ThrowRead(nameof(tbsSignatureAlgorithm));
             }
-            if (!certificateReader.MoveNext(out tbsSignature))
+            if (!certificateReader.MoveNext(out AsnBitString tbsSignature))
             {
                 ThrowRead(nameof(tbsSignature));
             }
@@ -103,35 +100,32 @@ namespace AuthenticodeLint.Core.x509
         private void ReadTbsCertificate(AsnSequence tbsCertificate)
         {
             _tbsCertificate = tbsCertificate.ElementData;
-            AsnConstructed version;
-            AsnInteger serialNumber;
-            AsnSequence signature, issuer, validityPeriod, subject, spki;
             var reader = new AsnConstructedReader(tbsCertificate);
-            if (!reader.MoveNext(out version))
+            if (!reader.MoveNext(out AsnConstructed version))
             {
                 ThrowRead(nameof(version));
             }
-            if (!reader.MoveNext(out serialNumber))
+            if (!reader.MoveNext(out AsnInteger serialNumber))
             {
                 ThrowRead(nameof(serialNumber));
             }
-            if (!reader.MoveNext(out signature))
+            if (!reader.MoveNext(out AsnSequence signature))
             {
                 ThrowRead(nameof(signature));
             }
-            if (!reader.MoveNext(out issuer))
+            if (!reader.MoveNext(out AsnSequence issuer))
             {
                 ThrowRead(nameof(issuer));
             }
-            if (!reader.MoveNext(out validityPeriod))
+            if (!reader.MoveNext(out AsnSequence validityPeriod))
             {
                 ThrowRead(nameof(validityPeriod));
             }
-            if (!reader.MoveNext(out subject))
+            if (!reader.MoveNext(out AsnSequence subject))
             {
                 ThrowRead(nameof(subject));
             }
-            if (!reader.MoveNext(out spki))
+            if (!reader.MoveNext(out AsnSequence spki))
             {
                 ThrowRead(nameof(spki));
             }
@@ -143,17 +137,16 @@ namespace AuthenticodeLint.Core.x509
                 throw new x509Exception("Version is not specified.");
             }
             Version = (int)AsnReader.Read<AsnInteger>(version).Value;
-            var validity = AsnReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
-            NotBefore = validity.Item1.Value;
-            NotAfter = validity.Item2.Value;
+            var (notBefore, notAfter) = AsnReader.Read<IAsnDateTime, IAsnDateTime>(validityPeriod);
+            NotBefore = notBefore.Value;
+            NotAfter = notAfter.Value;
             Subject = new x500DistinguishedName(subject);
             PublicKey = new SubjectPublicKeyInfo(spki);
             if (reader.CanMove() && Version == 0)
             {
                 throw new x509Exception("x509 certificate is version 1 but contains version 2 or 3 data.");
             }
-            AsnConstructed element;
-            while (reader.MoveNext(out element))
+            while (reader.MoveNext(out AsnConstructed element))
             {
                 if (element.Tag.IsExImTag(1) || element.Tag.IsExImTag(2))
                 {

@@ -13,16 +13,17 @@ namespace AuthenticodeLint.Core.Pkcs7
         public TstAccuracy(AsnSequence sequence)
         {
             var reader = new AsnConstructedReader(sequence);
-            AsnInteger seconds;
-            if (!reader.MoveNext(out seconds))
+            if (reader.MoveNext(out AsnInteger seconds))
+            {
+                _seconds = (long)seconds.Value;
+                _millis = 0;
+                _micros = 0;
+            }
+            else
             {
                 throw new Pkcs7Exception("Unable to read seconds for accuracy.");
             }
-            _seconds = (long)seconds.Value;
-            _millis = 0;
-            _micros = 0;
-            AsnElement next;
-            while (reader.MoveNext(out next))
+            while (reader.MoveNext(out AsnElement next))
             {
                 if (next.Tag.IsExImTag(0))
                 {
@@ -52,11 +53,13 @@ namespace AuthenticodeLint.Core.Pkcs7
 
         public override bool Equals(object obj)
         {
-            if (!(obj is TstAccuracy))
+            switch (obj)
             {
-                return false;
+                case TstAccuracy tst:
+                    return Equals(tst);
+                default:
+                    return false;
             }
-            return Equals((TstAccuracy)obj);
         }
 
         public bool Equals(TstAccuracy other) => this == other;
