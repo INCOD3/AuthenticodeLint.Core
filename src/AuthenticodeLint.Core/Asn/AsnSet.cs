@@ -7,8 +7,8 @@ namespace AuthenticodeLint.Core.Asn
     /// </summary>
     public sealed class AsnSet : AsnConstructed
     {
-        public AsnSet(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
-            : base(tag, contentData, elementData, contentLength, headerSize)
+        public AsnSet(AsnTag tag, ArraySegment<byte> elementData, long? contentLength, int headerSize)
+            : base(tag, elementData, contentLength, headerSize)
         {
         }
     }

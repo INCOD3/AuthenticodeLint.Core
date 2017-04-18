@@ -8,8 +8,8 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnNumericString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
-            : base(tag)
+        public AsnNumericString(AsnTag tag, ArraySegment<byte> elementData, long? contentLength, int headerSize)
+            : base(tag, headerSize)
         {
             if (tag.Constructed)
             {
@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Core.Asn
                 throw new AsnException("Undefined lengths for NumericString are not supported.");
             }
             ElementData = elementData.Constrain(contentLength.Value + headerSize);
-            ContentData = contentData.Constrain(contentLength.Value);
+            ContentData = elementData.Window(headerSize, contentLength.Value);
             var arr = new char[ContentData.Count];
             for (int i = 0, j = ContentData.Offset; i < ContentData.Count; i++, j++)
             {

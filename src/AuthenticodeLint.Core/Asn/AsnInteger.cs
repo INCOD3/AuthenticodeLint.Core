@@ -16,8 +16,8 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnInteger(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
-            : base(tag)
+        public AsnInteger(AsnTag tag, ArraySegment<byte> elementData, long? contentLength, int headerSize)
+            : base(tag, headerSize)
         {
             if (tag.Constructed)
             {
@@ -28,7 +28,7 @@ namespace AuthenticodeLint.Core.Asn
                 throw new AsnException("Undefined lengths for Integer are not supported.");
             }
             ElementData = elementData.Constrain(contentLength.Value + headerSize);
-            ContentData = contentData.Constrain(contentLength.Value);
+            ContentData = elementData.Window(headerSize, contentLength.Value);
             var buffer = new byte[ContentData.Count];
             //BigInteger expects the number in little endian.
             for (int i = ContentData.Count - 1, j = 0; i >= 0; i--, j++)

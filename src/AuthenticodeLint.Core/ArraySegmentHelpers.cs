@@ -33,15 +33,15 @@ namespace AuthenticodeLint.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ArraySegment<T> Constrain<T>(this ArraySegment<T> ars, ulong to)
-        {
-            return new ArraySegment<T>(ars.Array, ars.Offset, checked((int)to));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArraySegment<T> Advance<T>(this ArraySegment<T> ars, int by)
         {
             return new ArraySegment<T>(ars.Array, ars.Offset + by, ars.Count - by);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ArraySegment<T> Window<T>(this ArraySegment<T> ars, int start, long end)
+        {
+            return new ArraySegment<T>(ars.Array, ars.Offset + start,  checked((int)end));
         }
 
         public static ArraySegment<T> TrimOff<T>(this ArraySegment<T> ars, Func<T, bool> selector)
