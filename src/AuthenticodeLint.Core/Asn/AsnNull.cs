@@ -7,8 +7,8 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnNull(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
-            : base(tag)
+        public AsnNull(AsnTag tag, ArraySegment<byte> elementData, long? contentLength, int headerSize)
+            : base(tag, headerSize)
         {
             if (tag.Constructed)
             {
@@ -18,12 +18,13 @@ namespace AuthenticodeLint.Core.Asn
             {
                 throw new AsnException("Undefined lengths for NULL are not supported.");
             }
-            ElementData = elementData.Constrain(contentLength.Value + headerSize);
-            ContentData = contentData.Constrain(contentLength.Value);
-            if (ContentData.Count > 0)
+            if (contentLength > 0)
             {
                 throw new AsnException("Null data cannot have a length.");
             }
+            ElementData = elementData.Constrain(contentLength.Value + headerSize);
+            ContentData = elementData.Window(headerSize, contentLength.Value);
+
         }
 
         public override string ToString() => "Null";

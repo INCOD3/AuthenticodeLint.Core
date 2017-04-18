@@ -7,6 +7,8 @@ namespace AuthenticodeLint.Core.Asn
     /// </summary>
     public abstract class AsnElement : IAsnElement, IEquatable<AsnElement>
     {
+        private readonly int _headerSize;
+
         /// <summary>
         /// Gets the segement of data for the content of the element.
         /// </summary>
@@ -22,9 +24,10 @@ namespace AuthenticodeLint.Core.Asn
         /// </summary>
         public AsnTag Tag { get; private set; }
 
-        protected AsnElement(AsnTag tag)
+        protected AsnElement(AsnTag tag, int headerSize)
         {
             Tag = tag;
+            _headerSize = headerSize;
         }
 
         public override bool Equals(object obj) => Equals(obj as AsnElement);
@@ -60,7 +63,7 @@ namespace AuthenticodeLint.Core.Asn
         public virtual TType Reinterpret<TType>() where TType : AsnElement
         {
             //Yuck, but, yuck.
-            return (TType)Activator.CreateInstance(typeof(TType), Tag, ContentData, ElementData, (ulong?)ContentData.Count, (ulong?)ElementData.Count);
+            return (TType)Activator.CreateInstance(typeof(TType), Tag, ElementData, (long?)ContentData.Count, _headerSize);
         }
 
         public override string ToString() => ContentData.Join();

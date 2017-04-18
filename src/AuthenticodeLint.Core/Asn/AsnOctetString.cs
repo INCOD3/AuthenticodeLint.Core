@@ -9,8 +9,8 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnOctetString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
-            : base(tag)
+        public AsnOctetString(AsnTag tag, ArraySegment<byte> elementData, long? contentLength, int headerSize)
+            : base(tag, headerSize)
         {
             if (tag.Constructed)
             {
@@ -21,7 +21,7 @@ namespace AuthenticodeLint.Core.Asn
                 throw new AsnException("Undefined lengths for OctetString are not supported.");
             }
             ElementData = elementData.Constrain(contentLength.Value + headerSize);
-            ContentData = contentData.Constrain(contentLength.Value);
+            ContentData = elementData.Window(headerSize, contentLength.Value);
         }
     }
 

@@ -9,8 +9,8 @@ namespace AuthenticodeLint.Core.Asn
         public override ArraySegment<byte> ContentData { get; }
         public override ArraySegment<byte> ElementData { get; }
 
-        public AsnVisibleString(AsnTag tag, ArraySegment<byte> contentData, ArraySegment<byte> elementData, ulong? contentLength, ulong headerSize)
-            : base(tag)
+        public AsnVisibleString(AsnTag tag, ArraySegment<byte> elementData, long? contentLength, int headerSize)
+            : base(tag, headerSize)
         {
             if (tag.Constructed)
             {
@@ -23,7 +23,7 @@ namespace AuthenticodeLint.Core.Asn
             try
             {
                 ElementData = elementData.Constrain(contentLength.Value + headerSize);
-                ContentData = contentData.Constrain(contentLength.Value);
+                ContentData = elementData.Window(headerSize, contentLength.Value);
                 Value = AsnTextEncoding.ASCII.GetString(ContentData.Array, ContentData.Offset, ContentData.Count);
             }
             catch (Exception e) when (e is ArgumentException || e is DecoderFallbackException)
